@@ -7,14 +7,12 @@ import {
   TouchableOpacity,
   Switch,
   KeyboardAvoidingView,
-  Image,
+  Platform,
 } from "react-native";
 import CountryPicker from "react-native-country-picker-modal";
-import { Button } from "react-native-elements";
-import BackButton from "../../components/BackButton";
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
-import LogoCorner from "../../components/logo-corner";
 import CustomButton from "../../components/CustomButton";
+import Header from "../../components/header";
 import "react-async-hook"; // Ensure this is imported if required
 
 export default function LoginScreen({ navigation }) {
@@ -35,18 +33,14 @@ export default function LoginScreen({ navigation }) {
   return (
     <SafeAreaWrapper>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
-        <View style={styles.header}>
-          <BackButton navigation={navigation} />
-          <LogoCorner />
-        </View>
-
+        <Header navigation={navigation}/>
         <Text style={styles.title}>Log in</Text>
         <Text style={styles.subtitle}>
           Please confirm your country code and enter the number associated with
           your account.
         </Text>
 
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, Platform.OS === "android" ? {paddingVertical : 8} : "null"]}>
           <CountryPicker
             countryCode={countryCode}
             withFlag
@@ -73,7 +67,7 @@ export default function LoginScreen({ navigation }) {
           <Switch value={syncContacts} onValueChange={setSyncContacts} />
         </View>
 
-        <CustomButton onPressName={"Signin"} navigation={navigation}>
+        <CustomButton onPressName={"verify"} navigation={navigation}>
           <Text style={styles.signInButtonText}>Continue</Text>
         </CustomButton>
 
@@ -97,23 +91,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  backButton: {
-    fontSize: 18,
-    color: "#000",
-  },
-  logo: {
-    width: 100,
-    height: 50,
-    resizeMode: "contain",
-    marginLeft: "auto",
-    marginRight: "auto",
-  },
+
+  
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -134,7 +113,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#ccc",
     marginBottom: 5,
-    paddingBottom:5
 
   },
   inputContainer_2: {
@@ -145,12 +123,11 @@ const styles = StyleSheet.create({
     marginBottom:20
   },
   countryPicker: {
+    textAlign:"center",
     marginRight: 10,
   },
   textCode:{
-    paddingRight: 20,
-    borderRightColor:"black",
-    borderRightWidth: 1
+    width:50,
   },
   phoneInput: {
     flex: 1,

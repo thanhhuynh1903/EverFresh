@@ -1,7 +1,8 @@
 import welcome from "../screens/welcome/welcome";
 import signup from "../screens/signup/signup";
 import signin from "../screens/signin/signin";
-
+import Verification from "../screens/OTPverfication/Verification";
+import Registerverify from "../screens/Registerverify/Registerverify";
 export const publicRoutes = [
   {
     name: 'Welcome',
@@ -20,6 +21,20 @@ export const publicRoutes = [
   {
     name: 'CreateAnAccount',
     component: signup,
+    options: {
+      headerShown: false, // Hide the header if needed
+    },
+  },
+  {
+    name: 'verify',
+    component: Verification,
+    options: {
+      headerShown: false, // Hide the header if needed
+    },
+  },
+  {
+    name: 'registerverify',
+    component: Registerverify,
     options: {
       headerShown: false, // Hide the header if needed
     },
