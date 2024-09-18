@@ -34,17 +34,11 @@ const Verification = ({ navigation }) => {
             focusedStyle={{ borderColor: "#5cb85c", borderBottomWidth: 2 }}
           />
         </View>
-        <CustomButton onPressName={""} navigation={navigation}>
+        <CustomButton onPressName={"homepage"} navigation={navigation}>
           <Text style={styles.signInButtonText}>Verify</Text>
         </CustomButton>
         <Text style={styles.signUpText}>
-        Send code again{" "}
-          <Text
-            style={styles.signUpLink}
-           
-          >
-            0:20
-          </Text>
+          Send code again <Text style={styles.signUpLink}>0:20</Text>
         </Text>
       </KeyboardAvoidingView>
     </SafeAreaWrapper>
@@ -83,7 +77,7 @@ const styles = StyleSheet.create({
   signUpText: {
     textAlign: "center",
     marginTop: 10,
-    fontWeight:"500"
+    fontWeight: "500",
   },
   signUpLink: {
     color: "#4CAF50",

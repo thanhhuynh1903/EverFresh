@@ -1,19 +1,35 @@
-import React from "react";
-import { View, StyleSheet, Text, KeyboardAvoidingView } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  KeyboardAvoidingView,
+  TouchableOpacity,
+} from "react-native";
 import OtpTextInput from "react-native-text-input-otp";
 import Header from "../../components/header";
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
-import CustomButton from "../../components/CustomButton";
+import Modal from "../../components/Overlay";
+import { Platform } from "react-native";
 const Registerverify = ({ navigation }) => {
-  const [otp, setOtp] = React.useState("");
+  const [otp, setOtp] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(""); // State to manage modal visibility
+
+  const handleVerifyPress = () => {
+    setIsModalVisible(true); // Show the modal when Verify is pressed
+  };
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+  };
 
   return (
     <SafeAreaWrapper>
-      <KeyboardAvoidingView behavior="padding" style={styles.container}>
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        
         <Header navigation={navigation} />
         <Text style={styles.title}>Verify your phone number</Text>
         <Text style={styles.subtitle}>
-          We’ve sent an SMS with an activation code to your phone
+          We’ve sent an SMS with an activation code to your phone{" "}
           <Text style={{ fontWeight: "bold", color: "#333" }}>
             +33 2 94 27 84 11
           </Text>
@@ -36,20 +52,22 @@ const Registerverify = ({ navigation }) => {
         </View>
 
         <Text style={styles.signUpText}>
-        I didn’t receive a code?{' '}
-          <Text
-            style={styles.signUpLink}
-         
-          >
-            {' '}Resend
-          </Text>
+          I didn’t receive a code?{" "}
+          <Text style={styles.signUpLink}> Resend</Text>
         </Text>
-        
-        <CustomButton onPressName={""} navigation={navigation}>
+
+        <TouchableOpacity
+          style={styles.ButtonStyle}
+          onPress={handleVerifyPress}
+        >
           <Text style={styles.signInButtonText}>Verify</Text>
-        </CustomButton>
-        
+        </TouchableOpacity>
       </KeyboardAvoidingView>
+      <Modal
+        navigation={navigation}
+        modevisible={isModalVisible}
+        onClose={handleCloseModal}
+      />
     </SafeAreaWrapper>
   );
 };
@@ -57,6 +75,7 @@ const Registerverify = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height:"100%",
     backgroundColor: "#fff",
     padding: 20,
   },
@@ -85,12 +104,21 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     textAlign: "center",
-    marginBottom: 25,
+    marginBottom: 15,
     fontWeight: "500",
   },
   signUpLink: {
     color: "black",
     fontWeight: "bold",
+  },
+  ButtonStyle: {
+    zIndex: 5,
+    backgroundColor: "#0D986A",
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 5,
+    width: "100%",
+    alignItems: "center",
   },
 });
 

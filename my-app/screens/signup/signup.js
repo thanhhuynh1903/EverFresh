@@ -14,7 +14,7 @@ import CustomButton from "../../components/CustomButton";
 import Header from "../../components/header";
 import "react-async-hook"; // Ensure this is imported if required
 import { Platform } from "react-native";
-export default function signup({ navigation }) {
+export default function Signup({ navigation }) {
   const [countryCode, setCountryCode] = useState("VN");
   const [country, setCountry] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -32,13 +32,19 @@ export default function signup({ navigation }) {
   return (
     <SafeAreaWrapper>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
-        <Header navigation={navigation}/>
+        <Header navigation={navigation} />
         <Text style={styles.title}>Register new account</Text>
         <Text style={styles.subtitle}>
-        Please fill your phone number that you are using now to create an new account!.
+          Please fill your phone number that you are using now to create an new
+          account!.
         </Text>
 
-        <View style={[styles.inputContainer, Platform.OS === "android" ? {paddingVertical : 8} : "null"]}>
+        <View
+          style={[
+            styles.inputContainer,
+            Platform.OS === "android" ? { paddingVertical: 8 } : "null",
+          ]}
+        >
           <CountryPicker
             countryCode={countryCode}
             withFlag
@@ -68,8 +74,6 @@ export default function signup({ navigation }) {
         <CustomButton onPressName={"registerverify"} navigation={navigation}>
           <Text style={styles.signInButtonText}>Continue</Text>
         </CustomButton>
-
-       
       </KeyboardAvoidingView>
     </SafeAreaWrapper>
   );
@@ -82,7 +86,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
-  
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -103,21 +106,20 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#ccc",
     marginBottom: 5,
-    paddingBottom:5
-
+    paddingBottom: 5,
   },
   inputContainer_2: {
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
-    marginBottom:20
+    marginBottom: 20,
   },
   countryPicker: {
     marginRight: 10,
   },
-  textCode:{
-    width:50,
+  textCode: {
+    width: 50,
   },
   phoneInput: {
     flex: 1,
@@ -135,5 +137,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#FFF",
   },
- 
 });

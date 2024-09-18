@@ -1,12 +1,16 @@
 import { TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 
-export default function CustomButton({ children, style, onPressName,navigation }) {
+export default function CustomButton({
+  children,
+  style,
+  onPressName,
+  navigation,
+}) {
   //extra use for override or add more style <CustomButton style={styles.customStyle}>
-  
   return (
     <TouchableOpacity
-      style={[styles.ButtonStyle,style]}
+      style={[styles.ButtonStyle, style]}
       onPress={() => navigation.navigate(onPressName)}
     >
       {children}
