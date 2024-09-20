@@ -42,9 +42,11 @@ export default function PackagePlan({ navigation }) {
             </Card>
           </TouchableOpacity>
         ))}
+        <View style={{flex : 1 ,justifyContent :"center", alignContent:"center"}}>
         <CustomButton onPressName={"homepage"} navigation={navigation} style={styles.ButtonStyle}>
           <Text style={styles.signInButtonText}>Complete subscription</Text>
         </CustomButton>
+        </View>
       </View>
     </SafeAreaWrapper>
   );
@@ -96,6 +98,6 @@ const styles = StyleSheet.create({
     color: "#FFF",
   },
   ButtonStyle: {
-    width:"92%"
+    width:"100%"
   },
 });
