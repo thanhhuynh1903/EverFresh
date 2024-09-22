@@ -3,7 +3,7 @@
 //  * @description List of routes for Tabs Navigator and Stack navigator, Along addational  Option for Tabs
 //  */
 // import React from 'react';
-// import Home from '../screens/Home';
+import Home from '../screens/Homepage/Homepage';
 // import ProductDetails from '../screens/ProductDetails';
 
 // import WriteReview from '../screens/WriteReview';
@@ -20,191 +20,232 @@
 // import Orders from '../screens/Orders';
 // import Address from '../screens/Address';
 // import Feather from 'react-native-vector-icons/dist/Feather';
-// import {appColors} from '../utils/appColors';
-// import {scale} from 'react-native-size-matters';
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { appColors } from '../utils/appColors.js';
+import { scale } from 'react-native-size-matters';
 // import Category from '../screens/Category';
 
-// export const RoutesList = [
- 
-//   {
-//     name: 'Home',
-//     component: Home,
-//     options: {
-//       //tabBarBadge: 3,
-//       tabBarIcon: (props) => (
-//         <Feather
-//           name={'mouse-pointer'}
-//           size={scale(20)}
-//           color={appColors.primary}
-//           {...props}
-//         />
-//       ),
-//       tabBarLabel: 'Home',
-//     },
-//   },
-//   {
-//     name: 'Cart',
-//     component: Cart,
-//     options: {
-//       //tabBarBadge: 3,
-//       tabBarIcon: (props) => (
-//         <Feather
-//           name={'shopping-cart'}
-//           size={scale(20)}
-//           color={appColors.primary}
-//           {...props}
-//         />
-//       ),
-//       tabBarLabel: 'Cart',
-//     },
-//   },
+export const RoutesList = [
 
-//   {
-//     name: 'ProductDetails',
-//     component: ProductDetails,
-//     options: {
-//       tabBarButton: (props) => null,
-//       tabBarVisible: false,
-//       tabBarBadge: 3,
-//       tabBarLabel: 'ProductDetails',
-//     },
-//   },
+    {
+        name: 'homepage',
+        component: Home,
+        options: {
+            //tabBarBadge: 3,
+            tabBarIcon: (props) => (
+                <Icon name="home-outline" size={32} color="rgba(59,206,172,0.75)" />
+            ),
+            headerShown: false
+        },
+    },
+    {
+        name: 'Home1',
+        component: Home,
+        options: {
+            //tabBarBadge: 3,
+            tabBarIcon: (props) => (
+                <Icon name="tree-outline" size={32} color="rgba(59,206,172,0.75)" />
+            ),
+            headerShown: false
+        },
+    },
+    {
+        name: 'Home2',
+        component: Home,
+        options: {
+            //tabBarBadge: 3,
+            tabBarIcon: (props) => (
+                // <Feather
+                //     name={'mouse-pointer'}
+                //     size={scale(20)}
+                //     // color={appColors.primary}
+                //     {...props}
+                // />
+                <Icon name="tree-outline" size={32} color="rgba(59,206,172,0.75)" />
+            ),
+            headerShown: false
+        },
+    },
+    {
+        name: 'Home3',
+        component: Home,
+        options: {
+            //tabBarBadge: 3,
+            tabBarIcon: (props) => (
+                // <Feather
+                //     name={'mouse-pointer'}
+                //     size={scale(20)}
+                //     // color={appColors.primary}
+                //     {...props}
+                // />
+                <Icon name="tree-outline" size={32} color="rgba(59,206,172,0.75)" />
+            ),
+            headerShown: false
+        },
+    },
+    //   {
+    //     name: 'Cart',
+    //     component: Cart,
+    //     options: {
+    //       //tabBarBadge: 3,
+    //       tabBarIcon: (props) => (
+    //         <Feather
+    //           name={'shopping-cart'}
+    //           size={scale(20)}
+    //           color={appColors.primary}
+    //           {...props}
+    //         />
+    //       ),
+    //       tabBarLabel: 'Cart',
+    //     },
+    //   },
 
-//   {
-//     name: 'WriteReview',
-//     component: WriteReview,
-//     options: {
-//       tabBarButton: (props) => null,
-//       tabBarVisible: false,
-//       tabBarBadge: 3,
-//       tabBarLabel: 'WriteReview',
-//     },
-//   },
+    //   {
+    //     name: 'ProductDetails',
+    //     component: ProductDetails,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       tabBarVisible: false,
+    //       tabBarBadge: 3,
+    //       tabBarLabel: 'ProductDetails',
+    //     },
+    //   },
 
-//   {
-//     name: 'Checkout',
-//     component: Checkout,
-//     options: {
-//       tabBarButton: (props) => null,
-//       //tabBarVisible:false,
-//       //tabBarBadge: 3,
-//       tabBarLabel: 'Checkout',
-//     },
-//   },
+    //   {
+    //     name: 'WriteReview',
+    //     component: WriteReview,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       tabBarVisible: false,
+    //       tabBarBadge: 3,
+    //       tabBarLabel: 'WriteReview',
+    //     },
+    //   },
 
-//   {
-//     name: 'Category',
-//     component: Category,
-//     options: {
-//       tabBarButton: (props) => null,
-//       tabBarVisible: false,
-//       //tabBarBadge: 3,
-//       tabBarLabel: 'Category',
-//     },
-//   },
+    //   {
+    //     name: 'Checkout',
+    //     component: Checkout,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       //tabBarVisible:false,
+    //       //tabBarBadge: 3,
+    //       tabBarLabel: 'Checkout',
+    //     },
+    //   },
 
-//   {
-//     name: 'Filters',
-//     component: Filters,
-//     options: {
-//       tabBarButton: (props) => null,
-//       tabBarVisible: false,
-//       //tabBarBadge: 3,
-//       tabBarLabel: 'Filters',
-//     },
-//   },
+    //   {
+    //     name: 'Category',
+    //     component: Category,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       tabBarVisible: false,
+    //       //tabBarBadge: 3,
+    //       tabBarLabel: 'Category',
+    //     },
+    //   },
 
-//   {
-//     name: 'Search',
-//     component: Search,
-//     options: {
-//       tabBarButton: (props) => null,
-//       //tabBarVisible: false,
-//       //tabBarBadge: 3,
-//       tabBarLabel: 'Search',
-//     },
-//   },
+    //   {
+    //     name: 'Filters',
+    //     component: Filters,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       tabBarVisible: false,
+    //       //tabBarBadge: 3,
+    //       tabBarLabel: 'Filters',
+    //     },
+    //   },
 
-//   {
-//     name: 'CheckoutDelivery',
-//     component: CheckoutDelivery,
-//     options: {
-//       tabBarButton: (props) => null,
-//       tabBarVisible: false,
-//       //tabBarBadge: 3,
-//       tabBarLabel: 'CheckoutDelivery',
-//     },
-//   },
+    //   {
+    //     name: 'Search',
+    //     component: Search,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       //tabBarVisible: false,
+    //       //tabBarBadge: 3,
+    //       tabBarLabel: 'Search',
+    //     },
+    //   },
 
-//   {
-//     name: 'CheckOutSteper',
-//     component: CheckOutSteper,
-//     options: {
-//       tabBarButton: (props) => null,
-//       tabBarVisible: false,
-//       //tabBarBadge: 3,
-//       tabBarLabel: 'CheckOutSteper',
-//     },
-//   },
+    //   {
+    //     name: 'CheckoutDelivery',
+    //     component: CheckoutDelivery,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       tabBarVisible: false,
+    //       //tabBarBadge: 3,
+    //       tabBarLabel: 'CheckoutDelivery',
+    //     },
+    //   },
 
-//   {
-//     name: 'Summary',
-//     component: Summary,
-//     options: {
-//       tabBarButton: (props) => null,
-//       tabBarVisible: false,
-//       //tabBarBadge: 3,
-//       tabBarLabel: 'Summary',
-//     },
-//   },
+    //   {
+    //     name: 'CheckOutSteper',
+    //     component: CheckOutSteper,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       tabBarVisible: false,
+    //       //tabBarBadge: 3,
+    //       tabBarLabel: 'CheckOutSteper',
+    //     },
+    //   },
 
-//   {
-//     name: 'Account',
-//     component: Account,
-//     options: {
-//       // tabBarButton: (props) => null,
-//       //tabBarVisible: false,
-//       //tabBarBadge: 3,
-//       tabBarIcon: (props) => (
-//         <Feather
-//           name={'user'}
-//           size={scale(20)}
-//           color={appColors.primary}
-//           {...props}
-//         />
-//       ),
-//       tabBarLabel: 'Account',
-//     },
-//   },
-//   {
-//     name: 'Orders',
-//     component: Orders,
-//     options: {
-//       tabBarButton: (props) => null,
-//       //tabBarVisible: false,
-//       //tabBarBadge: 3,
-//       tabBarLabel: 'Orders',
-//     },
-//   },
-//   {
-//     name: 'Address',
-//     component: Address,
-//     options: {
-//       tabBarButton: (props) => null,
-//       //tabBarVisible: false,
-//       //tabBarBadge: 3,
-//       tabBarLabel: 'Address',
-//     },
-//   },
+    //   {
+    //     name: 'Summary',
+    //     component: Summary,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       tabBarVisible: false,
+    //       //tabBarBadge: 3,
+    //       tabBarLabel: 'Summary',
+    //     },
+    //   },
 
-//   {
-//     name: 'WishList',
-//     component: WishList,
-//     options: {
-//       tabBarButton: (props) => null,
-//       //tabBarVisible: false,
-//       //tabBarBadge: 3,
-//       tabBarLabel: 'WishList',
-//     },
-//   },
-// ];
+    //   {
+    //     name: 'Account',
+    //     component: Account,
+    //     options: {
+    //       // tabBarButton: (props) => null,
+    //       //tabBarVisible: false,
+    //       //tabBarBadge: 3,
+    //       tabBarIcon: (props) => (
+    //         <Feather
+    //           name={'user'}
+    //           size={scale(20)}
+    //           color={appColors.primary}
+    //           {...props}
+    //         />
+    //       ),
+    //       tabBarLabel: 'Account',
+    //     },
+    //   },
+    //   {
+    //     name: 'Orders',
+    //     component: Orders,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       //tabBarVisible: false,
+    //       //tabBarBadge: 3,
+    //       tabBarLabel: 'Orders',
+    //     },
+    //   },
+    //   {
+    //     name: 'Address',
+    //     component: Address,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       //tabBarVisible: false,
+    //       //tabBarBadge: 3,
+    //       tabBarLabel: 'Address',
+    //     },
+    //   },
+
+    //   {
+    //     name: 'WishList',
+    //     component: WishList,
+    //     options: {
+    //       tabBarButton: (props) => null,
+    //       //tabBarVisible: false,
+    //       //tabBarBadge: 3,
+    //       tabBarLabel: 'WishList',
+    //     },
+    //   },
+];

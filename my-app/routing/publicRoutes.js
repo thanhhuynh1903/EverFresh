@@ -5,6 +5,7 @@ import Verification from "../screens/OTPverfication/Verification";
 import Registerverify from "../screens/Registerverify/Registerverify";
 import PackagePlan from "../screens/PackagePlan/PackagePlan";
 import Homepage from "../screens/Homepage/Homepage";
+import SavedPlant from "../screens/SavedPlant/SavedPlant";
 export const publicRoutes = [
   {
     name: 'Welcome',
@@ -51,6 +52,13 @@ export const publicRoutes = [
   {
     name: 'homepage',
     component: Homepage,
+    options: {
+      headerShown: false, // Hide the header if needed
+    },
+  },
+  {
+    name: 'savedplant',
+    component: SavedPlant,
     options: {
       headerShown: false, // Hide the header if needed
     },

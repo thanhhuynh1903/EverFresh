@@ -9,6 +9,11 @@ const Stack = createStackNavigator();
 const MainStack = () => {
   return (
     <Stack.Navigator>
+      <Stack.Screen
+        name="Main"
+        component={TabNavigator}
+        options={{ headerShown: false }}
+      />
       {publicRoutes.map((route, index) => (
         <Stack.Screen
           key={index}

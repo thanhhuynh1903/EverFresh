@@ -34,7 +34,7 @@ const Verification = ({ navigation }) => {
             focusedStyle={{ borderColor: "#5cb85c", borderBottomWidth: 2 }}
           />
         </View>
-        <CustomButton onPressName={"homepage"} navigation={navigation}>
+        <CustomButton onPressName={"Main"} navigation={navigation}>
           <Text style={styles.signInButtonText}>Verify</Text>
         </CustomButton>
         <Text style={styles.signUpText}>
