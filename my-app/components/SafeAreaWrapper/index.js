@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   AndroidSafeArea: {
     flex: 1,
     backgroundColor: "#FFF",
-    paddingTop: Platform.OS === 'android' ? 25 : 0
+    // marginTop: Platform.OS === 'android' ? 25 : 0
   }
 });
 

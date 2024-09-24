@@ -1,10 +1,11 @@
 import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import { useNavigation } from "@react-navigation/native";
-import React from 'react'
+import React, { useState } from 'react'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import SafeAreaWrapper from '../../components/SafeAreaWrapper'
 import HomeHeader from '../../components/HomeHeader'
+import MenuModal from '../../components/Modal/MenuModal/MenuModal';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
@@ -71,6 +72,7 @@ const seasonalPlantCardDemo = [
 export default function Homepage() {
 
   const navigation = useNavigation();
+  const [menuVisible, setMenuVisible] = useState(false)
 
   const renderPopularPlantCard = (item, key) => {
     return (
@@ -134,56 +136,68 @@ export default function Homepage() {
   }
 
   return (
-    <SafeAreaWrapper >
-      <HomeHeader navigation={navigation} />
-      <ScrollView style={styles.container}>
-        <View style={styles.yourPland}>
-          <Text style={styles.yourPlandTitle}>Hi User. Your plant missed you!</Text>
-          <TouchableOpacity style={styles.yourPlandViewAll}>
-            <Text style={styles.yourPlandViewAllText}>View all</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.popularPlandContainer}>
-          {popularPlantCardDemo.map((item, key) => renderPopularPlantCard(item, item.name + key))}
-        </View>
-        <View style={styles.popularPlandInfor}>
-          <View style={styles.popularPlandInforRow}>
-            <Icon name="tree-outline" size={18} color="rgba(59,206,172,0.75)" />
-            <Text style={styles.popularPlandInforRowText}>Using 6 out 9 pods</Text>
+    <>
+      <SafeAreaWrapper >
+        <HomeHeader
+          navigation={navigation}
+          handleMenuToggle={() => setMenuVisible(!menuVisible)}
+          backgroundColor={menuVisible && "#0B845C"}
+        />
+        <ScrollView style={styles.container}>
+          <View style={styles.yourPland}>
+            <Text style={styles.yourPlandTitle}>Hi User. Your plant missed you!</Text>
+            <TouchableOpacity style={styles.yourPlandViewAll}>
+              <Text style={styles.yourPlandViewAllText}>View all</Text>
+            </TouchableOpacity>
           </View>
-          <View style={styles.popularPlandInforRow}>
-            <Icon name="clock-time-two-outline" size={18} color="rgba(59,206,172,0.75)" />
-            <Text style={styles.popularPlandInforRowText}>Basil will be ready for harvest in 3 days</Text>
+          <View style={styles.popularPlandContainer}>
+            {popularPlantCardDemo.map((item, key) => renderPopularPlantCard(item, item.name + key))}
           </View>
-        </View>
-        <View style={styles.deviderLine} />
-        <View style={styles.yourPland}>
-          <Text style={styles.yourPlandTitle}>Saved Plant</Text>
-          <TouchableOpacity style={styles.yourPlandViewAll}>
-            <Text style={styles.yourPlandViewAllText}>View all</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.savedPlandContainer}>
-          {savedPlantCardDemo.map((item, key) => renderSavedPlantCard(item, key))}
-        </View>
-        <View style={styles.deviderLine} />
-        <View style={styles.yourPland}>
-          <Text style={styles.yourPlandTitle}>Plant guide</Text>
-          <TouchableOpacity style={styles.yourPlandViewAll}>
-            <Text style={styles.yourPlandViewAllText}>View all</Text>
-          </TouchableOpacity>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.seasonalPlandContainer}>
-          {guidePlantCardDemo.map((item, key) => renderGuidePlantCard(item, item.name + key))}
+          <View style={styles.popularPlandInfor}>
+            <View style={styles.popularPlandInforRow}>
+              <Icon name="tree-outline" size={18} color="rgba(59,206,172,0.75)" />
+              <Text style={styles.popularPlandInforRowText}>Using 6 out 9 pods</Text>
+            </View>
+            <View style={styles.popularPlandInforRow}>
+              <Icon name="clock-time-two-outline" size={18} color="rgba(59,206,172,0.75)" />
+              <Text style={styles.popularPlandInforRowText}>Basil will be ready for harvest in 3 days</Text>
+            </View>
+          </View>
+          <View style={styles.deviderLine} />
+          <View style={styles.yourPland}>
+            <Text style={styles.yourPlandTitle}>Saved Plant</Text>
+            <TouchableOpacity style={styles.yourPlandViewAll}>
+              <Text style={styles.yourPlandViewAllText}>View all</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.savedPlandContainer}>
+            {savedPlantCardDemo.map((item, key) => renderSavedPlantCard(item, key))}
+          </View>
+          <View style={styles.deviderLine} />
+          <View style={styles.yourPland}>
+            <Text style={styles.yourPlandTitle}>Plant guide</Text>
+            <TouchableOpacity style={styles.yourPlandViewAll}>
+              <Text style={styles.yourPlandViewAllText}>View all</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.seasonalPlandContainer}>
+            {guidePlantCardDemo.map((item, key) => renderGuidePlantCard(item, item.name + key))}
+          </ScrollView>
+          <View style={styles.yourPland}>
+            <Text style={styles.yourPlandTitle}>Seasonal Plants</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.seasonalPlandContainer}>
+            {seasonalPlantCardDemo.map((item, key) => renderSeasonalPlantCard(item, key))}
+          </ScrollView>
         </ScrollView>
-        <View style={styles.yourPland}>
-          <Text style={styles.yourPlandTitle}>Seasonal Plants</Text>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.seasonalPlandContainer}>
-          {seasonalPlantCardDemo.map((item, key) => renderSeasonalPlantCard(item, key))}
-        </ScrollView>
-      </ScrollView>
-    </SafeAreaWrapper>
+      </SafeAreaWrapper>
+      <MenuModal
+        visible={menuVisible}
+        closeModal={() => {
+          setMenuVisible(false)
+        }} />
+    </>
+
   )
 }
 

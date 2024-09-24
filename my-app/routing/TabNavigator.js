@@ -6,6 +6,7 @@ import Home from '../screens/Homepage/Homepage';
 // import Search from '../screens/Search';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomTabBar from '../components/CustomTabBar/CustomTabBar';
+import { RoutesList } from './routes';
 
 const Tab = createBottomTabNavigator();
 
@@ -18,45 +19,16 @@ const TabNavigator = () => {
         headerShown: false, // Hide header if not needed
       }}
     >
-      <Tab.Screen
-        name="Home"
-        component={Home}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="home-outline" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Search"
-        component={Home}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="magnify" color={color} size={size} />
-          ),
-          iconStyles: { transform: [{ translateX: -20 }] }
-        }}
-
-      />
-      <Tab.Screen
-        name="Profile"
-        component={Home}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="account-outline" color={color} size={size} />
-          ),
-          iconStyles: { transform: [{ translateX: 20 }] }
-        }}
-      />
-      <Tab.Screen
-        name="Profile1"
-        component={Home}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="account-outline" color={color} size={size} />
-          ),
-        }}
-      />
+      {
+        RoutesList.map((item, index) => (
+          <Tab.Screen
+            key={index}
+            name={item.name}
+            component={item.component}
+            options={item.options}
+          />
+        ))
+      }
     </Tab.Navigator>
   );
 };

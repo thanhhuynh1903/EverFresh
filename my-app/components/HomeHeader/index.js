@@ -5,9 +5,9 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
-export default function HomeHeader({ navigation }) {
+export default function HomeHeader({ navigation, handleMenuToggle, backgroundColor }) {
     return (
-        <View style={styles.header}>
+        <View style={{ ...styles.header, backgroundColor: backgroundColor ? backgroundColor : "white" }}>
             <Image
                 source={require("../../assets/img/logo.png")}
                 style={styles.iconstyle}
@@ -16,7 +16,7 @@ export default function HomeHeader({ navigation }) {
                 <TouchableOpacity>
                     <Icon name="bell-outline" size={32} color="#FCCC1F" />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handleMenuToggle}>
                     <Icon name="menu" size={32} color="#0D986A" />
                 </TouchableOpacity>
             </View>

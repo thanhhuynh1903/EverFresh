@@ -8,7 +8,9 @@ const Stack = createStackNavigator();
 
 const MainStack = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{ headerShown: false }}
+    >
       <Stack.Screen
         name="Main"
         component={TabNavigator}
@@ -22,6 +24,7 @@ const MainStack = () => {
           options={route.options}
         />
       ))}
+
       {/* <Stack.Screen name="HomeTabs" component={TabNavigator} options={{ headerShown: false }} /> */}
     </Stack.Navigator>
   );
