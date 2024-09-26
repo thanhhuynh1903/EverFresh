@@ -6,7 +6,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import SafeAreaWrapper from '../../components/SafeAreaWrapper'
 import HomeHeader from '../../components/HomeHeader'
 import MenuModal from '../../components/Modal/MenuModal/MenuModal';
-import { formatPrice } from '../../utils/utils';
+import { formatPrice } from '../../utils/utils.js';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
@@ -19,9 +19,13 @@ export default function ShopPage() {
 
     const renderTab = (item, key) => {
         return (
-            <TouchableOpacity style={styles.tabContainer} onPress={() => setTabIndex(key)} key={key}>
+            <TouchableOpacity style={styles.tabContainer}
+                onPress={() => setTabIndex(key)}
+                key={key}
+            >
                 <Text
-                    style={{ ...styles.tabLabel, color: key === tabIndex ? "#0D986A" : "#002140" }}>
+                    style={{ ...styles.tabLabel, color: key === tabIndex ? "#0D986A" : "#002140" }}
+                >
                     {item.label}
                 </Text>
             </TouchableOpacity>
@@ -30,7 +34,10 @@ export default function ShopPage() {
 
     const renderPlantCard = (item, key) => {
         return (
-            <TouchableOpacity style={styles.plantCard} onPress={() => setTabIndex(key)} key={key}>
+            <TouchableOpacity style={styles.plantCard}
+                onPress={() => navigation.navigate("PlantDetail", { plant: item })}
+                key={key}
+            >
                 <ImageBackground
                     source={item.background}
                     style={styles.plantCardBackground}

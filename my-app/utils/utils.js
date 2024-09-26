@@ -1,3 +1,3 @@
-export function formatPrice(value) {
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-}
+export const formatPrice = (price) => {
+    return price.toLocaleString('vi-VN'); 
+};

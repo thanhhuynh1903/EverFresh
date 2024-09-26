@@ -7,6 +7,12 @@ import PackagePlan from "../screens/PackagePlan/PackagePlan";
 import Homepage from "../screens/Homepage/Homepage";
 import SavedPlant from "../screens/SavedPlant/SavedPlant";
 import ShopPage from "../screens/ShopPage/ShopPage";
+import PlantDetail from "../screens/PlantDetail/PlantDetail";
+import Checkout from "../screens/Checkout/Checkout";
+import Payment from "../screens/Payment/Payment";
+import OrderComplete from "../screens/OrderComplete/OrderComplete";
+import TrackingOrder from "../screens/TrackingOrder/TrackingOrder";
+import PlantGuide from "../screens/PlantGuide/PlantGuide";
 export const publicRoutes = [
   {
     name: 'Welcome',
@@ -43,5 +49,29 @@ export const publicRoutes = [
   {
     name: 'ShopPage',
     component: ShopPage,
+  },
+  {
+    name: 'PlantDetail',
+    component: PlantDetail,
+  },
+  {
+    name: 'Checkout',
+    component: Checkout,
+  },
+  {
+    name: 'Payment',
+    component: Payment,
+  },
+  {
+    name: 'OrderComplete',
+    component: OrderComplete,
+  },
+  {
+    name: 'TrackingOrder',
+    component: TrackingOrder,
+  },
+  {
+    name: 'PlantGuide',
+    component: PlantGuide,
   },
 ];

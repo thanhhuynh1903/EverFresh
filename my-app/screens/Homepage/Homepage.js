@@ -108,7 +108,11 @@ export default function Homepage() {
 
   const renderGuidePlantCard = (item, key) => {
     return (
-      <TouchableOpacity style={styles.guidePlantCard} key={key}>
+      <TouchableOpacity
+        style={styles.guidePlantCard}
+        onPress={() => navigation.navigate("PlantGuide", { plant: item })}
+        key={key}
+      >
         <Image
           source={item.img}
           style={styles.guidePlantCardImage}
