@@ -18,22 +18,22 @@ const tabList = [
     {
         name: "plant care",
         icon: require("../../../assets/menu/care.png"),
-        page: "ShopPage",
+        // page: "ShopPage",
     },
     {
         name: "community",
         icon: require("../../../assets/menu/community.png"),
-        page: "ShopPage",
+        // page: "ShopPage",
     },
     {
         name: "my account",
         icon: require("../../../assets/menu/account.png"),
-        page: "ShopPage",
+        // page: "ShopPage",
     },
     {
         name: "my orders",
         icon: require("../../../assets/menu/order.png"),
-        page: "ShopPage",
+        // page: "CartView",
     },
 ]
 
@@ -62,7 +62,11 @@ export default function MenuModal({ visible, closeModal }) {
         return (
             <TouchableOpacity
                 style={styles.tabCard}
-                onPress={() => { closeModal(), navigation.navigate(item.page) }}
+                onPress={() => {
+                    if (item.page) {
+                        closeModal(), navigation.navigate(item.page)
+                    }
+                }}
                 key={key}
             >
                 <View style={styles.tabIcon}>
@@ -124,7 +128,7 @@ export default function MenuModal({ visible, closeModal }) {
 
                     <TouchableOpacity
                         style={styles.tabCard}
-                        onPress={() => { closeModal(), navigation.navigate("ShopPage") }}
+                        onPress={() => { closeModal(), navigation.navigate("CartView") }}
                     >
                         <View style={styles.tabIcon}>
                             <Icon name="cart-outline" size={28} color="rgba(256,256,256,0.7)" />

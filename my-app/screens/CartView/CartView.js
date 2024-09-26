@@ -82,7 +82,7 @@ export default function CartView({ goback }) {
 
     return (
         <View style={styles.container}>
-            <BottomSheetHeader goback={goback} title={"Your Cart"} />
+            <BottomSheetHeader goback={navigation.goBack} title={"Your Cart"} />
             <ScrollView style={styles.contentContainer}>
                 <View style={styles.cartHeader}>
                     <Text style={styles.cartAmount}>3 items</Text>
