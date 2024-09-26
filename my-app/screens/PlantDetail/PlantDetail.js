@@ -7,7 +7,6 @@ import HomeHeader from '../../components/HomeHeader'
 import MenuModal from '../../components/Modal/MenuModal/MenuModal';
 import { formatPrice } from '../../utils/utils';
 import { LinearGradient } from 'expo-linear-gradient';
-import CartView from '../../components/CartView/CartView';
 // import { Tooltip, lightColors } from '@rneui/themed';
 
 const WIDTH = Dimensions.get('window').width;
@@ -264,16 +263,13 @@ export default function PlantDetail() {
                         />
                     </View>
                 </ScrollView>
-                {modalVisible.cartViewVisible && <CartView
-                    goback={() => setModalVisible({ ...modalVisible, cartViewVisible: false })}
-                />}
                 <LinearGradient
                     colors={['#0B845C', '#0D986A']}  // Set the gradient colors
                     start={{ x: 1, y: 0 }}  // Start from the right
                     end={{ x: 0, y: 0 }}    // End at the left
                     style={styles.bottomCartSheet}
                 >
-                    <TouchableOpacity style={styles.bottomCartSheetContainer} onPress={() => setModalVisible({ ...modalVisible, cartViewVisible: true })}>
+                    <TouchableOpacity style={styles.bottomCartSheetContainer} onPress={() => navigation.navigate("CartView")}>
                         <View style={styles.bottomCartSheetContainerLeft}>
                             <Image
                                 source={require('../../assets/plant details/shopIcon.png')}
