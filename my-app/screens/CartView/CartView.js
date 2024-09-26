@@ -1,11 +1,11 @@
 import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image, ImageBackground } from 'react-native'
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from 'react'
-import BottomSheetHeader from '../BottomSheetHeader/BottomSheetHeader';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import PlantBookingCard from '../PlantBookingCard/PlantBookingCard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { formatPrice } from '../../utils/utils';
+import BottomSheetHeader from '../../components/BottomSheetHeader/BottomSheetHeader';
+import PlantBookingCard from '../../components/PlantBookingCard/PlantBookingCard';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;

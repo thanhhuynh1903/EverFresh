@@ -13,6 +13,7 @@ import Payment from "../screens/Payment/Payment";
 import OrderComplete from "../screens/OrderComplete/OrderComplete";
 import TrackingOrder from "../screens/TrackingOrder/TrackingOrder";
 import PlantGuide from "../screens/PlantGuide/PlantGuide";
+import CartView from "../screens/CartView/CartView";
 export const publicRoutes = [
   {
     name: 'Welcome',
@@ -73,5 +74,9 @@ export const publicRoutes = [
   {
     name: 'PlantGuide',
     component: PlantGuide,
+  },
+  {
+    name: 'CartView',
+    component: CartView,
   },
 ];

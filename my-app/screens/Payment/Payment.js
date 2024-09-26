@@ -7,6 +7,24 @@ import BottomSheet from '@gorhom/bottom-sheet';
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
+const data = [
+    {
+        id: '1',
+        title: 'Item 1',
+        imageUrl: require("../../assets/utilsImage/card-1.png"), // Replace with your own image
+    },
+    {
+        id: '2',
+        title: 'Item 2',
+        imageUrl: require("../../assets/visaCard.png"),
+    },
+    {
+        id: '3',
+        title: 'Item 3',
+        imageUrl: require("../../assets/utilsImage/card-1.png"),
+    },
+];
+
 export default function Payment({ route }) {
     const navigation = useNavigation();
     const [bottomSheetVisible, setBottomSheetVisible] = useState(false)
@@ -19,6 +37,34 @@ export default function Payment({ route }) {
     const closeBottomSheet = () => {
         bottomSheetRef.current?.close();
         setBottomSheetVisible(false);
+    };
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const flatListRef = useRef(null);
+
+
+    const renderCarouselItem = ({ item }) => {
+        return (
+            <View style={styles.carouselItem}>
+                <Image source={{ uri: item.imageUrl }} style={styles.carouselImage} />
+                <Text style={styles.carouselText}>{item.title}</Text>
+            </View>
+        );
+    };
+
+    const handleNext = () => {
+        const nextIndex = currentIndex + 1;
+        if (nextIndex < data.length) {
+            setCurrentIndex(nextIndex);
+            flatListRef.current.scrollToIndex({ index: nextIndex });
+        }
+    };
+
+    const handlePrev = () => {
+        const prevIndex = currentIndex - 1;
+        if (prevIndex >= 0) {
+            setCurrentIndex(prevIndex);
+            flatListRef.current.scrollToIndex({ index: prevIndex });
+        }
     };
 
     return (
@@ -296,6 +342,7 @@ const styles = StyleSheet.create({
         paddingVertical: 50,
         backgroundColor: "#FFFFFF",
         borderBottomWidth: 1,
+        borderColor: 'rgba(0,0,0,0.1)',
 
         shadowColor: 'rgba(0,0,0,0.1)',  // Black color
         shadowOffset: { width: 0, height: -4 },  // X: 0, Y: -4
