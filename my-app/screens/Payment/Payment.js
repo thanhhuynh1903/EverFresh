@@ -1,6 +1,6 @@
-import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image, ImageBackground, Button, TextInput } from 'react-native'
+import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image, FlatList, TextInput } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import BottomSheet from '@gorhom/bottom-sheet';
 
@@ -11,7 +11,7 @@ const data = [
     {
         id: '1',
         title: 'Item 1',
-        imageUrl: require("../../assets/utilsImage/card-1.png"), // Replace with your own image
+        imageUrl: require("../../assets/utilsImage/card-1.png"),
     },
     {
         id: '2',
@@ -27,45 +27,41 @@ const data = [
 
 export default function Payment({ route }) {
     const navigation = useNavigation();
-    const [bottomSheetVisible, setBottomSheetVisible] = useState(false)
-
+    const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const flatListRef = useRef(null);
     const bottomSheetRef = useRef(null);
-
-    // Define snap points
     const snapPoints = useMemo(() => ['25%', '50%'], []);
 
     const closeBottomSheet = () => {
         bottomSheetRef.current?.close();
         setBottomSheetVisible(false);
     };
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const flatListRef = useRef(null);
 
+    const renderCarouselItem = ({ item }) => (
+        <View style={styles.carouselItem}>
+            <Image
+                source={item.imageUrl}
+                style={styles.carouselImage}
+                resizeMode="stretch"
+            />
+        </View>
+    );
 
-    const renderCarouselItem = ({ item }) => {
-        return (
-            <View style={styles.carouselItem}>
-                <Image source={{ uri: item.imageUrl }} style={styles.carouselImage} />
-                <Text style={styles.carouselText}>{item.title}</Text>
-            </View>
-        );
-    };
-
-    const handleNext = () => {
-        const nextIndex = currentIndex + 1;
-        if (nextIndex < data.length) {
-            setCurrentIndex(nextIndex);
-            flatListRef.current.scrollToIndex({ index: nextIndex });
-        }
-    };
-
-    const handlePrev = () => {
-        const prevIndex = currentIndex - 1;
-        if (prevIndex >= 0) {
-            setCurrentIndex(prevIndex);
-            flatListRef.current.scrollToIndex({ index: prevIndex });
-        }
-    };
+    // Render dots for the carousel
+    const renderDots = () => (
+        <View style={styles.dotContainer}>
+            {data.map((_, index) => (
+                <View
+                    key={index}
+                    style={[
+                        styles.dot,
+                        { backgroundColor: currentIndex === index ? '#0D986A' : '#ccc' }
+                    ]}
+                />
+            ))}
+        </View>
+    );
 
     return (
         <View style={styles.container}>
@@ -90,6 +86,28 @@ export default function Payment({ route }) {
                         <Text style={styles.shippingAddressChangetText}>Change</Text>
                     </View>
                 </View>
+
+                {/* Carousel */}
+                <FlatList
+                    ref={flatListRef}
+                    data={data}
+                    renderItem={renderCarouselItem}
+                    horizontal
+                    pagingEnabled={false} // Disable default paging since we are customizing it
+                    snapToInterval={WIDTH * 0.8} // Width of card + margins
+                    decelerationRate="fast" // Fast snapping behavior
+                    snapToAlignment="center" // Snap the card to the center
+                    keyExtractor={(item) => item.id}
+                    showsHorizontalScrollIndicator={false}
+                    onMomentumScrollEnd={(event) => {
+                        const newIndex = Math.floor(event.nativeEvent.contentOffset.x / (WIDTH * 0.8));
+                        setCurrentIndex(newIndex);
+                    }}
+                />
+
+                {/* Dots */}
+                {renderDots()}
+
                 <View style={styles.paymentTitle}>
                     <Text style={styles.paymentTitleText}>Payment </Text>
                     <TouchableOpacity
@@ -100,6 +118,8 @@ export default function Payment({ route }) {
                         <Text style={styles.paymentTitltAddText}>Add New Card</Text>
                     </TouchableOpacity>
                 </View>
+
+                {/* Payment Summary */}
                 <View style={styles.paymentDetail}>
                     <View style={{ ...styles.flexRow, justifyContent: "space-between" }}>
                         <Text style={styles.paymentDetailTitle}>Order</Text>
@@ -114,15 +134,16 @@ export default function Payment({ route }) {
                         <Text style={{ ...styles.paymentDetailText, fontSize: 16 }}>525.000 VNĐ</Text>
                     </View>
                 </View>
+
                 <TouchableOpacity
                     style={styles.proceedButton}
                     onPress={() => { navigation.navigate("OrderComplete") }}
                 >
                     <Text style={styles.buttonText}>Pay Now</Text>
                 </TouchableOpacity>
-
             </ScrollView >
 
+            {/* Bottom sheet */}
             {bottomSheetVisible && (
                 <TouchableOpacity
                     style={styles.overlay}
@@ -133,26 +154,19 @@ export default function Payment({ route }) {
 
             <BottomSheet
                 ref={bottomSheetRef}
-                index={-1} // Initially closed
+                index={-1}
                 snapPoints={snapPoints}
                 style={{ zIndex: 999 }}
             >
                 <View style={styles.sheetContent}>
-                    {/* Close Button */}
                     <TouchableOpacity style={styles.closeButton} onPress={closeBottomSheet}>
                         <Text style={styles.closeText}>×</Text>
                     </TouchableOpacity>
-
-                    {/* Title */}
                     <Text style={styles.title}>Add New Card</Text>
-
-                    {/* Form Fields */}
                     <Text style={styles.label}>Name on card</Text>
                     <TextInput style={styles.input} placeholder="Nguyen Thuong Huyen" />
-
                     <Text style={styles.label}>Card number</Text>
                     <TextInput style={styles.input} placeholder="1234 4567 7890 1234" keyboardType="numeric" />
-
                     <View style={styles.row}>
                         <View style={styles.col}>
                             <Text style={styles.label}>Expiry date</Text>
@@ -163,14 +177,11 @@ export default function Payment({ route }) {
                             <TextInput style={styles.input} placeholder="•••" keyboardType="numeric" secureTextEntry />
                         </View>
                     </View>
-
-                    {/* Submit Button */}
                     <TouchableOpacity style={styles.addButton}>
                         <Text style={styles.addButtonText}>Add Card</Text>
                     </TouchableOpacity>
                 </View>
             </BottomSheet>
-
         </View >
     )
 }
@@ -180,13 +191,57 @@ const styles = StyleSheet.create({
         position: "absolute",
         height: HEIGHT,
         width: WIDTH,
-        overflow: "visible",
-        marginBottom: 100,
         backgroundColor: "#FFFFFF",
-        zIndex: 11
     },
     contentContainer: {
-        paddingHorizontal: 16
+    },
+    header: {
+        position: "relative",
+        width: WIDTH,
+        height: HEIGHT * 0.05,
+        flexDirection: "row",
+        // alignItems: "center",
+        justifyContent: "center",
+        padding: 12,
+        paddingVertical: 50,
+        backgroundColor: "#FFFFFF",
+        zIndex: 10,
+        borderBottomWidth: 1,
+        borderColor: "rgba(0,0,0,0.1)",
+
+        shadowColor: 'rgba(0,0,0,0.1)',  // Black color
+        shadowOffset: { width: 0, height: -4 },  // X: 0, Y: -4
+        shadowOpacity: 0.1,  // 10% opacity
+        shadowRadius: 14,    // Blur: 14
+        elevation: 3,
+    },
+    iconstyle: {
+        position: "absolute",
+        width: WIDTH * 0.15,
+        height: HEIGHT * 0.045,
+        resizeMode: 'contain',
+        left: "10%",
+        bottom: 5,
+        fontSize: 17,
+        color: "#0D986A",
+        fontWeight: "regular"
+    },
+    backButton: {
+        fontSize: 17,
+        color: "#0D986A",
+        fontWeight: "regular"
+    },
+    fetureList: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        height: HEIGHT * 0.05,
+        gap: 12,
+        marginRight: 12,
+    },
+    title: {
+        textAlign: "center",
+        fontSize: 20,
+        fontWeight: "bold"
     },
     shippingAddress: {
         width: WIDTH,
@@ -199,7 +254,6 @@ const styles = StyleSheet.create({
     },
     shippingAddressTitle: {
         fontSize: 22,
-        fontWeight: "regular",
         color: "#424347",
         marginBottom: 24
     },
@@ -211,15 +265,11 @@ const styles = StyleSheet.create({
     shippingAddressDetailLeft: {
         width: "85%"
     },
-    shippingAddressDetailRight: {
-        width: "15%"
-    },
     shippingAddressChange: {
         marginTop: 12,
     },
     shippingAddressChangetText: {
         fontSize: 14,
-        fontWeight: "regular",
         color: "#0D986A",
     },
     paymentTitle: {
@@ -235,12 +285,10 @@ const styles = StyleSheet.create({
     },
     paymentTitltAddText: {
         fontSize: 13,
-        fontWeight: "regular",
         color: "#3E3E3E",
         marginLeft: 8
     },
     proceedButton: {
-        // width: "WIDTH",
         marginHorizontal: 28,
         paddingVertical: 14,
         backgroundColor: "#0D986A",
@@ -252,130 +300,94 @@ const styles = StyleSheet.create({
     },
     paymentDetail: {
         marginHorizontal: 28,
-        marginVertical: 32,
-        gap: 12,
-    },
-    paymentDetailTitle: {
-        fontSize: 13,
-        fontWeight: "regular",
-        color: "#3E3E3E",
-    },
-    paymentDetailText: {
-        fontSize: 13,
-        fontWeight: "regular",
-        color: "#3E3E3E",
-    },
-    // contentContainer
-    bottomSheetContainer: {
-        flex: 1,
-        alignItems: 'center',
-        padding: 16,
-    },
-
-    overlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(114, 114, 114, 0.8)',
-    },
-    sheetContent: {
-        flex: 1,
-        paddingHorizontal: 20,
-        zIndex: 20
-    },
-    closeButton: {
-        alignSelf: 'flex-end',
-    },
-    closeText: {
-        fontSize: 24,
-        color: '#000',
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    label: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 8,
-    },
-    input: {
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 10,
-        marginBottom: 20,
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    col: {
-        flex: 1,
-        marginRight: 10,
-    },
-    addButton: {
-        backgroundColor: '#28a745',
-        paddingVertical: 15,
-        borderRadius: 8,
-        marginTop: 20,
-    },
-    addButtonText: {
-        color: '#fff',
-        textAlign: 'center',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-
-    header: {
-        position: "relative",
-        width: WIDTH,
-        height: HEIGHT * 0.05,
-        flexDirection: "row",
-        // alignItems: "center",
-        justifyContent: "center",
-        padding: 12,
-        paddingVertical: 50,
-        backgroundColor: "#FFFFFF",
-        borderBottomWidth: 1,
-        borderColor: 'rgba(0,0,0,0.1)',
-
-        shadowColor: 'rgba(0,0,0,0.1)',  // Black color
-        shadowOffset: { width: 0, height: -4 },  // X: 0, Y: -4
-        shadowOpacity: 0.1,  // 10% opacity
-        shadowRadius: 14,    // Blur: 14
-        elevation: 3,
-    },
-    iconstyle: {
-        position: "absolute",
-        width: WIDTH * 0.15,
-        height: HEIGHT * 0.045,
-        resizeMode: 'contain',
-        left: "10%",
-        bottom: 0,
-        fontSize: 17,
-        color: "#0D986A",
-        fontWeight: "regular"
-    },
-    fetureList: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        height: HEIGHT * 0.05,
-        gap: 12,
-        marginRight: 12,
-    },
-    title: {
-        textAlign: "center",
-        fontSize: 20,
-        color: "#0D986A",
-        fontWeight: "bold"
+        marginVertical: 10
     },
     flexRow: {
         flexDirection: "row",
-        alignItems: "center"
-    }
+        alignItems: "center",
+    },
+    paymentDetailTitle: {
+        fontSize: 14,
+        color: "#8688BC"
+    },
+    paymentDetailText: {
+        fontSize: 14,
+        color: "#000000"
+    },
+    overlay: {
+        position: 'absolute',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        width: '100%',
+        height: '100%',
+        zIndex: 998
+    },
+    sheetContent: {
+        paddingHorizontal: 24,
+        paddingVertical: 16,
+    },
+    closeButton: {
+        position: 'absolute',
+        right: 10,
+        top: 10,
+    },
+    closeText: {
+        fontSize: 30,
+        color: '#000',
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: "#000",
+        textAlign: "center",
+        marginVertical: 10
+    },
+    label: {
+        fontSize: 14,
+        color: "#000",
+        marginVertical: 8,
+    },
+    input: {
+        backgroundColor: "#F5F5F5",
+        borderRadius: 4,
+        paddingHorizontal: 12,
+        paddingVertical: 12,
+        marginBottom: 16
+    },
+    row: {
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+    col: {
+        width: "48%"
+    },
+    addButton: {
+        paddingVertical: 14,
+        backgroundColor: "#0D986A",
+        borderRadius: 4
+    },
+    addButtonText: {
+        textAlign: "center",
+        color: "white"
+    },
+    carouselItem: {
+        width: WIDTH * 0.6, // Set width to 60% of the screen width
+        // marginHorizontal: WIDTH * 0.1, // Set margin to 10% of the screen width on both sides
+        height: 200,
+    },
+    carouselImage: {
+        width: '100%',
+        height: '100%',
+    },
+    dotContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginVertical: 10,
+    },
+    dot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        marginHorizontal: 5,
+    },
 });
+

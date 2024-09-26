@@ -6,6 +6,10 @@ import ShopPage from '../screens/ShopPage/ShopPage.js';
 import PlantDetail from '../screens/PlantDetail/PlantDetail.js';
 import TrackingOrder from '../screens/TrackingOrder/TrackingOrder.js';
 import PlantGuide from '../screens/PlantGuide/PlantGuide.js';
+import CartView from '../screens/CartView/CartView.js';
+import Checkout from '../screens/Checkout/Checkout.js';
+import Payment from '../screens/Payment/Payment.js';
+import OrderComplete from '../screens/OrderComplete/OrderComplete.js';
 // import Category from '../screens/Category';
 
 export const RoutesList = [
@@ -74,11 +78,44 @@ export const RoutesList = [
             tabBarButton: () => null,
         },
     },
-    // {
-    //     name: 'PlantDetail',
-    //     component: PlantDetail,
-    //     options: {
-    //         tabBarButton: () => null,
-    //     },
-    // },
+    {
+        name: 'CartView',
+        component: CartView,
+        options: {
+            tabBarButton: () => null,
+        },
+        hiddenBottomTab: true
+    },
+    {
+        name: 'PlantDetail',
+        component: PlantDetail,
+        options: {
+            tabBarButton: () => null,
+        },
+        hiddenBottomTab: true
+    },
+    {
+        name: 'Checkout',
+        component: Checkout,
+        options: {
+            tabBarButton: () => null,
+        },
+        hiddenBottomTab: true
+    },
+    {
+        name: 'Payment',
+        component: Payment,
+        options: {
+            tabBarButton: () => null,
+        },
+        hiddenBottomTab: true
+    },
+    {
+        name: 'OrderComplete',
+        component: OrderComplete,
+        options: {
+            tabBarButton: () => null,
+        },
+        hiddenBottomTab: true
+    },
 ];

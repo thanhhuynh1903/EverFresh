@@ -1,10 +1,17 @@
 // CustomTabBar.js
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { RoutesList } from '../../routing/routes';
 
 const CustomTabBar = ({ state, descriptors, navigation }) => {
+    const routeItem = useMemo(() => {
+        return RoutesList[state.index];
+    }, [state.index]);
+
+    if (routeItem.hiddenBottomTab) return
+
     return (
         <View style={{ position: 'absolute', bottom: 0, width: '100%', height: 80, backgroundColor: "white" }}>
             {/* Gradient Background */}
@@ -27,7 +34,6 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
             }}>
                 {/* Render Tab Bar Icons */}
                 {state.routes.map((route, index) => {
-
                     const { options } = descriptors[route.key];
                     const label =
                         options.tabBarLabel !== undefined
