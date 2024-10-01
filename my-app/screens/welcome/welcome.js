@@ -19,7 +19,7 @@ export default function Welcome({ navigation }) {
             style={styles.logo}
           />
         </View>
-        <View style={{marginVertical : 35}}>
+        <View style={{ marginVertical: 35 }}>
           <Text style={styles.title}>
             Explore with <Text style={styles.highlight}>everfresh</Text>
           </Text>
@@ -27,16 +27,17 @@ export default function Welcome({ navigation }) {
             Plant care now more accessible, efficient, and enjoyable than ever.
           </Text>
         </View>
-        
+
         <CustomButton
-          onPressName={"Signin"}
+          // onPressName={"Signin"}
+          onPressName={"login"}
           navigation={navigation}
         >
           <Text style={styles.signInButtonText}>Sign In</Text>
         </CustomButton>
         <CustomButton
           style={styles.createAccountButton}
-          onPressName={ "CreateAnAccount"}
+          onPressName={"CreateAnAccount"}
           navigation={navigation}
         >
           <Text style={styles.createAccountButtonText}>Create account</Text>
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   img_container: {
-    flex : 0.55,
+    flex: 0.55,
     // Set dimensions explicitly if necessary
     alignItems: "center", // Center content horizontally
   },
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   createAccountButton: {
-    backgroundColor:"#FFF important",
+    backgroundColor: "#FFF important",
     borderWidth: 1,
     borderColor: "#4CAF50",
     paddingVertical: 15,

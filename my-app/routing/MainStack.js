@@ -11,11 +11,6 @@ const MainStack = () => {
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
     >
-      <Stack.Screen
-        name="Main"
-        component={TabNavigator}
-        options={{ headerShown: false }}
-      />
       {publicRoutes.map((route, index) => (
         <Stack.Screen
           key={index}
@@ -24,7 +19,11 @@ const MainStack = () => {
           options={route.options}
         />
       ))}
-
+      <Stack.Screen
+        name="Main"
+        component={TabNavigator}
+        options={{ headerShown: false }}
+      />
       {/* <Stack.Screen name="HomeTabs" component={TabNavigator} options={{ headerShown: false }} /> */}
     </Stack.Navigator>
   );
