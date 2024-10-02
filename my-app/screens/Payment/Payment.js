@@ -1,8 +1,9 @@
-import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image, FlatList, TextInput } from 'react-native';
+import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image, FlatList, TextInput, Linking } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import React, { useMemo, useRef, useState } from 'react';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import BottomSheet from '@gorhom/bottom-sheet';
+import { paymentMomo } from '../../api/payment';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
@@ -32,6 +33,28 @@ export default function Payment({ route }) {
     const flatListRef = useRef(null);
     const bottomSheetRef = useRef(null);
     const snapPoints = useMemo(() => ['25%', '50%'], []);
+
+    const [cart, setCart] = useState(route.params.cart)
+    const [deliveryMethod, setDeliveryMethod] = useState(route.params.deliveryMethod)
+    const [deliveryInformation, setDeliveryInformationList] = useState(route.params.deliveryInformation)
+
+    const handlePayment = async () => {
+
+        const response = await paymentMomo({
+            voucherId: "",
+            deliveryMethodId: deliveryMethod._id,
+            deliveryInformationId: deliveryInformation._id,
+            cartId: route.params.currentCart._id
+        })
+        if (response.status === 200) {
+            // await Linking.openURL(response?.data?.deeplink)
+            console.log(response?.data?.deeplink);
+            console.log(response?.data?.payUrl);
+        }
+
+
+        // navigation.navigate("OrderComplete")
+    }
 
     const closeBottomSheet = () => {
         bottomSheetRef.current?.close();
@@ -93,8 +116,8 @@ export default function Payment({ route }) {
                     data={data}
                     renderItem={renderCarouselItem}
                     horizontal
-                    pagingEnabled={false} // Disable default paging since we are customizing it
-                    snapToInterval={WIDTH * 0.8} // Width of card + margins
+                    pagingEnabled={true} // Disable default paging since we are customizing it
+                    // snapToInterval={WIDTH} // Width of card + margins
                     decelerationRate="fast" // Fast snapping behavior
                     snapToAlignment="center" // Snap the card to the center
                     keyExtractor={(item) => item.id}
@@ -137,7 +160,7 @@ export default function Payment({ route }) {
 
                 <TouchableOpacity
                     style={styles.proceedButton}
-                    onPress={() => { navigation.navigate("OrderComplete") }}
+                    onPress={() => { handlePayment() }}
                 >
                     <Text style={styles.buttonText}>Pay Now</Text>
                 </TouchableOpacity>
@@ -370,7 +393,7 @@ const styles = StyleSheet.create({
         color: "white"
     },
     carouselItem: {
-        width: WIDTH * 0.6, // Set width to 60% of the screen width
+        width: WIDTH, // Set width to 60% of the screen width
         // marginHorizontal: WIDTH * 0.1, // Set margin to 10% of the screen width on both sides
         height: 200,
     },

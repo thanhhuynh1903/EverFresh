@@ -14,6 +14,7 @@ import OrderComplete from "../screens/OrderComplete/OrderComplete";
 import TrackingOrder from "../screens/TrackingOrder/TrackingOrder";
 import PlantGuide from "../screens/PlantGuide/PlantGuide";
 import CartView from "../screens/CartView/CartView";
+import LoginPage from "../screens/login/login";
 export const publicRoutes = [
   {
     name: 'Welcome',
@@ -78,5 +79,9 @@ export const publicRoutes = [
   {
     name: 'CartView',
     component: CartView,
+  },
+  {
+    name: 'LoginPage',
+    component: LoginPage,
   },
 ];

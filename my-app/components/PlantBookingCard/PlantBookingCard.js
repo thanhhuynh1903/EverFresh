@@ -6,23 +6,23 @@ import { formatPrice } from '../../utils/utils';
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
-export default function PlantBookingCard(plant) {
-    const [item, setItem] = useState(plant?.item)
+export default function PlantBookingCard({ plant, onPress, hanldeIncrease, hanldeDecrease, hanldeDelete }) {
+    const [item, setItem] = useState(plant || {})
 
     useEffect(() => {
-        setItem(plant?.item)
-    }, [plant?.item])
+        setItem(plant)
+    }, [plant])
 
     return (
-        <TouchableOpacity style={styles.container} activeOpacity={1} onPress={item?.onPress && item?.onPress}>
+        <TouchableOpacity style={styles.container} onPress={onPress && onPress}>
             <Image
-                source={item?.image}
+                source={item?.image || require("../../assets/cart/plant1.png")}
                 resizeMode="stretch"
                 style={styles.image}
             />
             <View style={styles.center}>
                 <View style={styles.centerFuncional}>
-                    <Text style={styles.centerTitle}>{item?.name}</Text>
+                    <Text style={styles.centerTitle}>{item?.plantDetail?.name}</Text>
                     <TouchableOpacity style={styles.flexRow}>
                         {!item?.bookmark && <Text style={styles.centerStock}>In stock</Text>}
 
@@ -38,21 +38,21 @@ export default function PlantBookingCard(plant) {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.centerFuncional}>
-                    <TouchableOpacity style={styles.funcionalButton}>
+                    <TouchableOpacity style={styles.funcionalButton} onPress={hanldeIncrease && hanldeIncrease}>
                         <Icon name="plus" size={24} color="#002140" />
                     </TouchableOpacity>
-                    <Text style={styles.amount}>{item?.amount || 1}</Text>
-                    <TouchableOpacity style={styles.funcionalButton}>
+                    <Text style={styles.amount}>{item?.quantity || 1}</Text>
+                    <TouchableOpacity style={styles.funcionalButton} onPress={hanldeDecrease && hanldeDecrease}>
                         <Icon name="minus" size={24} color="#002140" />
                     </TouchableOpacity>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={hanldeDelete && hanldeDelete}>
                         <Image
                             source={require('../../assets/cart/bin.png')}
                             resizeMode="stretch"
                             style={styles.bookMarkIcon}
                         />
                     </TouchableOpacity>
-                    <Text style={styles.centerPrice}>{formatPrice(item?.price || 0)} VNĐ</Text>
+                    <Text style={styles.centerPrice}>{formatPrice((item?.plantDetail?.price || 1) * (item?.quantity || 1))} VNĐ</Text>
                 </View>
             </View>
         </TouchableOpacity >

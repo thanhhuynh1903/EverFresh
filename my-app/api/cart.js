@@ -19,3 +19,27 @@ export const createCart = async () => {
         return error;
     }
 };
+
+export const addToCart = async (id, amount) => {
+    try {
+        const data = {
+            plant_id: id,
+            quantity: amount || 1
+        }
+        const response = await api.post(`/cart-items`, data);
+        return response;
+    } catch (error) {
+        console.log("addToCart in service/cart error : ", error);
+        return error;
+    }
+};
+
+export const updateCartItem = async (id, amount) => {
+    try {
+        const response = await api.put(`/cart-items/${id}`, amount);
+        return response;
+    } catch (error) {
+        console.log("updateCartItem in service/cart error : ", error);
+        return error;
+    }
+};

@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image, TextInput, ImageBackground } from 'react-native'
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import SafeAreaWrapper from '../../components/SafeAreaWrapper'
 import HomeHeader from '../../components/HomeHeader'
@@ -12,13 +12,40 @@ import { LinearGradient } from 'expo-linear-gradient';
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
-export default function PlantDetail() {
+export default function PlantDetail({ route }) {
 
     const navigation = useNavigation();
+    const [plant, setPlant] = useState(route.params.plant || {})
     const [menuVisible, setMenuVisible] = useState(false)
     const [modalVisible, setModalVisible] = useState({
         cartViewVisible: false
     })
+
+    useEffect(() => {
+        setPlant(route.params.plant)
+    }, [route.params.plant])
+
+
+    const OverviewItems = useMemo(() => {
+        return [
+            {
+                img: require('../../assets/plant details/drop.png'),
+                value: "250ml",
+                name: "Water",
+            },
+            {
+                img: require('../../assets/plant details/sun.png'),
+                value: "35-40%",
+                name: "Light",
+            },
+            {
+                img: require('../../assets/plant details/fertilizer.png'),
+                value: "250gm",
+                name: "Fertilizer",
+            },
+        ]
+    }, [plant]);
+
 
     const renderTooltipView = () => {
         return (
@@ -118,24 +145,6 @@ export default function PlantDetail() {
         require("../../assets/plant details/plantImage3.png"),
     ]
 
-    const OverviewItems = [
-        {
-            img: require('../../assets/plant details/drop.png'),
-            value: "250ml",
-            name: "Water",
-        },
-        {
-            img: require('../../assets/plant details/sun.png'),
-            value: "35-40%",
-            name: "Light",
-        },
-        {
-            img: require('../../assets/plant details/fertilizer.png'),
-            value: "250gm",
-            name: "Fertilizer",
-        },
-    ]
-
     return (
         <>
             <SafeAreaWrapper >
@@ -156,9 +165,9 @@ export default function PlantDetail() {
                         <View style={styles.plantDetailHeaderContent}>
                             <View style={styles.headerContentPlantType}>
                                 <View style={styles.plantTypeLeft}>
-                                    <Text style={styles.plantTypeLabel}>Air Purifier</Text>
+                                    <Text style={styles.plantTypeLabel}>{plant.uses || "Air Purifier"}</Text>
                                     <Image
-                                        source={require("../../assets/plant details/pawIcon.png")}
+                                        source={plant.img_url[0] || require("../../assets/plant details/pawIcon.png")}
                                         style={styles.plantTypeLabelIcon}
                                     />
                                 </View>
@@ -167,21 +176,21 @@ export default function PlantDetail() {
                                         source={require("../../assets/plant details/star.png")}
                                         style={styles.plantTypeLabelIcon}
                                     />
-                                    <Text style={styles.plantTypeRate}>4.8</Text>
+                                    <Text style={styles.plantTypeRate}>{plant.average_rating || "0"}</Text>
                                 </View>
                             </View>
                             <View style={styles.headerPlantName}>
-                                <Text style={styles.headerPlantNameText}>Watermelon Peperomia</Text>
+                                <Text style={styles.headerPlantNameText}>{plant.name}</Text>
                             </View>
                             <View style={styles.headerPlant}>
                                 <View style={styles.headerPlantPrice}>
                                     <View style={styles.headerPlantInfo}>
                                         <Text style={styles.headerPlantPriceTitle}>Price</Text>
-                                        <Text style={styles.headerPlantPriceText}>{formatPrice(170000)} VNĐ</Text>
+                                        <Text style={styles.headerPlantPriceText}>{formatPrice(plant.price || 0)} VNĐ</Text>
                                     </View>
                                     <View style={styles.headerPlantInfo}>
                                         <Text style={styles.headerPlantPriceTitle}>Size</Text>
-                                        <Text style={styles.headerPlantPriceText}>30 Cm</Text>
+                                        <Text style={styles.headerPlantPriceText}>{plant.height || "Unknown"}</Text>
                                     </View>
                                     <View style={[styles.headerPlantFeature, styles.headerPlantInfo]}>
                                         <TouchableOpacity>

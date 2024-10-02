@@ -1,36 +1,65 @@
 import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image, ImageBackground } from 'react-native'
-import { useNavigation } from "@react-navigation/native";
-import React, { useState } from 'react'
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, { useMemo, useState } from 'react'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from 'expo-linear-gradient';
 import { formatPrice } from '../../utils/utils';
 import BottomSheetHeader from '../../components/BottomSheetHeader/BottomSheetHeader';
 import PlantBookingCard from '../../components/PlantBookingCard/PlantBookingCard';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectCart } from '../../redux/selector/selector';
+import SpinnerLoading from '../../components/SpinnerLoading/SpinnerLoading';
+import { getPlants } from '../../api/plant';
+import { getDeliveryMethods } from '../../api/delivery';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
 export default function CartView({ goback }) {
     const navigation = useNavigation();
+    const dispatch = useDispatch();
+    const cartRedux = useSelector(selectCart);
+    const [cart, setCart] = useState([])
+    const [deliveryMethodList, setDeliveryMethodList] = useState([])
+    const [loading, setLoading] = useState(true)
 
-    const plantList = [
-        {
-            image: require("../../assets/cart/plant2.png"),
-            name: "Watermelon Peperomia",
-            price: 170000,
-            // bookmark:true
-        },
-        {
-            image: require("../../assets/cart/plant1.png"),
-            name: "Peperomia Obtusfolia",
-            price: 200000,
-        },
-        {
-            image: require("../../assets/cart/plant5.png"),
-            name: "Cactus",
-            price: 170000,
-        },
-    ]
+    useFocusEffect(
+        React.useCallback(() => {
+            loadCartList()
+            loadDeliveryMethod()
+        }, [])
+    );
+
+    const loadCartList = async () => {
+        setLoading(true)
+        const updatedCart = await Promise.all(
+            cartRedux.cartList[0].list_cart_item_id?.map(async (cartItem) => {
+                const response = await getPlants(cartItem.plant_id);
+                return {
+                    ...cartItem,
+                    selected: true,
+                    plantDetail: response.data,
+                };
+            })
+        );
+        setCart(updatedCart);
+        setLoading(false)
+    };
+
+    const loadDeliveryMethod = async () => {
+        const response = await getDeliveryMethods()
+        if (response.status === 200) {
+            setDeliveryMethodList(response.data)
+        }
+    }
+
+    const paymentPrice = useMemo(() => {
+        let totalPrice = 0
+        cart.filter(item => item.selected).map(item => {
+            totalPrice += (item?.quantity * item?.plantDetail?.price)
+        })
+        return totalPrice
+    }, [cart]);
 
     const savePlantList = [
         {
@@ -73,10 +102,41 @@ export default function CartView({ goback }) {
 
     const renderCardBooking = (item, key) => {
         return (
-            <View style={styles.bookingCard} key={key}>
-                <Icon name="checkbox-marked" size={32} color="#8688BC" />
-                <PlantBookingCard item={item} />
-            </View>
+            <TouchableOpacity style={styles.bookingCard} key={key}
+            //  onPress={() => handleChangeSelected(item)}
+            >
+                {item.selected ?
+                    <Icon name="checkbox-marked" size={32} color="#8688BC" />
+                    :
+                    <Icon name="checkbox-blank-outline" size={32} color="#8688BC" />
+                }
+                <PlantBookingCard
+                    plant={item}
+                    hanldeIncrease={() => hanldeChangeAmount(item, item.quantity + 1)}
+                    hanldeDecrease={() => hanldeChangeAmount(item, item.quantity - 1)}
+                // onPress={() => handleChangeSelected(item)}
+                />
+            </TouchableOpacity>
+        )
+    }
+
+    const hanldeChangeAmount = (item, amount) => {
+        if (amount === 0) {
+            setCart(cart.filter(cartItem => cartItem._id !== item._id))
+        } else {
+            setCart(
+                cart.map(cartItem => {
+                    return { ...cartItem, quantity: cartItem._id === item._id ? amount : cartItem.quantity }
+                })
+            )
+        }
+    }
+
+    const handleChangeSelected = (item) => {
+        setCart(
+            cart.map(cartItem => {
+                return { ...cartItem, selected: cartItem._id === item._id ? !cartItem.selected : cartItem.selected }
+            })
         )
     }
 
@@ -100,7 +160,7 @@ export default function CartView({ goback }) {
                     </TouchableOpacity>
                 </View>
                 <View>
-                    {plantList.map((item, key) => renderCardBooking(item, key))}
+                    {!loading && cart.map((item, key) => renderCardBooking(item, key))}
                 </View>
                 <View style={styles.bookingInfor}>
                     <View style={styles.bookingInfoImage}>
@@ -148,8 +208,8 @@ export default function CartView({ goback }) {
                 <View style={styles.savePlantList}>
                     {savePlantList.map((item, key) => <PlantBookingCard item={item} key={key} />)}
                 </View>
-
             </ScrollView >
+            {loading && <SpinnerLoading />}
             <LinearGradient
                 colors={['#0B845C', '#0D986A']}  // Set the gradient colors
                 start={{ x: 1, y: 0 }}  // Start from the right
@@ -158,12 +218,12 @@ export default function CartView({ goback }) {
             >
                 <TouchableOpacity
                     style={styles.bottomCartSheetContainer}
-                    onPress={() => navigation.navigate("Checkout")}
+                    onPress={() => navigation.navigate("Checkout", { cart: cart, deliveryMethod: deliveryMethodList[0], currentCart: cartRedux.cartList[0] })}
                 >
                     <View style={styles.bottomCartSheetContainerLeft}>
                         <Text style={styles.bottomCartSheetContainerRight}>Checkout</Text>
                     </View>
-                    <Text style={styles.bottomCartSheetContainerRight}>{formatPrice(668990)} VNĐ</Text>
+                    <Text style={styles.bottomCartSheetContainerRight}>{formatPrice(paymentPrice || 0)} VNĐ</Text>
                 </TouchableOpacity>
             </LinearGradient>
         </View >
@@ -181,6 +241,7 @@ const styles = StyleSheet.create({
         zIndex: 11
     },
     contentContainer: {
+        position: "relative",
         paddingHorizontal: 16
     },
     cartHeader: {

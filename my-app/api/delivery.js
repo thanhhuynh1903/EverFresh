@@ -2,7 +2,7 @@ import api from "./apiService";
 
 export const getDeliveryMethods = async (id) => {
     try {
-        const response = await api.get(`/delivery-methods/${id}`);
+        const response = await api.get(`/delivery-methods/` + (id || ""))
         return response;
     } catch (error) {
         console.log("getDeliveryMethods in service/delivery error : ", error);
@@ -12,7 +12,7 @@ export const getDeliveryMethods = async (id) => {
 
 export const getDeliveryInformation = async (id) => {
     try {
-        const response = await api.get(`/delivery-information/${id}`);
+        const response = await api.get(`/delivery-information/` + (id || ""));
         return response;
     } catch (error) {
         console.log("getDeliveryInformation in service/delivery error : ", error);

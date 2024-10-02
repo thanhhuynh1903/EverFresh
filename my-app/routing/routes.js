@@ -10,11 +10,12 @@ import CartView from '../screens/CartView/CartView.js';
 import Checkout from '../screens/Checkout/Checkout.js';
 import Payment from '../screens/Payment/Payment.js';
 import OrderComplete from '../screens/OrderComplete/OrderComplete.js';
+import LoginPage from '../screens/login/login.js';
 // import Category from '../screens/Category';
 
 export const RoutesList = [
     {
-        name: 'Home',
+        name: 'homepage',
         component: Home,
         options: {
             tabBarIcon: ({ color, focused }) => (
@@ -113,6 +114,14 @@ export const RoutesList = [
     {
         name: 'OrderComplete',
         component: OrderComplete,
+        options: {
+            tabBarButton: () => null,
+        },
+        hiddenBottomTab: true
+    },
+    {
+        name: 'LoginPage',
+        component: LoginPage,
         options: {
             tabBarButton: () => null,
         },

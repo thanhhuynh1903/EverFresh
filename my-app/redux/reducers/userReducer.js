@@ -1,14 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { getCurrentUserThunk, loginThunk } from "../thunk/userThunk";
 
 const initState = {
-    _id: "",
-    email: "",
-    password: "",
-    role: "",
-    status: false,
-    createdAt: "",
-    updatedAt: "",
-    __v: 0
+    user: {
+        _id: "",
+        email: "",
+        password: "",
+        role: "",
+        status: false,
+        createdAt: "",
+        updatedAt: "",
+        __v: 0
+    }
 };
 
 const userSlice = createSlice({
@@ -18,6 +21,25 @@ const userSlice = createSlice({
         setUserInfo: (state, action) => {
             state.data = action.payload;
         },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(loginThunk.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(loginThunk.fulfilled, (state, action) => {
+                state.loading = false;
+            })
+            .addCase(loginThunk.rejected, (state, action) => {
+                state.loading = false;
+            })
+            .addCase(getCurrentUserThunk.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload; // Set the user data after fetching
+            })
+            .addCase(getCurrentUserThunk.rejected, (state) => {
+                state.loading = false;
+            });
     },
 });
 export const { setUserInfo } = userSlice.actions;

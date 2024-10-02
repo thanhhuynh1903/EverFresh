@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image, TextInput, ImageBackground } from 'react-native'
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import React, { useState } from 'react'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -7,6 +7,12 @@ import SafeAreaWrapper from '../../components/SafeAreaWrapper'
 import HomeHeader from '../../components/HomeHeader'
 import MenuModal from '../../components/Modal/MenuModal/MenuModal';
 import { formatPrice } from '../../utils/utils.js';
+import { getPlants } from '../../api/plant.js';
+import SpinnerLoading from '../../components/SpinnerLoading/SpinnerLoading.js';
+import useCustomToast from '../../components/ToastNotification/ToastNotification.js';
+import { useDispatch } from 'react-redux';
+import { getCartItemsThunk } from '../../redux/thunk/cartThunk.js';
+import { addToCart } from '../../api/cart.js';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
@@ -14,9 +20,38 @@ const HEIGHT = Dimensions.get('window').height;
 export default function ShopPage() {
 
     const navigation = useNavigation();
+    const showToast = useCustomToast();
+    const dispatch = useDispatch();
     const [tabIndex, setTabIndex] = useState(0)
     const [menuVisible, setMenuVisible] = useState(false)
+    const [plantList, setPlantList] = useState([])
+    const [loading, setLoading] = useState(true)
 
+    useFocusEffect(
+        React.useCallback(() => {
+            loadPlantList()
+        }, [])
+    );
+
+    const loadPlantList = async () => {
+        setLoading(true)
+        const response = await getPlants()
+        if (response?.status === 200) {
+            setPlantList(response.data)
+        }
+        setLoading(false)
+    }
+
+    const handleAddToCart = async item => {
+        console.log(item._id);
+        const response = await addToCart(item._id)
+        if (response.status === 201) {
+            showToast("Success", `Add plant to cart successfull`, "success");
+            await dispatch(getCartItemsThunk());
+        } else {
+            showToast("Fail", `Add plant to cart fail`, "error");
+        }
+    }
     const renderTab = (item, key) => {
         return (
             <TouchableOpacity style={styles.tabContainer}
@@ -33,19 +68,20 @@ export default function ShopPage() {
     }
 
     const renderPlantCard = (item, key) => {
+        if (!item) return
         return (
             <TouchableOpacity style={styles.plantCard}
                 onPress={() => navigation.navigate("PlantDetail", { plant: item })}
                 key={key}
             >
                 <ImageBackground
-                    source={item.background}
+                    source={item.background || require("../../assets/shopping/Rectangle9CE5CB.png")}
                     style={styles.plantCardBackground}
                     resizeMode="contain"
                 >
                     <View style={styles.plantCardInfor}>
                         <View style={styles.plantCardLabelContainer}>
-                            <Text style={styles.plantCardLabel}>{item.label}</Text>
+                            <Text style={styles.plantCardLabel}>{item.uses}</Text>
                             <Image
                                 source={require("../../assets/shopping/pawIcon.png")}
                                 style={styles.plantCardLabelIcon}
@@ -61,7 +97,7 @@ export default function ShopPage() {
                                         style={styles.plantCardFeatureIcon}
                                     />
                                 </TouchableOpacity>
-                                <TouchableOpacity>
+                                <TouchableOpacity onPress={() => { handleAddToCart(item) }}>
                                     <Image
                                         source={require("../../assets/shopping/shopIcon.png")}
                                         style={styles.plantCardFeatureIcon}
@@ -72,13 +108,13 @@ export default function ShopPage() {
                     </View>
                     <View style={styles.plantImageContainer}>
                         <Image
-                            source={item.plantImage}
+                            source={item.plantImage || require("../../assets/shopping/plant1.png")}
                             style={styles.plantImage}
                         />
                     </View>
 
                 </ImageBackground>
-            </TouchableOpacity>
+            </TouchableOpacity >
         )
     }
 
@@ -90,7 +126,7 @@ export default function ShopPage() {
         { label: "Planters" },
     ]
 
-    const plantList = [
+    const plantListDefault = [
         {
             label: "Air Purifier",
             name: "Peperomia",
@@ -179,7 +215,7 @@ export default function ShopPage() {
                         {tabList.map((item, key) => renderTab(item, key))}
                     </View>
 
-                    <View style={styles.plantList}>
+                    <View style={styles.plantListDefault}>
                         {renderPlantCard(plantList[0], 0)}
                         {renderPlantCard(plantList[1], 1)}
                         <ImageBackground
@@ -216,6 +252,7 @@ export default function ShopPage() {
                         {renderPlantCard(plantList[4], 4)}
                         {renderPlantCard(plantList[5], 5)}
                     </View>
+                    {loading && <SpinnerLoading />}
                 </ScrollView>
             </SafeAreaWrapper>
             <MenuModal visible={menuVisible} closeModal={() => setMenuVisible(false)} />
@@ -226,6 +263,7 @@ export default function ShopPage() {
 
 const styles = StyleSheet.create({
     container: {
+        position: "relative",
         height: HEIGHT,
         width: WIDTH,
         overflow: "visible",

@@ -1,84 +1,55 @@
 import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image, ImageBackground, Button } from 'react-native'
-import { useNavigation } from "@react-navigation/native";
-import React, { useState } from 'react'
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, { useMemo, useState } from 'react'
 import BottomSheetHeader from '../../components/BottomSheetHeader/BottomSheetHeader';
 import PlantBookingCard from '../../components/PlantBookingCard/PlantBookingCard';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { selectCart } from '../../redux/selector/selector';
+import { useSelector } from 'react-redux';
+import { formatPrice } from '../../utils/utils';
+import { getDeliveryInformation } from '../../api/delivery';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
 export default function Checkout({ route }) {
     const navigation = useNavigation();
+    const cartRedux = useSelector(selectCart);
+    const [cart, setCart] = useState(route.params.cart)
+    const [deliveryMethod, setDeliveryMethod] = useState(route.params.deliveryMethod)
+    const [deliveryInformationList, setDeliveryInformationList] = useState([])
 
-    const plantList = [
-        {
-            image: require("../../assets/cart/plant2.png"),
-            name: "Watermelon Peperomia",
-            price: 170000,
-            // bookmark:true
-        },
-        {
-            image: require("../../assets/cart/plant1.png"),
-            name: "Peperomia Obtusfolia",
-            price: 200000,
-        },
-        {
-            image: require("../../assets/cart/plant5.png"),
-            name: "Cactus",
-            price: 170000,
-        },
-    ]
+    useFocusEffect(
+        React.useCallback(() => {
+            loadDeliveryInformationList()
+        }, [])
+    );
 
-    const savePlantList = [
-        {
-            image: require("../../assets/cart/plant2.png"),
-            name: "Watermelon Peperomia",
-            price: 170000,
-            bookmark: true
-        },
-        {
-            image: require("../../assets/cart/plant1.png"),
-            name: "Peperomia Obtusfolia",
-            price: 200000,
-            bookmark: true
-        },
-        {
-            image: require("../../assets/cart/plant5.png"),
-            name: "Cactus",
-            price: 170000,
-            bookmark: true
-        },
-        {
-            image: require("../../assets/cart/plant2.png"),
-            name: "Watermelon Peperomia",
-            price: 170000,
-            bookmark: true
-        },
-        {
-            image: require("../../assets/cart/plant1.png"),
-            name: "Peperomia Obtusfolia",
-            price: 200000,
-            bookmark: true
-        },
-        {
-            image: require("../../assets/cart/plant5.png"),
-            name: "Cactus",
-            price: 170000,
-            bookmark: true
-        },
-    ]
+    const loadDeliveryInformationList = async () => {
+        const response = await getDeliveryInformation()
+        if (response.status === 200) {
+            setDeliveryInformationList(response.data)
+        }
+    }
+
+    const paymentPrice = useMemo(() => {
+        let totalPrice = 0
+        cart.map(item => {
+            totalPrice += (item?.quantity * item?.plantDetail?.price)
+        })
+        return totalPrice
+    }, [cart]);
 
     return (
         <View style={styles.container}>
             <BottomSheetHeader goback={() => navigation.goBack()} title={"Checkout"} />
             <ScrollView style={styles.contentContainer}>
                 <View style={styles.plantList}>
-                    {plantList.map((item, key) => <PlantBookingCard item={item} key={key} />)}
+                    {cart.map((item, key) => <PlantBookingCard plant={item} key={key} />)}
                 </View>
                 <View style={styles.totalPrice}>
                     <Text style={styles.totalPriceText}>Sub-total:</Text>
-                    <Text style={styles.totalPriceText}>495.000 VNĐ</Text>
+                    <Text style={styles.totalPriceText}>{formatPrice(paymentPrice || 0)} VNĐ</Text>
                 </View>
                 <View style={styles.shippingAddress}>
                     <Text style={styles.shippingAddressTitle}>Shipping address</Text>
@@ -97,11 +68,18 @@ export default function Checkout({ route }) {
                 </View>
                 <TouchableOpacity
                     style={styles.proceedButton}
-                    onPress={() => { navigation.navigate("Payment") }}
+                    onPress={() => {
+                        navigation.navigate("Payment", {
+                            cart: cart,
+                            deliveryInformation: deliveryInformationList[0],
+                            deliveryMethod: deliveryMethod,
+                            currentCart: route.params.currentCart
+                        })
+                    }}
                 >
                     <Text style={styles.buttonText}>Proceed</Text>
                 </TouchableOpacity>
-
+                {/* {loading && <SpinnerLoading />} */}
             </ScrollView >
         </View >
     )

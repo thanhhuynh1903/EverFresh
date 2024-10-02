@@ -30,7 +30,7 @@ export default function Welcome({ navigation }) {
 
         <CustomButton
           // onPressName={"Signin"}
-          onPressName={"login"}
+          onPressName={"LoginPage"}
           navigation={navigation}
         >
           <Text style={styles.signInButtonText}>Sign In</Text>
