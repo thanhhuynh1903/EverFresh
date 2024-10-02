@@ -1,11 +1,12 @@
 // CustomTabBar.js
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RoutesList } from '../../routing/routes';
 
 const CustomTabBar = ({ state, descriptors, navigation }) => {
+    const [isOpenCircelMenu, setIsOpenCircelMenu] = useState(false)
     const routeItem = useMemo(() => {
         return RoutesList[state.index];
     }, [state.index]);
@@ -51,6 +52,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                         });
 
                         if (!isFocused && !event.defaultPrevented) {
+                            setIsOpenCircelMenu(false)
                             navigation.navigate(route.name);
                         }
                     };
@@ -106,10 +108,31 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}
-                // onPress={() => { navigation.navigate("ScanCamera") }}
-                activeOpacity={0.5}
+                onPress={() => { setIsOpenCircelMenu(!isOpenCircelMenu) }}
+                activeOpacity={0.9}
             // Add desired action for the central button
             >
+                {
+                    isOpenCircelMenu &&
+                    <View style={styles.circleTabBar}>
+                        <LinearGradient
+                            colors={['#47B571', '#75E00A']}
+                            style={styles.halfCircleTabBar}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 0, y: 1 }}
+                        >
+                            <TouchableOpacity style={styles.scanIcon}>
+                                <Icon name="line-scan" size={28} color="#fff" />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.imageIcon}>
+                                <Icon name="image-outline" size={30} color="#fff" />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.videoIcon}>
+                                <Icon name="video-outline" size={30} color="#fff" />
+                            </TouchableOpacity>
+                        </LinearGradient>
+                    </View>
+                }
                 <LinearGradient
                     colors={['#FCCC1F', '#EB5210']}
                     style={{
@@ -122,7 +145,8 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                     end={{ x: 1, y: 0.5 }}
                 >
                 </LinearGradient>
-                <Icon name="camera" size={30} color="#fff" />
+                <Icon name="camera-outline" size={30} color="#fff" />
+
             </TouchableOpacity>
 
         </View>
@@ -145,6 +169,37 @@ const styles = StyleSheet.create({
         height: 90, // Full height (diameter)
         backgroundColor: 'white', // Circle color
         borderRadius: 50, // This makes it a circle
+    },
+    circleTabBar: {
+        position: "absolute",
+        width: 200,
+        height: 100,
+        overflow: 'hidden',
+        top: 0,
+        transform: [{ translateY: -60 }],
+        alignSelf: 'center',
+    },
+    halfCircleTabBar: {
+        width: 200,
+        height: 200,
+        backgroundColor: 'white',
+        borderRadius: 150,
+    },
+
+    scanIcon: {
+        position: "absolute",
+        top: 60,
+        left: 20,
+    },
+    imageIcon: {
+        position: "absolute",
+        top: 15,
+        left: 83,
+    },
+    videoIcon: {
+        position: "absolute",
+        top: 60,
+        right: 20,
     },
 });
 

@@ -126,57 +126,6 @@ export default function ShopPage() {
         { label: "Planters" },
     ]
 
-    const plantListDefault = [
-        {
-            label: "Air Purifier",
-            name: "Peperomia",
-            price: 200000,
-            favorite: true,
-            background: require("../../assets/shopping/Rectangle9CE5CB.png"),
-            plantImage: require("../../assets/shopping/plant1.png"),
-        },
-        {
-            label: "Air Purifier",
-            name: "Watermelon",
-            price: 170000,
-            favorite: true,
-            background: require("../../assets/shopping/RectangleFFF3CC.png"),
-            plantImage: require("../../assets/shopping/plant2.png")
-        },
-        {
-            label: "Air Purifier",
-            name: "Croton Petra",
-            price: 300000,
-            favorite: true,
-            background: require("../../assets/shopping/Rectangle56D1A7.png"),
-            plantImage: require("../../assets/shopping/plant3.png")
-        },
-        {
-            label: "Air Purifier",
-            name: "Bird’s Nest Fern",
-            price: 100000,
-            favorite: true,
-            background: require("../../assets/shopping/RectangleB2E28D.png"),
-            plantImage: require("../../assets/shopping/plant4.png")
-        },
-        {
-            label: "Air Purifier",
-            name: "Cactus",
-            price: 125000,
-            favorite: true,
-            background: require("../../assets/shopping/RectangleDEEC8A.png"),
-            plantImage: require("../../assets/shopping/plant5.png")
-        },
-        {
-            label: "Air Purifier",
-            name: "Aloe Vera",
-            price: 60000,
-            favorite: true,
-            background: require("../../assets/shopping/RectangleDEEC8A.png"),
-            plantImage: require("../../assets/shopping/plant6.png")
-        },
-    ]
-
     return (
         <>
             <SafeAreaWrapper >
@@ -252,8 +201,8 @@ export default function ShopPage() {
                         {renderPlantCard(plantList[4], 4)}
                         {renderPlantCard(plantList[5], 5)}
                     </View>
-                    {loading && <SpinnerLoading />}
                 </ScrollView>
+                {loading && <SpinnerLoading />}
             </SafeAreaWrapper>
             <MenuModal visible={menuVisible} closeModal={() => setMenuVisible(false)} />
         </>
@@ -267,7 +216,7 @@ const styles = StyleSheet.create({
         height: HEIGHT,
         width: WIDTH,
         overflow: "visible",
-        marginBottom: 100,
+        marginBottom: 85,
     },
     headerImg: {
         height: WIDTH * 0.5,
