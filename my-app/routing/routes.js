@@ -11,6 +11,8 @@ import Checkout from '../screens/Checkout/Checkout.js';
 import Payment from '../screens/Payment/Payment.js';
 import OrderComplete from '../screens/OrderComplete/OrderComplete.js';
 import LoginPage from '../screens/login/login.js';
+import ScanCamera from '../screens/ScanCamera/ScanCamera.js';
+import OrderList from '../screens/OrderList/OrderList.js';
 // import Category from '../screens/Category';
 
 export const RoutesList = [
@@ -126,5 +128,20 @@ export const RoutesList = [
             tabBarButton: () => null,
         },
         hiddenBottomTab: true
+    },
+    {
+        name: 'ScanCamera',
+        component: ScanCamera,
+        options: {
+            tabBarButton: () => null,
+        },
+        hiddenBottomTab: true
+    },
+    {
+        name: 'OrderList',
+        component: OrderList,
+        options: {
+            tabBarButton: () => null,
+        },
     },
 ];

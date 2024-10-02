@@ -106,7 +106,8 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}
-                activeOpacity={0.9}
+                // onPress={() => { navigation.navigate("ScanCamera") }}
+                activeOpacity={0.5}
             // Add desired action for the central button
             >
                 <LinearGradient

@@ -11,6 +11,7 @@ const MainStack = () => {
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
     >
+
       {publicRoutes.map((route, index) => (
         <Stack.Screen
           key={index}

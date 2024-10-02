@@ -33,7 +33,7 @@ const tabList = [
     {
         name: "my orders",
         icon: require("../../../assets/menu/order.png"),
-        // page: "CartView",
+        page: "OrderList",
     },
 ]
 

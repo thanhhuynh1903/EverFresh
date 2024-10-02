@@ -30,7 +30,7 @@ export default function LoginPage() {
         const userResponse = await dispatch(getCurrentUserThunk());
         if (userResponse.meta.requestStatus === 'fulfilled') {
             const response = await dispatch(getCartItemsThunk());
-            navigation.navigate("homepage");
+            navigation.navigate("Main");
         }
         setLoading(false)
     }

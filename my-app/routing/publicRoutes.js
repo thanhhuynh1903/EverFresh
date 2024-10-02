@@ -15,6 +15,8 @@ import TrackingOrder from "../screens/TrackingOrder/TrackingOrder";
 import PlantGuide from "../screens/PlantGuide/PlantGuide";
 import CartView from "../screens/CartView/CartView";
 import LoginPage from "../screens/login/login";
+import ScanCamera from "../screens/ScanCamera/ScanCamera";
+import OrderList from "../screens/OrderList/OrderList";
 export const publicRoutes = [
   {
     name: 'Welcome',
@@ -83,5 +85,13 @@ export const publicRoutes = [
   {
     name: 'LoginPage',
     component: LoginPage,
+  },
+  {
+    name: 'ScanCamera',
+    component: ScanCamera,
+  },
+  {
+    name: 'OrderList',
+    component: OrderList,
   },
 ];

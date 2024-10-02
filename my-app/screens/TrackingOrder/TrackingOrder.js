@@ -1,32 +1,12 @@
 import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image, ImageBackground, Button, TextInput } from 'react-native'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigation } from '@react-navigation/native';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import OrderStatusBar from '../../components/OrderStatusBar/OrderStatusBar';
-import { formatPrice } from '../../utils/utils';
+import { formatDate, formatPrice } from '../../utils/utils';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
-
-const orderStatusList = [
-    {
-        name: "Order Confirmed",
-        date: "Wed, 1 lth July",
-        checked: true
-    },
-    {
-        name: "Shipped",
-        date: "Wed, 1 lth July"
-    },
-    {
-        name: "Out For Delivery",
-        date: "Wed, 1 lth July"
-    },
-    {
-        name: "Delivered ",
-        date: "Wed, 1 lth July"
-    },
-]
 
 const savePlantList = [
     {
@@ -52,12 +32,42 @@ const savePlantList = [
 export default function TrackingOrder({ route }) {
     const navigation = useNavigation();
 
+    const [orderDetail, setOrderDetail] = useState(route.params.orderDetail)
+    const orderStatusList = useMemo(() => {
+        return [
+            {
+                name: "Order Confirmed",
+                date: "Wed, 1 lth July",
+                checked: ["Confirmed", "Shipped", "Out Of Delivery", "Delivered"].includes(orderDetail.status)
+            },
+            {
+                name: "Shipped",
+                date: "Wed, 1 lth July",
+                checked: ["Shipped", "Out Of Delivery", "Delivered"].includes(orderDetail.status)
+            },
+            {
+                name: "Out For Delivery",
+                date: "Wed, 1 lth July",
+                checked: ["Out Of Delivery", "Delivered"].includes(orderDetail.status)
+            },
+            {
+                name: "Delivered ",
+                date: "Wed, 1 lth July",
+                checked: ["Delivered"].includes(orderDetail.status)
+            },
+        ]
+    }, [orderDetail]);
+
+    useEffect(() => {
+        setOrderDetail(route.params.orderDetail)
+    }, [route.params.orderDetail])
+
     const renderBookingCard = (item, key) => {
         return (
             <TouchableOpacity style={styles.bookingCardContainer} activeOpacity={1} onPress={item?.onPress && item?.onPress} key={key}>
                 <View style={styles.imageContainer}>
                     <Image
-                        source={item?.image}
+                        source={item?.image || require("../../assets/cart/plant1.png")}
                         resizeMode="stretch"
                         style={styles.image}
                     />
@@ -65,13 +75,13 @@ export default function TrackingOrder({ route }) {
 
                 <View style={styles.center}>
                     <View style={styles.centerFuncional}>
-                        <Text style={styles.centerTitle}>{item?.name}</Text>
-                        <Text style={styles.centerPrice}>{formatPrice(item?.price || 0)} VNĐ</Text>
+                        <Text style={styles.centerTitle}>{item?.plant_id?.name}</Text>
+                        <Text style={styles.centerPrice}>{formatPrice(item?.item_total_price || 0)} VNĐ</Text>
                     </View>
                     <View style={{ ...styles.centerFuncional, justifyContent: "flex-start" }}>
-                        <Text style={styles.amount}>Air Purifier</Text>
+                        <Text style={styles.amount}>{item?.plant_id?.uses}</Text>
                         <View style={styles.split} />
-                        <Text style={styles.amount}>3-4 weeks</Text>
+                        <Text style={styles.amount}>{item?.plant_id?.growth_rate}</Text>
                         <View style={styles.split} />
                         <Text style={styles.amount}>35 cm</Text>
                         <Text
@@ -81,7 +91,7 @@ export default function TrackingOrder({ route }) {
                                 right: 0
                             }}
                         >
-                            Oty: 1
+                            Oty: {item?.quantity}
                         </Text>
                     </View>
                 </View>
@@ -92,24 +102,30 @@ export default function TrackingOrder({ route }) {
     return (
         <ScrollView style={styles.container}>
             <View style={{ ...styles.header, backgroundColor: "white" }}>
-                <Text style={styles.orderCode}>Order #9876543</Text>
+                <Text style={styles.orderCode}>Order {orderDetail._id}</Text>
             </View>
             <View style={styles.orderContainer}>
                 <View style={styles.orderTime}>
                     <Text style={styles.orderTimeTitle}>Order date:</Text>
-                    <Text style={styles.orderTimeValue}>May 16, 2024</Text>
+                    <Text style={styles.orderTimeValue}>{formatDate(orderDetail.createdAt)}</Text>
                     <Image
                         source={require("../../assets/cart/deliveryIcon.png")}
                         resizeMode="stretch"
                         style={styles.deliveryIcon}
                     />
-                    <Text style={styles.orderTimeExpDate}>Estimated delivery: May 16, 2024</Text>
+                    <Text style={styles.orderTimeExpDate}>Estimated delivery: {formatDate(orderDetail.updatedAt)}</Text>
                 </View>
                 <View style={styles.orderStatusBar}>
-                    <OrderStatusBar orderStatusList={orderStatusList} />
+                    {
+                        orderDetail.status === "Failed Delivery" ?
+                            <Text>Failed Delivery</Text>
+                            :
+                            <OrderStatusBar orderStatusList={orderStatusList} />
+                    }
+
                 </View>
                 <View style={styles.dashLine} />
-                {savePlantList.map((item, key) => renderBookingCard(item, key))}
+                {orderDetail?.list_cart_item_id?.map((item, key) => renderBookingCard(item, key))}
                 <View style={styles.dashLine} />
                 <View style={styles.orderInfo}>
                     <View style={styles.orderInfoTab}>
@@ -167,7 +183,7 @@ export default function TrackingOrder({ route }) {
                         <Text style={styles.orderInfoTabTitle}>Delivery</Text>
                         <View style={{ ...styles.flexRow, justifyContent: "space-between", marginBottom: 12 }}>
                             <Text style={{ ...styles.orderInfoTabText, fontSize: 14, fontWeight: "medium", color: "#475467" }}>Subtotal</Text>
-                            <Text style={{ ...styles.orderInfoTabText, color: "#475467" }}>{formatPrice(495000)} VNĐ</Text>
+                            <Text style={{ ...styles.orderInfoTabText, color: "#475467" }}>{formatPrice(orderDetail.total_price - orderDetail.delivery_method?.price)} VNĐ</Text>
                         </View>
                         <View style={{ ...styles.flexRow, justifyContent: "space-between", marginBottom: 12 }}>
                             <Text style={{ ...styles.orderInfoTabText, color: "#475467" }}>Discount</Text>
@@ -175,7 +191,7 @@ export default function TrackingOrder({ route }) {
                         </View>
                         <View style={{ ...styles.flexRow, justifyContent: "space-between", marginBottom: 12 }}>
                             <Text style={{ ...styles.orderInfoTabText, color: "#475467" }}>Delivery</Text>
-                            <Text style={{ ...styles.orderInfoTabText, color: "#475467" }}>{formatPrice(30000)} VNĐ</Text>
+                            <Text style={{ ...styles.orderInfoTabText, color: "#475467" }}>{formatPrice(orderDetail.delivery_method?.price)} VNĐ</Text>
                         </View>
                         <View style={{ ...styles.flexRow, justifyContent: "space-between", marginBottom: 12 }}>
                             <Text style={{ ...styles.orderInfoTabText, color: "#475467" }}>Fee</Text>
@@ -184,7 +200,7 @@ export default function TrackingOrder({ route }) {
                         <View style={{ width: "100%", borderBottomWidth: 1, borderStyle: "dashed", marginBottom: 6 }} />
                         <View style={{ ...styles.flexRow, justifyContent: "space-between", marginBottom: 12 }}>
                             <Text style={{ ...styles.orderInfoTabText, color: "#475467" }}>Total</Text>
-                            <Text style={{ ...styles.orderInfoTabText, color: "#1D2939", fontSize: 17, fontWeight: "bold" }}>{formatPrice(525000)} VNĐ</Text>
+                            <Text style={{ ...styles.orderInfoTabText, color: "#1D2939", fontSize: 17, fontWeight: "bold" }}>{formatPrice(orderDetail.total_price)} VNĐ</Text>
                         </View>
                     </View>
                 </View>
