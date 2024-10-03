@@ -17,81 +17,86 @@ import CartView from "../screens/CartView/CartView";
 import LoginPage from "../screens/login/login";
 import ScanCamera from "../screens/ScanCamera/ScanCamera";
 import OrderList from "../screens/OrderList/OrderList";
+import PlantReport from "../screens/PlantReport/PlantReport";
 export const publicRoutes = [
   {
-    name: 'Welcome',
+    name: "Welcome",
     component: welcome,
   },
   {
-    name: 'Signin',
+    name: "Signin",
     component: signin,
   },
   {
-    name: 'CreateAnAccount',
+    name: "CreateAnAccount",
     component: Signup,
   },
   {
-    name: 'verify',
+    name: "verify",
     component: Verification,
   },
   {
-    name: 'registerverify',
+    name: "registerverify",
     component: Registerverify,
   },
   {
-    name: 'packageplan',
+    name: "packageplan",
     component: PackagePlan,
   },
   {
-    name: 'homepage',
+    name: "homepage",
     component: Homepage,
   },
   {
-    name: 'savedplant',
+    name: "savedplant",
     component: SavedPlant,
   },
   {
-    name: 'ShopPage',
+    name: "ShopPage",
     component: ShopPage,
   },
   {
-    name: 'PlantDetail',
+    name: "PlantDetail",
     component: PlantDetail,
   },
   {
-    name: 'Checkout',
+    name: "Checkout",
     component: Checkout,
   },
   {
-    name: 'Payment',
+    name: "Payment",
     component: Payment,
   },
   {
-    name: 'OrderComplete',
+    name: "OrderComplete",
     component: OrderComplete,
   },
   {
-    name: 'TrackingOrder',
+    name: "TrackingOrder",
     component: TrackingOrder,
   },
   {
-    name: 'PlantGuide',
+    name: "PlantGuide",
     component: PlantGuide,
   },
   {
-    name: 'CartView',
+    name: "CartView",
     component: CartView,
   },
   {
-    name: 'LoginPage',
+    name: "LoginPage",
     component: LoginPage,
   },
   {
-    name: 'ScanCamera',
+    name: "ScanCamera",
     component: ScanCamera,
   },
   {
-    name: 'OrderList',
+    name: "OrderList",
     component: OrderList,
+  },
+  {
+    name: "PlantReport",
+    component: PlantReport,
   },
 ];

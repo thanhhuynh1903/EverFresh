@@ -14,6 +14,7 @@ const TabNavigator = () => {
         tabBarShowLabel: false,
         headerShown: false, // Hide header if not needed
       })}
+      backBehavior="history"
     >
       {RoutesList.map((item, index) => (
         <Tab.Screen
