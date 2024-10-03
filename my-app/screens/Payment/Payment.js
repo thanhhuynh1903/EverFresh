@@ -58,12 +58,13 @@ export default function Payment({ route }) {
   );
 
   const handlePayment = async () => {
-    const response = await paymentMomo({
-      voucherId: "",
-      deliveryMethodId: deliveryMethod._id,
-      deliveryInformationId: deliveryInformation._id,
-      cartId: route.params.currentCart._id,
-    });
+    const data = {
+      delivery_method_id: deliveryMethod._id,
+      delivery_information_id: deliveryInformation._id,
+      cart_id: route.params.currentCart._id,
+    };
+    const response = await paymentMomo(data);
+
     if (response.status === 200) {
       await Linking.openURL(response?.data?.deeplink);
       console.log(response?.data?.deeplink);
@@ -465,7 +466,7 @@ const styles = StyleSheet.create({
   carouselItem: {
     width: WIDTH, // Set width to 60% of the screen width
     // marginHorizontal: WIDTH * 0.1, // Set margin to 10% of the screen width on both sides
-    height: 200,
+    height: 280,
   },
   carouselImage: {
     width: "100%",
