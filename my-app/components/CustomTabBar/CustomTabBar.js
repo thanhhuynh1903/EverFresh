@@ -1,9 +1,12 @@
 // CustomTabBar.js
 import React, { useMemo, useState } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RoutesList } from "../../routing/routes";
+
+const WIDTH = Dimensions.get("window").width;
+const HEIGHT = Dimensions.get("window").height;
 
 const CustomTabBar = ({ state, descriptors, navigation }) => {
   const [isOpenCircelMenu, setIsOpenCircelMenu] = useState(false);
@@ -19,7 +22,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
         position: "absolute",
         bottom: 0,
         width: "100%",
-        height: 80,
+        height: HEIGHT * 0.08,
         backgroundColor: "white",
       }}
     >
@@ -110,17 +113,14 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
           );
         })}
       </View>
-      <View style={styles.circleContainer}>
-        <View style={styles.halfCircle} />
-      </View>
       {/* Center Button */}
       <TouchableOpacity
         style={{
           position: "absolute",
           alignSelf: "center",
           top: "-50%",
-          width: 80,
-          height: 80,
+          width: HEIGHT * 0.08,
+          height: HEIGHT * 0.08,
           borderRadius: 50,
           backgroundColor: "#ff9900", // Adjust as needed
           justifyContent: "center",
@@ -155,6 +155,9 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
             </LinearGradient>
           </View>
         )}
+        <View style={styles.circleContainer}>
+          <View style={styles.halfCircle} />
+        </View>
         <LinearGradient
           colors={["#FCCC1F", "#EB5210"]}
           style={{
@@ -175,50 +178,50 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 const styles = StyleSheet.create({
   circleContainer: {
     position: "absolute",
-    width: 90, // Diameter of the full circle
-    height: 45, // Half of the diameter
-    overflow: "hidden", // Hides the bottom half,
+    width: HEIGHT * 0.09,
+    height: HEIGHT * 0.045,
+    overflow: "hidden",
     transform: [{ rotateZ: "180deg" }],
-    top: 0,
+    bottom: -HEIGHT * 0.005,
     alignSelf: "center",
     // top: "-0%",
   },
   halfCircle: {
-    width: 90, // Full width (diameter)
-    height: 90, // Full height (diameter)
+    width: HEIGHT * 0.09, // Full width (diameter)
+    height: HEIGHT * 0.09, // Full height (diameter)
     backgroundColor: "white", // Circle color
     borderRadius: 50, // This makes it a circle
   },
   circleTabBar: {
     position: "absolute",
-    width: 200,
-    height: 100,
+    width: HEIGHT * 0.2,
+    height: HEIGHT * 0.1,
     overflow: "hidden",
     top: 0,
-    transform: [{ translateY: -60 }],
+    transform: [{ translateY: -(HEIGHT * 0.06) }],
     alignSelf: "center",
   },
   halfCircleTabBar: {
-    width: 200,
-    height: 200,
+    width: HEIGHT * 0.2,
+    height: HEIGHT * 0.2,
     backgroundColor: "white",
     borderRadius: 150,
   },
 
   scanIcon: {
     position: "absolute",
-    top: 60,
-    left: 20,
+    top: HEIGHT * 0.06,
+    left: HEIGHT * 0.02,
   },
   imageIcon: {
     position: "absolute",
-    top: 15,
-    left: 83,
+    top: HEIGHT * 0.015,
+    left: HEIGHT * 0.083,
   },
   videoIcon: {
     position: "absolute",
-    top: 60,
-    right: 20,
+    top: HEIGHT * 0.06,
+    right: HEIGHT * 0.02,
   },
 });
 

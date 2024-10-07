@@ -16,7 +16,7 @@ export default function LoginPage() {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -51,7 +51,7 @@ export default function LoginPage() {
         userResponse.payload.status === 200
       ) {
         const cartResponse = await dispatch(getCartItemsThunk());
-        navigation.navigate("homepage"); // Redirect to homepage
+        navigation.navigate("Main"); // Redirect to homepage
       } else {
         console.log("Failed to fetch user data or invalid status");
       }

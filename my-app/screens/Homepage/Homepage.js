@@ -1,32 +1,42 @@
-import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Image } from 'react-native'
+import {
+  View,
+  Text,
+  ScrollView,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-import SafeAreaWrapper from '../../components/SafeAreaWrapper'
-import HomeHeader from '../../components/HomeHeader'
-import MenuModal from '../../components/Modal/MenuModal/MenuModal';
+import SafeAreaWrapper from "../../components/SafeAreaWrapper";
+import HomeHeader from "../../components/HomeHeader";
+import MenuModal from "../../components/Modal/MenuModal/MenuModal";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../redux/selector/selector";
 
-const WIDTH = Dimensions.get('window').width;
-const HEIGHT = Dimensions.get('window').height;
+const WIDTH = Dimensions.get("window").width;
+const HEIGHT = Dimensions.get("window").height;
 
 const popularPlantCardDemo = [
   {
     status: "Fits well",
     name: "Happy David Rosemary",
-    img: require("../../assets/homeImg/plant1.png")
+    img: require("../../assets/homeImg/plant1.png"),
   },
   {
     status: "Fits well",
     name: "Lovely Gracie Betel grass",
     img: require("../../assets/homeImg/plant2.png"),
-    textStroke: ""
+    textStroke: "",
   },
-]
+];
 
 const savedPlantCardDemo = [
   {
-    img: require("../../assets/homeImg/plantImage1.png")
+    img: require("../../assets/homeImg/plantImage1.png"),
   },
   {
     img: require("../../assets/homeImg/plantImage2.png"),
@@ -34,12 +44,12 @@ const savedPlantCardDemo = [
   {
     img: require("../../assets/homeImg/plantImage3.png"),
   },
-]
+];
 
 const guidePlantCardDemo = [
   {
     name: "Lily",
-    img: require("../../assets/homeImg/guidePlant1.png")
+    img: require("../../assets/homeImg/guidePlant1.png"),
   },
   {
     name: "Common Yarrow",
@@ -49,13 +59,13 @@ const guidePlantCardDemo = [
     name: "Zinnia",
     img: require("../../assets/homeImg/guidePlant3.png"),
   },
-]
+];
 
 const seasonalPlantCardDemo = [
   {
     description: "Summer plant less water required for growth",
     name: "Yarrow",
-    img: require("../../assets/homeImg/seasonalPlant1.png")
+    img: require("../../assets/homeImg/seasonalPlant1.png"),
   },
   {
     description: "Winter plant minimum water required for growth",
@@ -67,29 +77,30 @@ const seasonalPlantCardDemo = [
     name: "Bacopa",
     img: require("../../assets/homeImg/seasonalPlant3.png"),
   },
-]
+];
 
 export default function Homepage() {
-
   const navigation = useNavigation();
-  const [menuVisible, setMenuVisible] = useState(false)
+  const userRedux = useSelector(selectUser);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const renderPopularPlantCard = (item, key) => {
     return (
       <TouchableOpacity style={styles.popularPlantCard} key={key}>
         <View style={styles.popularPlantCardDetail}>
-          <Text style={styles.popularPlantCardDetailStatus}>{item.status || "Fits well"}</Text>
-          <Text style={styles.popularPlantCardDetailName}>{item.name || "Happy David Rosemary"}</Text>
+          <Text style={styles.popularPlantCardDetailStatus}>
+            {item.status || "Fits well"}
+          </Text>
+          <Text style={styles.popularPlantCardDetailName}>
+            {item.name || "Happy David Rosemary"}
+          </Text>
         </View>
         <View style={styles.popularPlantCardImage}>
-          <Image
-            source={item.img}
-            style={styles.popularPlantCardImagePlant}
-          />
+          <Image source={item.img} style={styles.popularPlantCardImagePlant} />
         </View>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   const renderSavedPlantCard = (item, key) => {
     return (
@@ -98,13 +109,10 @@ export default function Homepage() {
         key={key}
         onPress={() => navigation.navigate("savedplant", { savedPlant: item })}
       >
-        <Image
-          source={item.img}
-          style={styles.savedPlantCardImage}
-        />
+        <Image source={item.img} style={styles.savedPlantCardImage} />
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   const renderGuidePlantCard = (item, key) => {
     return (
@@ -113,35 +121,33 @@ export default function Homepage() {
         onPress={() => navigation.navigate("PlantGuide", { plant: item })}
         key={key}
       >
-        <Image
-          source={item.img}
-          style={styles.guidePlantCardImage}
-        />
+        <Image source={item.img} style={styles.guidePlantCardImage} />
         <Text style={styles.guidePlantCardText}>{item.name}</Text>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   const renderSeasonalPlantCard = (item, key) => {
     return (
       <TouchableOpacity style={styles.seasonalPlantCard} key={key}>
         <View style={styles.seasonalPlantCardImage}>
-          <Image
-            source={item.img}
-            style={styles.seasonalPlantCardImagePlant}
-          />
+          <Image source={item.img} style={styles.seasonalPlantCardImagePlant} />
         </View>
         <View style={styles.seasonalPlantCardDetail}>
-          <Text style={styles.seasonalPlantCardDetailnName}>{item.name || "Fits well"}</Text>
-          <Text style={styles.seasonalPlantCardDetailDesc}>{item.description || "Happy David Rosemary"}</Text>
+          <Text style={styles.seasonalPlantCardDetailnName}>
+            {item.name || "Fits well"}
+          </Text>
+          <Text style={styles.seasonalPlantCardDetailDesc}>
+            {item.description || "Happy David Rosemary"}
+          </Text>
         </View>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   return (
     <>
-      <SafeAreaWrapper >
+      <SafeAreaWrapper>
         <HomeHeader
           navigation={navigation}
           handleMenuToggle={() => setMenuVisible(!menuVisible)}
@@ -149,22 +155,42 @@ export default function Homepage() {
         />
         <ScrollView style={styles.container}>
           <View style={styles.yourPland}>
-            <Text style={styles.yourPlandTitle}>Hi User. Your plant missed you!</Text>
+            <Text style={styles.yourPlandTitle}>
+              Hi{" "}
+              <Text style={{ textTransform: "capitalize" }}>
+                {userRedux?.user?.name || "User"}
+              </Text>
+              . Your plant missed you!
+            </Text>
             <TouchableOpacity style={styles.yourPlandViewAll}>
               <Text style={styles.yourPlandViewAllText}>View all</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.popularPlandContainer}>
-            {popularPlantCardDemo.map((item, key) => renderPopularPlantCard(item, item.name + key))}
+            {popularPlantCardDemo.map((item, key) =>
+              renderPopularPlantCard(item, item.name + key)
+            )}
           </View>
           <View style={styles.popularPlandInfor}>
             <View style={styles.popularPlandInforRow}>
-              <Icon name="tree-outline" size={18} color="rgba(59,206,172,0.75)" />
-              <Text style={styles.popularPlandInforRowText}>Using 6 out 9 pods</Text>
+              <Icon
+                name="tree-outline"
+                size={18}
+                color="rgba(59,206,172,0.75)"
+              />
+              <Text style={styles.popularPlandInforRowText}>
+                Using 6 out 9 pods
+              </Text>
             </View>
             <View style={styles.popularPlandInforRow}>
-              <Icon name="clock-time-two-outline" size={18} color="rgba(59,206,172,0.75)" />
-              <Text style={styles.popularPlandInforRowText}>Basil will be ready for harvest in 3 days</Text>
+              <Icon
+                name="clock-time-two-outline"
+                size={18}
+                color="rgba(59,206,172,0.75)"
+              />
+              <Text style={styles.popularPlandInforRowText}>
+                Basil will be ready for harvest in 3 days
+              </Text>
             </View>
           </View>
           <View style={styles.deviderLine} />
@@ -175,7 +201,9 @@ export default function Homepage() {
             </TouchableOpacity>
           </View>
           <View style={styles.savedPlandContainer}>
-            {savedPlantCardDemo.map((item, key) => renderSavedPlantCard(item, key))}
+            {savedPlantCardDemo.map((item, key) =>
+              renderSavedPlantCard(item, key)
+            )}
           </View>
           <View style={styles.deviderLine} />
           <View style={styles.yourPland}>
@@ -184,25 +212,37 @@ export default function Homepage() {
               <Text style={styles.yourPlandViewAllText}>View all</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.seasonalPlandContainer}>
-            {guidePlantCardDemo.map((item, key) => renderGuidePlantCard(item, item.name + key))}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.seasonalPlandContainer}
+          >
+            {guidePlantCardDemo.map((item, key) =>
+              renderGuidePlantCard(item, item.name + key)
+            )}
           </ScrollView>
           <View style={styles.yourPland}>
             <Text style={styles.yourPlandTitle}>Seasonal Plants</Text>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.seasonalPlandContainer}>
-            {seasonalPlantCardDemo.map((item, key) => renderSeasonalPlantCard(item, key))}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.seasonalPlandContainer}
+          >
+            {seasonalPlantCardDemo.map((item, key) =>
+              renderSeasonalPlantCard(item, key)
+            )}
           </ScrollView>
         </ScrollView>
       </SafeAreaWrapper>
       <MenuModal
         visible={menuVisible}
         closeModal={() => {
-          setMenuVisible(false)
-        }} />
+          setMenuVisible(false);
+        }}
+      />
     </>
-
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -217,12 +257,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    marginBottom: 28
+    marginBottom: 28,
   },
   yourPlandTitle: {
-    width: "75%",
+    width: "90%",
     fontSize: 18,
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   yourPlandViewAll: {
     textAlign: "right",
@@ -233,14 +273,14 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontSize: 12,
     color: "#0D986A",
-    textDecorationLine: "underline"
+    textDecorationLine: "underline",
   },
   // popilar plant
   popularPlandContainer: {
     width: WIDTH,
     flexDirection: "row",
     marginBottom: 28,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   popularPlantCard: {
     position: "relative",
@@ -254,7 +294,7 @@ const styles = StyleSheet.create({
     marginRight: "5%",
     backgroundColor: "#F8F8F8",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },  // X: 0, Y: 4
+    shadowOffset: { width: 0, height: 4 }, // X: 0, Y: 4
     shadowOpacity: 0.25,
     shadowRadius: 10,
     elevation: 4,
@@ -266,24 +306,24 @@ const styles = StyleSheet.create({
   popularPlantCardDetailStatus: {
     color: "#61AF2B",
     fontWeight: "medium",
-    fontSize: 10
+    fontSize: 10,
   },
   popularPlantCardDetailName: {
     fontSize: 16,
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   popularPlantCardImage: {
     position: "relative",
     alignItems: "flex-end",
-    justifyContent: "flex-end"
+    justifyContent: "flex-end",
   },
   popularPlantCardImagePlant: {
     position: "absolute",
-    left: -15
+    left: -15,
   },
   //popular Pland Infor
   popularPlandInfor: {
-    width: WIDTH - (20 * 2),
+    width: WIDTH - 20 * 2,
     height: "auto",
     paddingHorizontal: 20,
     paddingVertical: 8,
@@ -294,7 +334,7 @@ const styles = StyleSheet.create({
 
     backgroundColor: "#FFFFFF",
     shadowColor: "#0C9359",
-    shadowOffset: { width: 0, height: 8 },  // X: 0, Y: 4
+    shadowOffset: { width: 0, height: 8 }, // X: 0, Y: 4
     shadowOpacity: 0.5,
     shadowRadius: 20,
     elevation: 8,
@@ -302,11 +342,11 @@ const styles = StyleSheet.create({
   popularPlandInforRow: {
     flexDirection: "row",
     gap: 12,
-    height: 25
+    height: 25,
   },
   popularPlandInforRowText: {
     color: "#06492C",
-    fontSize: 14
+    fontSize: 14,
   },
   deviderLine: {
     width: WIDTH - 20 * 2,
@@ -321,7 +361,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     marginBottom: 28,
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   savedPlantCard: {
     width: WIDTH * 0.28,
@@ -332,7 +372,7 @@ const styles = StyleSheet.create({
       width: 4,
       height: 4,
     },
-    shadowOpacity: 0.30,
+    shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
   },
@@ -340,7 +380,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: WIDTH * 0.28,
     resizeMode: "contain",
-
   },
   // guidePlantCard
   guidePlantCard: {
@@ -354,7 +393,7 @@ const styles = StyleSheet.create({
 
     backgroundColor: "#FFFFFF",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },  // X: 0, Y: 4
+    shadowOffset: { width: 0, height: 4 }, // X: 0, Y: 4
     shadowOpacity: 0.25,
     shadowRadius: 50,
     elevation: 4,
@@ -369,7 +408,7 @@ const styles = StyleSheet.create({
   guidePlantCardText: {
     width: "70%",
     fontSize: 18,
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   //seasonalPlantCard
   seasonalPlandContainer: {
@@ -377,7 +416,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     marginBottom: 28,
     flexDirection: "row",
-    overflow: "visible"
+    overflow: "visible",
   },
   seasonalPlantCard: {
     width: WIDTH * 0.4,
@@ -390,28 +429,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(218,218,218,0)",
     shadowColor: "#000",
-    shadowOffset: { width: 4, height: 4 },  // X: 0, Y: 4
+    shadowOffset: { width: 4, height: 4 }, // X: 0, Y: 4
     shadowOpacity: 0.25,
     shadowRadius: 50,
     elevation: 4,
   },
   seasonalPlantCardImage: {
     width: "100%",
-    marginBottom: 10
+    marginBottom: 10,
   },
   seasonalPlantCardImagePlant: {
     width: "100%",
     resizeMode: "cover",
-    borderRadius: 6
+    borderRadius: 6,
   },
   seasonalPlantCardDetailnName: {
     color: "#002140",
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10
+    marginBottom: 10,
   },
   seasonalPlantCardDetailDesc: {
     color: "#002140",
     fontSize: 12,
-  }
+  },
 });

@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   Image,
   ImageBackground,
+  TextInput,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { formatPrice } from "../../utils/utils";
@@ -21,7 +22,9 @@ import SpinnerLoading from "../../components/SpinnerLoading/SpinnerLoading";
 import { getPlants } from "../../api/plant";
 import { getDeliveryMethods } from "../../api/delivery";
 import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
-import { updateCartItem } from "../../api/cart";
+import { deleteCartItem, updateCartItem } from "../../api/cart";
+import useCustomToast from "../../components/ToastNotification/ToastNotification";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -29,10 +32,15 @@ const HEIGHT = Dimensions.get("window").height;
 export default function CartView({ goback }) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const showToast = useCustomToast();
   const cartRedux = useSelector(selectCart);
   const [cart, setCart] = useState([]);
+  const [deliveryMethod, setDeliveryMethod] = useState([]);
   const [deliveryMethodList, setDeliveryMethodList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const chooseDeliveryBottomSheetRef = useRef(null);
+  const snapPoints = useMemo(() => ["25%", "50%", "75%"], []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -43,6 +51,10 @@ export default function CartView({ goback }) {
   useEffect(() => {
     loadCartList();
   }, [cartRedux]);
+
+  useEffect(() => {
+    setDeliveryMethod(deliveryMethodList[0]);
+  }, [deliveryMethodList]);
 
   const loadCartList = async () => {
     setLoading(true);
@@ -75,6 +87,10 @@ export default function CartView({ goback }) {
         totalPrice += item?.quantity * item?.plantDetail?.price;
       });
     return totalPrice;
+  }, [cart]);
+
+  const slectedItems = useMemo(() => {
+    return cart.filter((item) => item.selected);
   }, [cart]);
 
   const savePlantList = [
@@ -116,6 +132,110 @@ export default function CartView({ goback }) {
     },
   ];
 
+  const hanldeChangeAmount = async (item, amount) => {
+    const response = await updateCartItem(item._id, amount);
+    if (amount === 0) {
+      setCart(cart.filter((cartItem) => cartItem._id !== item._id));
+    } else {
+      setCart(
+        cart.map((cartItem) => {
+          return {
+            ...cartItem,
+            quantity: cartItem._id === item._id ? amount : cartItem.quantity,
+          };
+        })
+      );
+    }
+  };
+
+  const handleDeteteCartItem = async (item) => {
+    const response = await deleteCartItem(item._id);
+
+    if (response.status === 200) {
+      setCart(cart.filter((cartItem) => cartItem._id !== item._id));
+    }
+  };
+
+  const handleDeleteSelectedItems = async () => {
+    try {
+      const deletePromises = slectedItems.map((item) =>
+        deleteCartItem(item._id)
+      );
+      const responses = await Promise.all(deletePromises);
+      const successfulDeletes = responses.filter(
+        (response) => response.status === 200
+      );
+      setCart((prevCart) =>
+        prevCart.filter(
+          (cartItem) => !items.some((item) => item._id === cartItem._id)
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting items: ", error);
+    }
+  };
+
+  const handleChangeSelected = (item) => {
+    setCart(
+      cart.map((cartItem) => {
+        return {
+          ...cartItem,
+          selected:
+            cartItem._id === item._id ? !cartItem.selected : cartItem.selected,
+        };
+      })
+    );
+  };
+
+  const handleAddToCollection = async (item) => {
+    showToast({
+      title: "Success",
+      message: (
+        <View
+          style={{
+            width: WIDTH * 0.75,
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text>Add to collection successfully</Text>
+          <TouchableOpacity
+            onPress={() => {
+              console.log("Manager");
+            }}
+          >
+            <Text style={{ color: "#4287f5", fontWeight: "bold" }}>
+              Manager
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ),
+      type: "success",
+      // position: "bottom",
+    });
+    // const response = await addToCart(item._id);
+    // if (response.status === 201) {
+    //   showToast({
+    //     title: "Success",
+    //     message: `Add plant to cart successfull`,
+    //     type: "success",
+    //   });
+    //   await dispatch(getCartItemsThunk());
+    // } else {
+    //   showToast({
+    //     title: "SuFailccess",
+    //     message: `Add plant to cart fail`,
+    //     type: "error",
+    //   });
+    // }
+  };
+
+  const closeBottomSheet = () => {
+    chooseDeliveryBottomSheetRef.current?.close();
+    setBottomSheetVisible(false);
+  };
+
   const renderCardBooking = (item, key) => {
     return (
       <TouchableOpacity
@@ -132,40 +252,71 @@ export default function CartView({ goback }) {
           plant={item}
           hanldeIncrease={() => hanldeChangeAmount(item, item.quantity + 1)}
           hanldeDecrease={() => hanldeChangeAmount(item, item.quantity - 1)}
-          // onPress={() => handleChangeSelected(item)}
+          handleDelete={() => handleDeteteCartItem(item)}
+          handleAddToCollection={() => handleAddToCollection(item)}
+          onPress={() => handleChangeSelected(item)}
         />
       </TouchableOpacity>
     );
   };
 
-  const hanldeChangeAmount = async (item, amount) => {
-    const response = await updateCartItem(item._id, amount);
-    console.log(response.status);
-    console.log(item._id);
-
-    if (amount === 0) {
-      setCart(cart.filter((cartItem) => cartItem._id !== item._id));
-    } else {
-      setCart(
-        cart.map((cartItem) => {
-          return {
-            ...cartItem,
-            quantity: cartItem._id === item._id ? amount : cartItem.quantity,
-          };
-        })
-      );
-    }
-  };
-
-  const handleChangeSelected = (item) => {
-    setCart(
-      cart.map((cartItem) => {
-        return {
-          ...cartItem,
-          selected:
-            cartItem._id === item._id ? !cartItem.selected : cartItem.selected,
-        };
-      })
+  const renderChooseDeliveryMethodBottomSheet = () => {
+    return (
+      <>
+        {bottomSheetVisible && (
+          <TouchableOpacity
+            style={styles.overlay}
+            activeOpacity={1}
+            onPress={closeBottomSheet}
+          />
+        )}
+        <BottomSheet
+          ref={chooseDeliveryBottomSheetRef}
+          index={-1}
+          snapPoints={snapPoints}
+          style={{ zIndex: 999 }}
+        >
+          <View style={styles.sheetContent}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={closeBottomSheet}
+            >
+              <Text style={styles.closeText}>×</Text>
+            </TouchableOpacity>
+            <Text style={styles.title}>Add New Card</Text>
+            <Text style={styles.label}>Name on card</Text>
+            <TextInput style={styles.input} placeholder="Nguyen Thuong Huyen" />
+            <Text style={styles.label}>Card number</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="1234 4567 7890 1234"
+              keyboardType="numeric"
+            />
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.label}>Expiry date</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="02/24"
+                  keyboardType="numeric"
+                />
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.label}>CVV</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="•••"
+                  keyboardType="numeric"
+                  secureTextEntry
+                />
+              </View>
+            </View>
+            <TouchableOpacity style={styles.addButton}>
+              <Text style={styles.addButtonText}>Add Card</Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheet>
+      </>
     );
   };
 
@@ -187,7 +338,10 @@ export default function CartView({ goback }) {
             <Icon name="check" size={32} color="#424347" />
             <Text style={styles.cartHeaderText}>Select All</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.flexRow}>
+          <TouchableOpacity
+            style={styles.flexRow}
+            onPress={handleDeleteSelectedItems}
+          >
             <Image
               source={require("../../assets/cart/delete.png")}
               resizeMode="stretch"
@@ -199,7 +353,13 @@ export default function CartView({ goback }) {
         <View>
           {!loading && cart.map((item, key) => renderCardBooking(item, key))}
         </View>
-        <View style={styles.bookingInfor}>
+        <TouchableOpacity
+          style={styles.bookingInfor}
+          onPress={() => {
+            chooseDeliveryBottomSheetRef.current?.expand();
+            setBottomSheetVisible(true);
+          }}
+        >
           <View style={styles.bookingInfoImage}>
             <Image
               source={require("../../assets/cart/deliveryIcon.png")}
@@ -213,17 +373,17 @@ export default function CartView({ goback }) {
               <View style={styles.bookingInfoRightStatusComplete} />
             </View>
             <Text style={styles.bookingInfoRightPrice}>
-              {formatPrice(30000)} VNĐ
+              {formatPrice(deliveryMethod.price || 0)} VNĐ
             </Text>
             <Text style={styles.bookingInfoRightFree}>
               Order above 1.000.000 VNĐ to get free delivery
             </Text>
             <Text style={styles.bookingInfoRightPriceLeft}>
-              Shop for more 505.000 VNĐ
+              Shop for more {formatPrice(1000000 - paymentPrice || 0)} VNĐ
             </Text>
           </View>
-        </View>
-        <View style={styles.bookingInfor}>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bookingInfor}>
           <View style={styles.bookingInfoImage}>
             <Image
               source={require("../../assets/cart/couponIcon.png")}
@@ -251,7 +411,7 @@ export default function CartView({ goback }) {
               />
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
         <View style={styles.totalPrice}>
           <Text style={styles.totalPriceText}>Sub-total:</Text>
           <Text style={styles.totalPriceText}>
@@ -268,7 +428,6 @@ export default function CartView({ goback }) {
           ))}
         </View>
       </ScrollView>
-      {loading && <SpinnerLoading />}
       <LinearGradient
         colors={["#0B845C", "#0D986A"]} // Set the gradient colors
         start={{ x: 1, y: 0 }} // Start from the right
@@ -281,7 +440,7 @@ export default function CartView({ goback }) {
             dispatch(getCartItemsThunk());
             navigation.navigate("Checkout", {
               cart: cart,
-              deliveryMethod: deliveryMethodList[0],
+              deliveryMethod: deliveryMethod,
               currentCart: cartRedux.cartList[0],
             });
           }}
@@ -294,6 +453,9 @@ export default function CartView({ goback }) {
           </Text>
         </TouchableOpacity>
       </LinearGradient>
+      {loading && <SpinnerLoading />}
+
+      {renderChooseDeliveryMethodBottomSheet()}
     </View>
   );
 }
@@ -306,7 +468,7 @@ const styles = StyleSheet.create({
     overflow: "visible",
     marginBottom: 100,
     backgroundColor: "#FFFFFF",
-    zIndex: 11,
+    // zIndex: 11,
   },
   contentContainer: {
     position: "relative",
@@ -446,6 +608,54 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#FFFFFF",
     fontWeight: "semibold",
+  },
+
+  overlay: {
+    position: "absolute",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    width: WIDTH,
+    height: HEIGHT,
+    top: 0,
+    left: 0,
+  },
+  sheetContent: {
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+  },
+  closeButton: {
+    position: "absolute",
+    right: 10,
+    top: 10,
+  },
+  closeText: {
+    fontSize: 30,
+    color: "#000",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#000",
+    textAlign: "center",
+    marginVertical: 10,
+  },
+  label: {
+    fontSize: 14,
+    color: "#000",
+    marginVertical: 8,
+  },
+  input: {
+    backgroundColor: "#F5F5F5",
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginBottom: 16,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  col: {
+    width: "48%",
   },
 
   flexRow: {

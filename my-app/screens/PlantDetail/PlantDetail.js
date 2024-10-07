@@ -65,10 +65,18 @@ export default function PlantDetail({ route }) {
   const handleAddToCart = async (item) => {
     const response = await addToCart(item._id);
     if (response.status === 201) {
-      showToast("Success", `Add plant to cart successfull`, "success");
+      showToast({
+        title: "Success",
+        message: `Add plant to cart successfull`,
+        type: "success",
+      });
       await dispatch(getCartItemsThunk());
     } else {
-      showToast("Fail", `Add plant to cart fail`, "error");
+      showToast({
+        title: "Fail",
+        message: `Add plant to cart fail`,
+        type: "error",
+      });
     }
   };
 
