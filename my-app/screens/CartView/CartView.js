@@ -8,6 +8,7 @@ import {
   Image,
   ImageBackground,
   TextInput,
+  Platform,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -329,7 +330,12 @@ export default function CartView({ goback }) {
         }}
         title={"Your Cart"}
       />
-      <ScrollView style={styles.contentContainer}>
+      <ScrollView
+        style={{
+          ...styles.contentContainer,
+          marginBottom: Platform.OS === "android" ? 0 : "15%",
+        }}
+      >
         <View style={styles.cartHeader}>
           <Text style={styles.cartAmount}>3 items</Text>
           <TouchableOpacity
@@ -373,7 +379,7 @@ export default function CartView({ goback }) {
               <View style={styles.bookingInfoRightStatusComplete} />
             </View>
             <Text style={styles.bookingInfoRightPrice}>
-              {formatPrice(deliveryMethod.price || 0)} VNĐ
+              {formatPrice(deliveryMethod?.price || 0)} VNĐ
             </Text>
             <Text style={styles.bookingInfoRightFree}>
               Order above 1.000.000 VNĐ to get free delivery
@@ -432,7 +438,10 @@ export default function CartView({ goback }) {
         colors={["#0B845C", "#0D986A"]} // Set the gradient colors
         start={{ x: 1, y: 0 }} // Start from the right
         end={{ x: 0, y: 0 }} // End at the left
-        style={styles.bottomCartSheet}
+        style={{
+          ...styles.bottomCartSheet,
+          bottom: Platform.OS === "android" ? 0 : "9.5%",
+        }}
       >
         <TouchableOpacity
           style={styles.bottomCartSheetContainer}
@@ -462,7 +471,7 @@ export default function CartView({ goback }) {
 
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
+    position: "relative",
     height: HEIGHT,
     width: WIDTH,
     overflow: "visible",
@@ -514,10 +523,11 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   bookingInfoRightTitle: {
-    width: "15%",
+    width: "20%",
     fontSize: 15,
     fontWeight: "bold",
     color: "#002140",
+    flexWrap: "nowrap",
   },
   bookingInfoRightStatus: {
     position: "relative",
@@ -586,7 +596,7 @@ const styles = StyleSheet.create({
     width: WIDTH,
     flexDirection: "row",
     borderRadius: 50,
-    bottom: 24,
+    bottom: 0,
   },
   bottomCartSheetContainer: {
     width: "100%",

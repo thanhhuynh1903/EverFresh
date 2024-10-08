@@ -147,7 +147,7 @@ export default function Homepage() {
 
   return (
     <>
-      <SafeAreaWrapper>
+      <View>
         <HomeHeader
           navigation={navigation}
           handleMenuToggle={() => setMenuVisible(!menuVisible)}
@@ -227,14 +227,17 @@ export default function Homepage() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={styles.seasonalPlandContainer}
+            style={{
+              ...styles.seasonalPlandContainer,
+              marginBottom: HEIGHT * 0.3,
+            }}
           >
             {seasonalPlantCardDemo.map((item, key) =>
               renderSeasonalPlantCard(item, key)
             )}
           </ScrollView>
         </ScrollView>
-      </SafeAreaWrapper>
+      </View>
       <MenuModal
         visible={menuVisible}
         closeModal={() => {
@@ -250,7 +253,7 @@ const styles = StyleSheet.create({
     height: HEIGHT,
     width: WIDTH,
     overflow: "visible",
-    marginBottom: 100,
+    backgroundColor: "white",
   },
   yourPland: {
     width: WIDTH,

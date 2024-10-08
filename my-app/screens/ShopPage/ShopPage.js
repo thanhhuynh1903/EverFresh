@@ -10,13 +10,13 @@ import {
   ImageBackground,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
 import HomeHeader from "../../components/HomeHeader";
 import MenuModal from "../../components/Modal/MenuModal/MenuModal";
-import { formatPrice } from "../../utils/utils.js";
+import { formatPrice, normalizeString } from "../../utils/utils.js";
 import { getPlants } from "../../api/plant.js";
 import SpinnerLoading from "../../components/SpinnerLoading/SpinnerLoading.js";
 import useCustomToast from "../../components/ToastNotification/ToastNotification.js";
@@ -34,7 +34,16 @@ export default function ShopPage() {
   const [tabIndex, setTabIndex] = useState(0);
   const [menuVisible, setMenuVisible] = useState(false);
   const [plantList, setPlantList] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const filterPlantList = useMemo(() => {
+    const normalizedSearchValue = normalizeString(searchValue); // Normalize search value
+    return plantList.filter((item) => {
+      const normalizedName = normalizeString(item.name); // Normalize item name
+      return normalizedName.includes(normalizedSearchValue); // Check if item name contains search value
+    });
+  }, [searchValue, plantList]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -179,7 +188,12 @@ export default function ShopPage() {
                 source={require("../../assets/shopping/searchIcon.png")}
                 style={styles.searchInputIcon}
               />
-              <TextInput style={styles.searchInputField} placeholder="Search" />
+              <TextInput
+                style={styles.searchInputField}
+                placeholder="Search"
+                value={searchValue}
+                onChangeText={setSearchValue}
+              />
               <Image
                 source={require("../../assets/shopping/QRScanIcon.png")}
                 style={styles.searchInputIcon}
@@ -194,8 +208,8 @@ export default function ShopPage() {
           </View>
 
           <View style={styles.plantListDefault}>
-            {renderPlantCard(plantList[0], 0)}
-            {renderPlantCard(plantList[1], 1)}
+            {renderPlantCard(filterPlantList[0], 0)}
+            {renderPlantCard(filterPlantList[1], 1)}
             <ImageBackground
               source={require("../../assets/shopping/inviteFriBackround.png")}
               style={styles.inviteFriContainer}
@@ -213,8 +227,8 @@ export default function ShopPage() {
                 </TouchableOpacity>
               </View>
             </ImageBackground>
-            {renderPlantCard(plantList[2], 2)}
-            {renderPlantCard(plantList[3], 3)}
+            {renderPlantCard(filterPlantList[2], 2)}
+            {renderPlantCard(filterPlantList[3], 3)}
             <View style={styles.videoContainer}>
               <Image
                 source={require("../../assets/shopping/video.png")}
@@ -231,8 +245,8 @@ export default function ShopPage() {
                 </TouchableOpacity>
               </View>
             </View>
-            {renderPlantCard(plantList[4], 4)}
-            {renderPlantCard(plantList[5], 5)}
+            {renderPlantCard(filterPlantList[4], 4)}
+            {renderPlantCard(filterPlantList[5], 5)}
           </View>
         </ScrollView>
         {loading && <SpinnerLoading />}

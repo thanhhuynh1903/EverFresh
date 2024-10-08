@@ -23,7 +23,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
         bottom: 0,
         width: "100%",
         height: HEIGHT * 0.08,
-        backgroundColor: "white",
+        // backgroundColor: "white",
       }}
     >
       {/* Gradient Background */}

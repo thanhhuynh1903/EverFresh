@@ -24,13 +24,13 @@ const PlantReport = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ImageBackground
-        // source={{ uri: selectedImage ||  }}
-        source={require("../../assets/utilsImage/plantReportBackgroundImage.png")}
+        source={{ uri: selectedImage || "" }}
+        // source={require("../../assets/utilsImage/plantReportBackgroundImage.png")}
         style={styles.imageBackground}
         resizeMode="cover"
       >
         <View style={styles.containerHeader}>
-          <Text style={styles.containerHeaderTitle}>Scanner</Text>
+          <Text style={styles.containerHeaderTitle}>Report</Text>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={navigation.goBack}
