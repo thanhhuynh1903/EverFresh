@@ -1,9 +1,17 @@
 import React from "react";
-import { StyleSheet, Platform, View, StatusBar } from "react-native";
+import {
+  StyleSheet,
+  Platform,
+  View,
+  StatusBar,
+  Dimensions,
+} from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+
+const HEIGHT = Dimensions.get("window").height;
 
 const SafeAreaWrapper = ({ children }) => {
   // const insets = useSafeAreaInsets();
@@ -30,7 +38,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF",
-    paddingTop: 50,
+    paddingTop: HEIGHT * 0.06,
   },
   AndroidSafeArea: {
     flex: 1,

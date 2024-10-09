@@ -46,7 +46,7 @@ export const updateCartItem = async (id, amount) => {
 
 export const deleteCartItem = async (id) => {
   try {
-    const response = await api.put(`/cart-items/${id}`);
+    const response = await api.delete(`/cart-items/${id}`);
     return response;
   } catch (error) {
     console.log("deleteCartItem in service/cart error : ", error);

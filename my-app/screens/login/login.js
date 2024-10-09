@@ -7,6 +7,8 @@ import SafeAreaWrapper from "../../components/SafeAreaWrapper";
 import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SpinnerLoading from "../../components/SpinnerLoading/SpinnerLoading";
+import { getGallery } from "../../api/gallery";
+import { getGaleryThunk } from "../../redux/thunk/galleryThunk";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -31,7 +33,8 @@ export default function LoginPage() {
       userResponse.meta.requestStatus === "fulfilled" &&
       userResponse.payload.status === 200
     ) {
-      const response = await dispatch(getCartItemsThunk());
+      await dispatch(getCartItemsThunk());
+      await dispatch(getGaleryThunk());
       navigation.navigate("Main");
     } else {
       console.log("Failed to fetch user data or invalid status");
@@ -40,6 +43,8 @@ export default function LoginPage() {
   };
 
   const handleLogin = async () => {
+    setLoading(true);
+
     const response = await dispatch(loginThunk({ email, password }));
 
     if (response.meta.requestStatus === "fulfilled") {
@@ -51,6 +56,7 @@ export default function LoginPage() {
         userResponse.payload.status === 200
       ) {
         const cartResponse = await dispatch(getCartItemsThunk());
+        await dispatch(getGaleryThunk());
         navigation.navigate("Main"); // Redirect to homepage
       } else {
         console.log("Failed to fetch user data or invalid status");
@@ -58,6 +64,7 @@ export default function LoginPage() {
     } else {
       console.log("Login failed: ", response.payload); // Handle error
     }
+    setLoading(false);
   };
 
   return (

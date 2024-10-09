@@ -28,16 +28,16 @@ const data = [
     title: "Item 1",
     imageUrl: require("../../assets/utilsImage/card-1.png"),
   },
-  {
-    id: "2",
-    title: "Item 2",
-    imageUrl: require("../../assets/visaCard.png"),
-  },
-  {
-    id: "3",
-    title: "Item 3",
-    imageUrl: require("../../assets/utilsImage/card-1.png"),
-  },
+  // {
+  //   id: "2",
+  //   title: "Item 2",
+  //   imageUrl: require("../../assets/visaCard.png"),
+  // },
+  // {
+  //   id: "3",
+  //   title: "Item 3",
+  //   imageUrl: require("../../assets/utilsImage/card-1.png"),
+  // },
 ];
 
 export default function Payment({ route }) {
@@ -83,11 +83,7 @@ export default function Payment({ route }) {
     // data.voucher_id= voucher._id
     // }
     const response = await createOrder(data);
-    // console.log(response.response.data);
-    console.log(response.status);
-
     if (response.status === 201) {
-      console.log(response.data);
       await dispatch(getCartItemsThunk());
       navigation.navigate("OrderComplete", { order: response.data });
     }
@@ -297,7 +293,7 @@ const styles = StyleSheet.create({
     // alignItems: "center",
     justifyContent: "center",
     padding: 12,
-    paddingVertical: 50,
+    paddingBottom: 50,
     backgroundColor: "#FFFFFF",
     zIndex: 10,
     borderBottomWidth: 1,

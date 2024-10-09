@@ -64,7 +64,13 @@ export default function OrderList() {
         </View>
         <View style={styles.orderItemInfo}>
           <Image
-            source={item?.image || require("../../assets/cart/plant1.png")}
+            source={
+              item?.list_cart_item_id[0]?.plant_id?.img_url[0]
+                ? {
+                    uri: item?.list_cart_item_id[0]?.plant_id?.img_url[0] || "",
+                  }
+                : require("../../assets/cart/plant1.png")
+            }
             resizeMode="stretch"
             style={styles.image}
           />
@@ -104,20 +110,18 @@ export default function OrderList() {
 
   return (
     <>
-      <SafeAreaWrapper>
-        <HomeHeader
-          navigation={navigation}
-          handleMenuToggle={() => setMenuVisible(!menuVisible)}
-          backgroundColor={menuVisible && "#0B845C"}
-        />
-        <ScrollView style={styles.container}>
-          {!loading ? (
-            orderList.map((item, key) => renderOrderItem(item, key))
-          ) : (
-            <SpinnerLoading />
-          )}
-        </ScrollView>
-      </SafeAreaWrapper>
+      <HomeHeader
+        navigation={navigation}
+        handleMenuToggle={() => setMenuVisible(!menuVisible)}
+        backgroundColor={menuVisible && "#0B845C"}
+      />
+      <ScrollView style={styles.container}>
+        {!loading ? (
+          orderList.map((item, key) => renderOrderItem(item, key))
+        ) : (
+          <SpinnerLoading />
+        )}
+      </ScrollView>
       <MenuModal
         visible={menuVisible}
         closeModal={() => {
@@ -161,6 +165,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   orderItemHeaderId: {
+    width: "60%",
     fontSize: 15,
     fontWeight: "bold",
     color: "#002140",

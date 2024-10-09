@@ -14,3 +14,27 @@ export const normalizeString = (str) => {
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 };
+
+export const getPlantIdListinGalery = (galery) => {
+  const plantIds = [];
+  // console.log(galery);
+
+  if (galery && galery.list_collection_id) {
+    galery.list_collection_id.forEach((collection) => {
+      if (collection.list_plant_id && collection.list_plant_id.length > 0) {
+        plantIds.push(...collection.list_plant_id);
+      }
+    });
+  }
+
+  return plantIds;
+};
+
+export const getCollectionIdFromPlantId = (galleryData, plantId) => {
+  for (const collection of galleryData.list_collection_id) {
+    if (collection.list_plant_id.includes(plantId)) {
+      return collection._id; // Return the collection ID
+    }
+  }
+  return null; // Return null if the plant ID is not found
+};

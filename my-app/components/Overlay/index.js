@@ -6,22 +6,19 @@ import CustomButton from "../CustomButton";
 import { CheckBox } from "react-native-elements";
 import { TouchableOpacity } from "react-native";
 
-const Modal = ({ navigation, modevisible,onClose }) => {
+const Modal = ({ navigation, modevisible, onClose }) => {
   const [isVisible, setIsVisible] = useState(modevisible);
   const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
     setIsVisible(modevisible);
-    console.log(isVisible);
-    console.log(isChecked);
-    
   }, [modevisible]);
 
   const toggleOverlayClose = () => {
     setIsVisible(false);
     onClose();
   };
-  
+
   return (
     <View style={styles.container}>
       <Overlay isVisible={isVisible} onBackdropPress={toggleOverlayClose}>
@@ -32,7 +29,12 @@ const Modal = ({ navigation, modevisible,onClose }) => {
                 <Icon name="login" size={25} color="black" />
               </View>
               <View style={styles.iconStyleClose}>
-                <Icon name="close" size={25} color="black" onPress={toggleOverlayClose} />
+                <Icon
+                  name="close"
+                  size={25}
+                  color="black"
+                  onPress={toggleOverlayClose}
+                />
               </View>
             </View>
             <Text style={styles.titleText}>Our private policy</Text>
@@ -66,8 +68,10 @@ const Modal = ({ navigation, modevisible,onClose }) => {
             </ScrollView>
           </View>
           <View style={styles.checkboxContainer}>
-            <CheckBox value={isChecked} 
-              onValueChange={(newValue) => setIsChecked(newValue)} />
+            <CheckBox
+              value={isChecked}
+              onValueChange={(newValue) => setIsChecked(newValue)}
+            />
             <Text style={styles.checkboxLabel}>
               I have read policy carefully.
             </Text>
@@ -81,7 +85,10 @@ const Modal = ({ navigation, modevisible,onClose }) => {
             >
               <Text style={styles.signInButtonText}>Accept</Text>
             </CustomButton>
-            <TouchableOpacity style={styles.declineButton} onPress={toggleOverlayClose}>
+            <TouchableOpacity
+              style={styles.declineButton}
+              onPress={toggleOverlayClose}
+            >
               <Text style={styles.declineText}>Decline</Text>
             </TouchableOpacity>
           </View>

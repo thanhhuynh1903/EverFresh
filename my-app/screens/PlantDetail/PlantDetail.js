@@ -188,177 +188,181 @@ export default function PlantDetail({ route }) {
 
   return (
     <>
-      <SafeAreaWrapper>
-        <HomeHeader
-          navigation={navigation}
-          handleMenuToggle={() => setMenuVisible(!menuVisible)}
-          backgroundColor={menuVisible && "#0B845C"}
-        />
-        <ScrollView style={styles.container}>
-          <View style={styles.plantDetailHeader}>
-            <Image
-              source={require("../../assets/plant details/headerBackground.png")} // Change this to your image path
-              resizeMode="stretch"
-              style={styles.plantDetailHeaderBackground}
-            />
-            <View style={styles.plantDetailHeaderContent}>
-              <View style={styles.headerContentPlantType}>
-                <View style={styles.plantTypeLeft}>
-                  <Text style={styles.plantTypeLabel}>
-                    {plant.uses || "Air Purifier"}
+      <HomeHeader
+        navigation={navigation}
+        handleMenuToggle={() => setMenuVisible(!menuVisible)}
+        backgroundColor={menuVisible && "#0B845C"}
+      />
+      <ScrollView style={styles.container}>
+        <View style={styles.plantDetailHeader}>
+          <Image
+            source={require("../../assets/plant details/headerBackground.png")} // Change this to your image path
+            resizeMode="stretch"
+            style={styles.plantDetailHeaderBackground}
+          />
+          <View style={styles.plantDetailHeaderContent}>
+            <View style={styles.headerContentPlantType}>
+              <View style={styles.plantTypeLeft}>
+                <Text style={styles.plantTypeLabel}>
+                  {plant.uses || "Air Purifier"}
+                </Text>
+                <Image
+                  source={
+                    plant.img_url[0] ||
+                    require("../../assets/plant details/pawIcon.png")
+                  }
+                  style={styles.plantTypeLabelIcon}
+                />
+              </View>
+              <View style={styles.plantTypeRight}>
+                <Image
+                  source={require("../../assets/plant details/star.png")}
+                  style={styles.plantTypeLabelIcon}
+                />
+                <Text style={styles.plantTypeRate}>
+                  {plant.average_rating || "0"}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.headerPlantName}>
+              <Text style={styles.headerPlantNameText} numberOfLines={2}>
+                {plant.name}
+              </Text>
+            </View>
+            <View style={styles.headerPlant}>
+              <View style={styles.headerPlantPrice}>
+                <View style={styles.headerPlantInfo}>
+                  <Text style={styles.headerPlantPriceTitle}>Price</Text>
+                  <Text style={styles.headerPlantPriceText}>
+                    {formatPrice(plant.price || 0)} VNĐ
                   </Text>
+                </View>
+                <View style={styles.headerPlantInfo}>
+                  <Text style={styles.headerPlantPriceTitle}>Size</Text>
+                  <Text style={styles.headerPlantPriceText}>
+                    {plant.height || "Unknown"}
+                  </Text>
+                </View>
+                <View
+                  style={[styles.headerPlantFeature, styles.headerPlantInfo]}
+                >
+                  <TouchableOpacity>
+                    <Image
+                      source={require("../../assets/shopping/heartIcon.png")}
+                      style={styles.headerPlantFeatureIcon}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleAddToCart(plant);
+                    }}
+                  >
+                    <Image
+                      source={require("../../assets/shopping/shopIcon.png")}
+                      style={styles.headerPlantFeatureIcon}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.headerPlantContainer}>
                   <Image
                     source={
-                      plant.img_url[0] ||
-                      require("../../assets/plant details/pawIcon.png")
+                      plant?.img_url && plant?.img_url[0]
+                        ? { uri: plant?.img_url[0] || "" }
+                        : require("../../assets/cart/plant1.png")
                     }
-                    style={styles.plantTypeLabelIcon}
+                    style={styles.headerPlantImage}
                   />
-                </View>
-                <View style={styles.plantTypeRight}>
-                  <Image
-                    source={require("../../assets/plant details/star.png")}
-                    style={styles.plantTypeLabelIcon}
-                  />
-                  <Text style={styles.plantTypeRate}>
-                    {plant.average_rating || "0"}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.headerPlantName}>
-                <Text style={styles.headerPlantNameText}>{plant.name}</Text>
-              </View>
-              <View style={styles.headerPlant}>
-                <View style={styles.headerPlantPrice}>
-                  <View style={styles.headerPlantInfo}>
-                    <Text style={styles.headerPlantPriceTitle}>Price</Text>
-                    <Text style={styles.headerPlantPriceText}>
-                      {formatPrice(plant.price || 0)} VNĐ
-                    </Text>
-                  </View>
-                  <View style={styles.headerPlantInfo}>
-                    <Text style={styles.headerPlantPriceTitle}>Size</Text>
-                    <Text style={styles.headerPlantPriceText}>
-                      {plant.height || "Unknown"}
-                    </Text>
-                  </View>
-                  <View
-                    style={[styles.headerPlantFeature, styles.headerPlantInfo]}
-                  >
-                    <TouchableOpacity>
-                      <Image
-                        source={require("../../assets/shopping/heartIcon.png")}
-                        style={styles.headerPlantFeatureIcon}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => {
-                        handleAddToCart(plant);
+                  <View style={styles.headerPlantDetailTooltip}>
+                    <View
+                      style={{
+                        position: "relative",
+                        alignSelf: "center",
+                        alignItems: "center",
+                        backgroundColor: "#FFFFFF",
+                        shadowColor: "#000",
+                        shadowOffset: { width: 4, height: 4 }, // X: 0, Y: 4
+                        shadowOpacity: 0.25,
+                        shadowRadius: 50,
+                        elevation: 8,
+                        borderRadius: 12,
                       }}
                     >
-                      <Image
-                        source={require("../../assets/shopping/shopIcon.png")}
-                        style={styles.headerPlantFeatureIcon}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.headerPlantContainer}>
-                    <Image
-                      source={require("../../assets/plant details/plant1.png")}
-                      style={styles.headerPlantImage}
-                    />
-                    <View style={styles.headerPlantDetailTooltip}>
-                      <View
-                        style={{
-                          position: "relative",
-                          alignSelf: "center",
-                          alignItems: "center",
-                          backgroundColor: "#FFFFFF",
-                          shadowColor: "#000",
-                          shadowOffset: { width: 4, height: 4 }, // X: 0, Y: 4
-                          shadowOpacity: 0.25,
-                          shadowRadius: 50,
-                          elevation: 8,
-                          borderRadius: 12,
-                        }}
-                      >
-                        {renderTooltipView()}
-                        <View style={styles.tooltipArrow} />
-                      </View>
+                      {renderTooltipView()}
+                      <View style={styles.tooltipArrow} />
                     </View>
                   </View>
                 </View>
               </View>
             </View>
           </View>
-          <View style={styles.plantOverview}>
-            <Text style={styles.plantOverviewTitle}>Overview</Text>
-            {OverviewItems.map((item, key) => renderOverviewItem(item, key))}
-            <Text style={styles.plantOverviewTitle}>Plant Bio</Text>
-            <Text style={styles.plantPlantBioDes}>
-              No green thumb required to keep our artificial watermelon
-              peperomia plant looking lively and lush anywhere you place it.
-            </Text>
-          </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            nestedScrollEnabled={true}
-            style={styles.plantImageList}
-          >
-            {plantImageList.map((item, key) => renderPlantImage(item, key))}
-          </ScrollView>
-          <View style={styles.similarPlant}>
-            <Text style={styles.plantOverviewTitle}>Similar Plants</Text>
-            <ScrollView horizontal style={styles.similarPlantList}>
-              {similarPlant.map((item, key) => renderSimilarPlant(item, key))}
-            </ScrollView>
-          </View>
-          <View style={styles.verifyPlant}>
-            <View style={styles.verifyPlantLeft}>
-              <Text style={styles.verifyPlantLeftTitle}>That very plant?</Text>
-              <Text style={styles.verifyPlantLeftDes}>
-                Just Scan and the AI will know exactly
-              </Text>
-              <TouchableOpacity style={styles.verifyPlantLeftButton}>
-                <Text style={styles.verifyPlantLeftButtonText}>Scan Now</Text>
-              </TouchableOpacity>
-            </View>
-            <Image
-              source={require("../../assets/plant details/scanPlant.png")}
-              resizeMode="contain"
-              style={styles.verifyPlantImage}
-            />
-          </View>
+        </View>
+        <View style={styles.plantOverview}>
+          <Text style={styles.plantOverviewTitle}>Overview</Text>
+          {OverviewItems.map((item, key) => renderOverviewItem(item, key))}
+          <Text style={styles.plantOverviewTitle}>Plant Bio</Text>
+          <Text style={styles.plantPlantBioDes}>
+            No green thumb required to keep our artificial watermelon peperomia
+            plant looking lively and lush anywhere you place it.
+          </Text>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          nestedScrollEnabled={true}
+          style={styles.plantImageList}
+        >
+          {plantImageList.map((item, key) => renderPlantImage(item, key))}
         </ScrollView>
-        {cartRedux?.cartList[0].total_price !== 0 && (
-          <LinearGradient
-            colors={["#0B845C", "#0D986A"]} // Set the gradient colors
-            start={{ x: 1, y: 0 }} // Start from the right
-            end={{ x: 0, y: 0 }} // End at the left
-            style={styles.bottomCartSheet}
-          >
-            <TouchableOpacity
-              style={styles.bottomCartSheetContainer}
-              onPress={() => navigation.navigate("CartView")}
-            >
-              <View style={styles.bottomCartSheetContainerLeft}>
-                <Image
-                  source={require("../../assets/plant details/shopIcon.png")}
-                  resizeMode="contain"
-                  style={styles.bottomCartSheetContainerLeftImage}
-                />
-                <Text style={styles.bottomCartSheetContainerLeftCartAmount}>
-                  View {cartRedux?.cartList[0].list_cart_item_id?.length} items
-                </Text>
-              </View>
-              <Text style={styles.bottomCartSheetContainerRight}>
-                {formatPrice(cartRedux?.cartList[0].total_price)} VNĐ
-              </Text>
+        <View style={styles.similarPlant}>
+          <Text style={styles.plantOverviewTitle}>Similar Plants</Text>
+          <ScrollView horizontal style={styles.similarPlantList}>
+            {similarPlant.map((item, key) => renderSimilarPlant(item, key))}
+          </ScrollView>
+        </View>
+        <View style={styles.verifyPlant}>
+          <View style={styles.verifyPlantLeft}>
+            <Text style={styles.verifyPlantLeftTitle}>That very plant?</Text>
+            <Text style={styles.verifyPlantLeftDes}>
+              Just Scan and the AI will know exactly
+            </Text>
+            <TouchableOpacity style={styles.verifyPlantLeftButton}>
+              <Text style={styles.verifyPlantLeftButtonText}>Scan Now</Text>
             </TouchableOpacity>
-          </LinearGradient>
-        )}
-      </SafeAreaWrapper>
+          </View>
+          <Image
+            source={require("../../assets/plant details/scanPlant.png")}
+            resizeMode="contain"
+            style={styles.verifyPlantImage}
+          />
+        </View>
+      </ScrollView>
+      {cartRedux?.cartList[0].total_price !== 0 && (
+        <LinearGradient
+          colors={["#0B845C", "#0D986A"]} // Set the gradient colors
+          start={{ x: 1, y: 0 }} // Start from the right
+          end={{ x: 0, y: 0 }} // End at the left
+          style={styles.bottomCartSheet}
+        >
+          <TouchableOpacity
+            style={styles.bottomCartSheetContainer}
+            onPress={() => navigation.navigate("CartView")}
+          >
+            <View style={styles.bottomCartSheetContainerLeft}>
+              <Image
+                source={require("../../assets/plant details/shopIcon.png")}
+                resizeMode="contain"
+                style={styles.bottomCartSheetContainerLeftImage}
+              />
+              <Text style={styles.bottomCartSheetContainerLeftCartAmount}>
+                View {cartRedux?.cartList[0].list_cart_item_id?.length} items
+              </Text>
+            </View>
+            <Text style={styles.bottomCartSheetContainerRight}>
+              {formatPrice(cartRedux?.cartList[0].total_price)} VNĐ
+            </Text>
+          </TouchableOpacity>
+        </LinearGradient>
+      )}
       <MenuModal
         visible={menuVisible}
         closeModal={() => setMenuVisible(false)}
@@ -404,6 +408,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    zIndex: 10,
   },
   plantTypeLeft: {
     flexDirection: "row",
@@ -431,18 +436,21 @@ const styles = StyleSheet.create({
   // headerPlantName
   headerPlantName: {
     width: "100%",
+    zIndex: 10,
   },
   headerPlantNameText: {
     width: "60%",
-    fontSize: 38,
+    fontSize: 35,
     color: "#002140",
     fontWeight: "bold",
+    zIndex: 10,
   },
   headerPlant: {
     width: "100%",
     height: "75%",
     overflow: "visible",
     transform: [{ translateY: -40 }],
+    zIndex: 1,
   },
   headerPlantPrice: {
     position: "relative",
@@ -452,6 +460,7 @@ const styles = StyleSheet.create({
   headerPlantInfo: {
     transform: [{ translateY: 40 }],
     marginTop: 24,
+    zIndex: 10,
   },
   headerPlantPriceTitle: {
     textTransform: "uppercase",
@@ -476,11 +485,12 @@ const styles = StyleSheet.create({
   headerPlantContainer: {
     position: "absolute",
     width: "70%",
-    height: "100%",
+    height: HEIGHT * 0.3,
     right: 0,
     bottom: 0,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1,
   },
   headerPlantImage: {
     width: "100%",
@@ -680,7 +690,6 @@ const styles = StyleSheet.create({
   bottomCartSheet: {
     width: "100%",
     flexDirection: "row",
-
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
   },

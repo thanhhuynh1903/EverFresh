@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 12,
     paddingBottom: 50,
-    // backgroundColor: "#FFFFFF",
+    backgroundColor: "#FFFFFF",
     zIndex: 10,
 
     shadowColor: "rgba(0,0,0,0.1)", // Black color

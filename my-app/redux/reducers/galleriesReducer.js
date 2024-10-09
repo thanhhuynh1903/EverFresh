@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getCartItemsThunk } from "../thunk/cartThunk";
+import { getGaleryThunk } from "../thunk/galleryThunk";
 
 const initState = {
   galleries: [],
@@ -16,14 +16,14 @@ const galleriesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getCartItemsThunk.pending, (state) => {
+      .addCase(getGaleryThunk.pending, (state) => {
         state.loading = true;
       })
-      .addCase(getCartItemsThunk.fulfilled, (state, action) => {
+      .addCase(getGaleryThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.cartList = action.payload;
+        state.galleries = action.payload;
       })
-      .addCase(getCartItemsThunk.rejected, (state, action) => {
+      .addCase(getGaleryThunk.rejected, (state, action) => {
         state.loading = false;
       });
   },

@@ -20,7 +20,7 @@ export default function PlantBookingCard({
   onPress,
   hanldeIncrease,
   hanldeDecrease,
-  hanldeDelete,
+  handleDelete,
   handleAddToCollection,
 }) {
   const [item, setItem] = useState(plant || {});
@@ -32,7 +32,11 @@ export default function PlantBookingCard({
   return (
     <TouchableOpacity style={styles.container} onPress={onPress && onPress}>
       <Image
-        source={item?.image || require("../../assets/cart/plant1.png")}
+        source={
+          item?.plantDetail?.img_url && item?.plantDetail?.img_url[0]
+            ? { uri: item?.plantDetail?.img_url[0] || "" }
+            : require("../../assets/cart/plant1.png")
+        }
         resizeMode="stretch"
         style={styles.image}
       />
@@ -72,7 +76,7 @@ export default function PlantBookingCard({
           >
             <Icon name="minus" size={24} color="#002140" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={hanldeDelete && hanldeDelete}>
+          <TouchableOpacity onPress={handleDelete && handleDelete}>
             <Image
               source={require("../../assets/cart/bin.png")}
               resizeMode="stretch"
@@ -98,6 +102,7 @@ const styles = StyleSheet.create({
     overflow: "visible",
     backgroundColor: "#FFFFFF",
     flexDirection: "row",
+    marginBottom: 24,
     // justifyContent: "space-between"
   },
   image: {

@@ -12,9 +12,9 @@ export const getCollections = async (id) => {
 
 export const addToCollections = async (id) => {
   try {
-    const response = await api.post(
-      `/collections/add-to-favorite` + { plant_id: id }
-    );
+    const response = await api.post(`/collections/add-to-favorite`, {
+      plant_id: id,
+    });
     return response;
   } catch (error) {
     console.log("addToCollections in service/collection error : ", error);
@@ -24,10 +24,10 @@ export const addToCollections = async (id) => {
 
 export const changeCollections = async (id, collectionName) => {
   try {
-    const response = await api.put(
-      `/collections/add-to-favorite` +
-        { plant_id: id, collection_name: collectionName }
-    );
+    const response = await api.put(`/collections/change-collection`, {
+      plant_id: id,
+      collection_name: collectionName,
+    });
     return response;
   } catch (error) {
     console.log("changeCollections in service/collection error : ", error);
@@ -35,11 +35,12 @@ export const changeCollections = async (id, collectionName) => {
   }
 };
 
-export const removePlantFromCollections = async (id, collectionName) => {
+export const removePlantFromCollections = async (id, collectionId) => {
   try {
-    const response = await api.put(
-      `/collections/remove` + { plant_id: id, collection_name: collectionName }
-    );
+    const response = await api.put(`/collections/remove`, {
+      plant_id: id,
+      collection_id: collectionId,
+    });
     return response;
   } catch (error) {
     console.log(

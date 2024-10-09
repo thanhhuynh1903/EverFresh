@@ -132,6 +132,7 @@ export default function ShopPage() {
                 <TouchableOpacity>
                   <Image
                     source={require("../../assets/shopping/heartIcon.png")}
+                    resizeMode="cover"
                     style={styles.plantCardFeatureIcon}
                   />
                 </TouchableOpacity>
@@ -151,7 +152,9 @@ export default function ShopPage() {
           <View style={styles.plantImageContainer}>
             <Image
               source={
-                item.plantImage || require("../../assets/shopping/plant1.png")
+                item?.img_url && item?.img_url[0]
+                  ? { uri: item?.img_url[0] || "" }
+                  : require("../../assets/cart/plant1.png")
               }
               style={styles.plantImage}
             />
@@ -171,86 +174,84 @@ export default function ShopPage() {
 
   return (
     <>
-      <SafeAreaWrapper>
-        <HomeHeader
-          navigation={navigation}
-          handleMenuToggle={() => setMenuVisible(!menuVisible)}
-          backgroundColor={menuVisible && "#0B845C"}
+      <HomeHeader
+        navigation={navigation}
+        handleMenuToggle={() => setMenuVisible(!menuVisible)}
+        backgroundColor={menuVisible && "#0B845C"}
+      />
+      <ScrollView style={styles.container}>
+        <Image
+          source={require("../../assets/shopping/headerImg.png")}
+          style={styles.headerImg}
         />
-        <ScrollView style={styles.container}>
-          <Image
-            source={require("../../assets/shopping/headerImg.png")}
-            style={styles.headerImg}
-          />
-          <View style={styles.searchContainer}>
-            <View style={styles.searchInputContainer}>
-              <Image
-                source={require("../../assets/shopping/searchIcon.png")}
-                style={styles.searchInputIcon}
-              />
-              <TextInput
-                style={styles.searchInputField}
-                placeholder="Search"
-                value={searchValue}
-                onChangeText={setSearchValue}
-              />
-              <Image
-                source={require("../../assets/shopping/QRScanIcon.png")}
-                style={styles.searchInputIcon}
-              />
-            </View>
-            <TouchableOpacity style={styles.filterButton}>
-              <Image source={require("../../assets/shopping/FilterIcon.png")} />
-            </TouchableOpacity>
+        <View style={styles.searchContainer}>
+          <View style={styles.searchInputContainer}>
+            <Image
+              source={require("../../assets/shopping/searchIcon.png")}
+              style={styles.searchInputIcon}
+            />
+            <TextInput
+              style={styles.searchInputField}
+              placeholder="Search"
+              value={searchValue}
+              onChangeText={setSearchValue}
+            />
+            <Image
+              source={require("../../assets/shopping/QRScanIcon.png")}
+              style={styles.searchInputIcon}
+            />
           </View>
-          <View style={styles.tabList}>
-            {tabList.map((item, key) => renderTab(item, key))}
-          </View>
+          <TouchableOpacity style={styles.filterButton}>
+            <Image source={require("../../assets/shopping/FilterIcon.png")} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.tabList}>
+          {tabList.map((item, key) => renderTab(item, key))}
+        </View>
 
-          <View style={styles.plantListDefault}>
-            {renderPlantCard(filterPlantList[0], 0)}
-            {renderPlantCard(filterPlantList[1], 1)}
-            <ImageBackground
-              source={require("../../assets/shopping/inviteFriBackround.png")}
-              style={styles.inviteFriContainer}
-              resizeMode="contain"
-            >
-              <Text style={styles.inviteFriTitle}>
-                Invite a Friend and earn Everfresh rewards
+        <View style={styles.plantListDefault}>
+          {renderPlantCard(filterPlantList[0], 0)}
+          {renderPlantCard(filterPlantList[1], 1)}
+          <ImageBackground
+            source={require("../../assets/shopping/inviteFriBackround.png")}
+            style={styles.inviteFriContainer}
+            resizeMode="contain"
+          >
+            <Text style={styles.inviteFriTitle}>
+              Invite a Friend and earn Everfresh rewards
+            </Text>
+            <View style={styles.redeemLink}>
+              <Text style={styles.redeemLinkText}>
+                Redeem them to get instant discounts
               </Text>
-              <View style={styles.redeemLink}>
-                <Text style={styles.redeemLinkText}>
-                  Redeem them to get instant discounts
-                </Text>
-                <TouchableOpacity style={styles.redeemLinkButton}>
-                  <Text style={styles.redeemLinkButtonText}>Invite</Text>
-                </TouchableOpacity>
-              </View>
-            </ImageBackground>
-            {renderPlantCard(filterPlantList[2], 2)}
-            {renderPlantCard(filterPlantList[3], 3)}
-            <View style={styles.videoContainer}>
-              <Image
-                source={require("../../assets/shopping/video.png")}
-                style={styles.videoImage}
-              />
-              <View style={styles.descriptionContainer}>
-                <Text style={styles.videoText} numberOfLines={3}>
-                  Caring for plants should be fun. That’s why we offer 1-on-1
-                  virtual consultations from the comfort of your home or office.
-                </Text>
-                <TouchableOpacity style={styles.videoLearnMore}>
-                  <View style={styles.videoDash} />
-                  <Text style={styles.videoLearnMoreText}>Learn More</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity style={styles.redeemLinkButton}>
+                <Text style={styles.redeemLinkButtonText}>Invite</Text>
+              </TouchableOpacity>
             </View>
-            {renderPlantCard(filterPlantList[4], 4)}
-            {renderPlantCard(filterPlantList[5], 5)}
+          </ImageBackground>
+          {renderPlantCard(filterPlantList[2], 2)}
+          {renderPlantCard(filterPlantList[3], 3)}
+          <View style={styles.videoContainer}>
+            <Image
+              source={require("../../assets/shopping/video.png")}
+              style={styles.videoImage}
+            />
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.videoText} numberOfLines={3}>
+                Caring for plants should be fun. That’s why we offer 1-on-1
+                virtual consultations from the comfort of your home or office.
+              </Text>
+              <TouchableOpacity style={styles.videoLearnMore}>
+                <View style={styles.videoDash} />
+                <Text style={styles.videoLearnMoreText}>Learn More</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </ScrollView>
-        {loading && <SpinnerLoading />}
-      </SafeAreaWrapper>
+          {renderPlantCard(filterPlantList[4], 4)}
+          {renderPlantCard(filterPlantList[5], 5)}
+        </View>
+      </ScrollView>
+      {loading && <SpinnerLoading />}
       <MenuModal
         visible={menuVisible}
         closeModal={() => setMenuVisible(false)}

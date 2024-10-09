@@ -14,11 +14,15 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import { formatPrice } from "../../utils/utils";
+import {
+  formatPrice,
+  getCollectionIdFromPlantId,
+  getPlantIdListinGalery,
+} from "../../utils/utils";
 import BottomSheetHeader from "../../components/BottomSheetHeader/BottomSheetHeader";
 import PlantBookingCard from "../../components/PlantBookingCard/PlantBookingCard";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCart } from "../../redux/selector/selector";
+import { selectCart, selectGallery } from "../../redux/selector/selector";
 import SpinnerLoading from "../../components/SpinnerLoading/SpinnerLoading";
 import { getPlants } from "../../api/plant";
 import { getDeliveryMethods } from "../../api/delivery";
@@ -26,6 +30,16 @@ import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
 import { deleteCartItem, updateCartItem } from "../../api/cart";
 import useCustomToast from "../../components/ToastNotification/ToastNotification";
 import BottomSheet from "@gorhom/bottom-sheet";
+import {
+  addToCollections,
+  changeCollections,
+  removePlantFromCollections,
+} from "../../api/collection";
+import { getGaleryThunk } from "../../redux/thunk/galleryThunk";
+import CollectionListBottomSheet from "../../components/CollectionListBottomSheet/CollectionListBottomSheet";
+import DeliveryListBottomSheet from "../../components/DeliveryListBottomSheet/DeliveryListBottomSheet";
+import CouponListBottomSheet from "../../components/CouponListBottomSheet/CouponListBottomSheet";
+import { getVouchers } from "../../api/voucher";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -35,23 +49,29 @@ export default function CartView({ goback }) {
   const dispatch = useDispatch();
   const showToast = useCustomToast();
   const cartRedux = useSelector(selectCart);
+  const galleryRedux = useSelector(selectGallery);
   const [cart, setCart] = useState([]);
+  const [focusPlant, setFocusPlant] = useState({});
   const [deliveryMethod, setDeliveryMethod] = useState([]);
   const [deliveryMethodList, setDeliveryMethodList] = useState([]);
+  const [coupon, setCoupon] = useState(null);
+  const [couponList, setCouponList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
-  const chooseDeliveryBottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ["25%", "50%", "75%"], []);
+  // bottomsheet visib;e
+  const [chooseCollectionVisible, setChooseCollectionVisible] = useState(false);
+  const [chooseDeliveryVisible, setChooseDeliveryVisible] = useState(false);
+  const [chooseCouponVisible, setChooseCouponVisible] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
       loadDeliveryMethod();
+      loadCouponList();
     }, [])
   );
 
   useEffect(() => {
     loadCartList();
-  }, [cartRedux]);
+  }, [cartRedux.cartList]);
 
   useEffect(() => {
     setDeliveryMethod(deliveryMethodList[0]);
@@ -59,8 +79,9 @@ export default function CartView({ goback }) {
 
   const loadCartList = async () => {
     setLoading(true);
+
     const updatedCart = await Promise.all(
-      cartRedux.cartList[0].list_cart_item_id?.map(async (cartItem) => {
+      cartRedux.cartList[0]?.list_cart_item_id?.map(async (cartItem) => {
         const response = await getPlants(cartItem.plant_id);
         return {
           ...cartItem,
@@ -69,6 +90,7 @@ export default function CartView({ goback }) {
         };
       })
     );
+
     setCart(updatedCart);
     setLoading(false);
   };
@@ -80,6 +102,13 @@ export default function CartView({ goback }) {
     }
   };
 
+  const loadCouponList = async () => {
+    const response = await getVouchers();
+    if (response.status === 200) {
+      setCouponList(response.data);
+    }
+  };
+
   const paymentPrice = useMemo(() => {
     let totalPrice = 0;
     cart
@@ -87,13 +116,22 @@ export default function CartView({ goback }) {
       .map((item) => {
         totalPrice += item?.quantity * item?.plantDetail?.price;
       });
+    totalPrice =
+      totalPrice -
+      (totalPrice * (coupon ? Number(coupon?.voucher_discount) : 0)) / 100;
+    if (deliveryMethod) {
+      totalPrice += deliveryMethod?.price;
+    }
     return totalPrice;
-  }, [cart]);
+  }, [cart, coupon, deliveryMethod]);
 
   const slectedItems = useMemo(() => {
     return cart.filter((item) => item.selected);
   }, [cart]);
 
+  const plantIdListinGalery = useMemo(() => {
+    return getPlantIdListinGalery(galleryRedux.galleries);
+  }, [galleryRedux]);
   const savePlantList = [
     {
       image: require("../../assets/cart/plant2.png"),
@@ -134,15 +172,15 @@ export default function CartView({ goback }) {
   ];
 
   const hanldeChangeAmount = async (item, amount) => {
-    const response = await updateCartItem(item._id, amount);
+    const response = await updateCartItem(item?._id, amount);
     if (amount === 0) {
-      setCart(cart.filter((cartItem) => cartItem._id !== item._id));
+      setCart(cart.filter((cartItem) => cartItem?._id !== item?._id));
     } else {
       setCart(
         cart.map((cartItem) => {
           return {
             ...cartItem,
-            quantity: cartItem._id === item._id ? amount : cartItem.quantity,
+            quantity: cartItem?._id === item?._id ? amount : cartItem.quantity,
           };
         })
       );
@@ -150,17 +188,23 @@ export default function CartView({ goback }) {
   };
 
   const handleDeteteCartItem = async (item) => {
-    const response = await deleteCartItem(item._id);
-
+    const response = await deleteCartItem(item?._id);
     if (response.status === 200) {
-      setCart(cart.filter((cartItem) => cartItem._id !== item._id));
+      setCart(cart.filter((cartItem) => cartItem?._id !== item?._id));
+      // await dispatch(getCartItemsThunk());
+      setTimeout(() => {
+        dispatch(getCartItemsThunk());
+      }, 3000);
+    } else {
+      console.log(response?.response?.data);
+      await dispatch(getCartItemsThunk());
     }
   };
 
   const handleDeleteSelectedItems = async () => {
     try {
       const deletePromises = slectedItems.map((item) =>
-        deleteCartItem(item._id)
+        deleteCartItem(item?._id)
       );
       const responses = await Promise.all(deletePromises);
       const successfulDeletes = responses.filter(
@@ -168,9 +212,10 @@ export default function CartView({ goback }) {
       );
       setCart((prevCart) =>
         prevCart.filter(
-          (cartItem) => !items.some((item) => item._id === cartItem._id)
+          (cartItem) => !items.some((item) => item?._id === cartItem?._id)
         )
       );
+      dispatch(getCartItemsThunk());
     } catch (error) {
       console.error("Error deleting items: ", error);
     }
@@ -182,62 +227,114 @@ export default function CartView({ goback }) {
         return {
           ...cartItem,
           selected:
-            cartItem._id === item._id ? !cartItem.selected : cartItem.selected,
+            cartItem?._id === item?._id
+              ? !cartItem.selected
+              : cartItem.selected,
         };
       })
     );
   };
 
   const handleAddToCollection = async (item) => {
-    showToast({
-      title: "Success",
-      message: (
-        <View
-          style={{
-            width: WIDTH * 0.75,
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text>Add to collection successfully</Text>
-          <TouchableOpacity
-            onPress={() => {
-              console.log("Manager");
+    const response = await addToCollections(item.plantDetail?._id);
+    if (response.status === 201) {
+      showToast({
+        title: "Success",
+        message: (
+          <View
+            style={{
+              width: WIDTH * 0.75,
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "space-between",
             }}
           >
-            <Text style={{ color: "#4287f5", fontWeight: "bold" }}>
-              Manager
-            </Text>
-          </TouchableOpacity>
-        </View>
-      ),
-      type: "success",
-      // position: "bottom",
-    });
-    // const response = await addToCart(item._id);
-    // if (response.status === 201) {
-    //   showToast({
-    //     title: "Success",
-    //     message: `Add plant to cart successfull`,
-    //     type: "success",
-    //   });
-    //   await dispatch(getCartItemsThunk());
-    // } else {
-    //   showToast({
-    //     title: "SuFailccess",
-    //     message: `Add plant to cart fail`,
-    //     type: "error",
-    //   });
-    // }
+            <Text>Add to collection successfully</Text>
+            <TouchableOpacity
+              onPress={() => {
+                setChooseCollectionVisible(true);
+                setFocusPlant(item);
+              }}
+            >
+              <Text style={{ color: "#4287f5", fontWeight: "bold" }}>
+                Manager
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ),
+        type: "success",
+        // position: "bottom",
+      });
+      await dispatch(getGaleryThunk());
+    } else {
+      showToast({
+        title: "Fail",
+        message: `Add plant to collection fail`,
+        type: "error",
+      });
+    }
   };
 
-  const closeBottomSheet = () => {
-    chooseDeliveryBottomSheetRef.current?.close();
-    setBottomSheetVisible(false);
+  const handleRemoveToCollection = async (item) => {
+    const collectionId = getCollectionIdFromPlantId(
+      galleryRedux.galleries,
+      item.plantDetail?._id
+    );
+
+    const response = await removePlantFromCollections(
+      item.plantDetail?._id,
+      collectionId
+    );
+    if (response.status === 200) {
+      showToast({
+        title: "Success",
+        message: "Remove from collection successfully",
+        type: "success",
+        // position: "bottom",
+      });
+      await dispatch(getGaleryThunk());
+    } else {
+      showToast({
+        title: "Fail",
+        message: `Remove plant from collection fail`,
+        type: "error",
+      });
+    }
+  };
+
+  const handleChangeCollections = async (collection) => {
+    const response = await changeCollections(
+      focusPlant.plantDetail?._id,
+      collection.collection_name
+    );
+    if (response.status === 201) {
+      showToast({
+        title: "Success",
+        message: `Change to collection ${collection?.collection_name} successfully`,
+        type: "success",
+        // position: "bottom",
+      });
+      await dispatch(getGaleryThunk());
+    } else {
+      showToast({
+        title: "Fail",
+        message: `Change collection fail`,
+        type: "error",
+      });
+    }
+  };
+
+  const handleChangeDeliveryMethod = (item) => {
+    setDeliveryMethod(item);
+  };
+
+  const handleChangeCoupon = (item) => {
+    setCoupon(item);
   };
 
   const renderCardBooking = (item, key) => {
+    item.bookmark = plantIdListinGalery.includes(item.plantDetail?._id);
+
     return (
       <TouchableOpacity
         style={styles.bookingCard}
@@ -254,70 +351,14 @@ export default function CartView({ goback }) {
           hanldeIncrease={() => hanldeChangeAmount(item, item.quantity + 1)}
           hanldeDecrease={() => hanldeChangeAmount(item, item.quantity - 1)}
           handleDelete={() => handleDeteteCartItem(item)}
-          handleAddToCollection={() => handleAddToCollection(item)}
+          handleAddToCollection={() =>
+            item.bookmark
+              ? handleRemoveToCollection(item)
+              : handleAddToCollection(item)
+          }
           onPress={() => handleChangeSelected(item)}
         />
       </TouchableOpacity>
-    );
-  };
-
-  const renderChooseDeliveryMethodBottomSheet = () => {
-    return (
-      <>
-        {bottomSheetVisible && (
-          <TouchableOpacity
-            style={styles.overlay}
-            activeOpacity={1}
-            onPress={closeBottomSheet}
-          />
-        )}
-        <BottomSheet
-          ref={chooseDeliveryBottomSheetRef}
-          index={-1}
-          snapPoints={snapPoints}
-          style={{ zIndex: 999 }}
-        >
-          <View style={styles.sheetContent}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={closeBottomSheet}
-            >
-              <Text style={styles.closeText}>×</Text>
-            </TouchableOpacity>
-            <Text style={styles.title}>Add New Card</Text>
-            <Text style={styles.label}>Name on card</Text>
-            <TextInput style={styles.input} placeholder="Nguyen Thuong Huyen" />
-            <Text style={styles.label}>Card number</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="1234 4567 7890 1234"
-              keyboardType="numeric"
-            />
-            <View style={styles.row}>
-              <View style={styles.col}>
-                <Text style={styles.label}>Expiry date</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="02/24"
-                  keyboardType="numeric"
-                />
-              </View>
-              <View style={styles.col}>
-                <Text style={styles.label}>CVV</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="•••"
-                  keyboardType="numeric"
-                  secureTextEntry
-                />
-              </View>
-            </View>
-            <TouchableOpacity style={styles.addButton}>
-              <Text style={styles.addButtonText}>Add Card</Text>
-            </TouchableOpacity>
-          </View>
-        </BottomSheet>
-      </>
     );
   };
 
@@ -337,7 +378,9 @@ export default function CartView({ goback }) {
         }}
       >
         <View style={styles.cartHeader}>
-          <Text style={styles.cartAmount}>3 items</Text>
+          <Text style={styles.cartAmount}>
+            {cartRedux.cartList[0]?.list_cart_item_id.length} items
+          </Text>
           <TouchableOpacity
             style={{ ...styles.flexRow, transform: [{ translateX: 20 }] }}
           >
@@ -362,8 +405,7 @@ export default function CartView({ goback }) {
         <TouchableOpacity
           style={styles.bookingInfor}
           onPress={() => {
-            chooseDeliveryBottomSheetRef.current?.expand();
-            setBottomSheetVisible(true);
+            setChooseDeliveryVisible(true);
           }}
         >
           <View style={styles.bookingInfoImage}>
@@ -379,17 +421,22 @@ export default function CartView({ goback }) {
               <View style={styles.bookingInfoRightStatusComplete} />
             </View>
             <Text style={styles.bookingInfoRightPrice}>
-              {formatPrice(deliveryMethod?.price || 0)} VNĐ
+              {formatPrice(deliveryMethod?.price || 0)} VND
             </Text>
             <Text style={styles.bookingInfoRightFree}>
-              Order above 1.000.000 VNĐ to get free delivery
+              Order above 1.000.000 VND to get free delivery
             </Text>
             <Text style={styles.bookingInfoRightPriceLeft}>
-              Shop for more {formatPrice(1000000 - paymentPrice || 0)} VNĐ
+              Shop for more {formatPrice(1000000 - paymentPrice || 0)} VND
             </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.bookingInfor}>
+        <TouchableOpacity
+          style={styles.bookingInfor}
+          onPress={() => {
+            setChooseCouponVisible(true);
+          }}
+        >
           <View style={styles.bookingInfoImage}>
             <Image
               source={require("../../assets/cart/couponIcon.png")}
@@ -401,21 +448,29 @@ export default function CartView({ goback }) {
             <Text style={{ ...styles.bookingInfoRightTitle, width: "25%" }}>
               Apply Coupon
             </Text>
-            <View
-              style={{
-                ...styles.bookingInfoRightStatus,
-                width: "40%",
-                height: 2,
-              }}
-            >
+            {coupon ? (
+              <View>
+                <Text>
+                  {coupon.voucher_name} ({coupon.voucher_discount}%)
+                </Text>
+              </View>
+            ) : (
               <View
                 style={{
-                  ...styles.bookingInfoRightStatusComplete,
-                  width: "100%",
+                  ...styles.bookingInfoRightStatus,
+                  width: "40%",
                   height: 2,
                 }}
-              />
-            </View>
+              >
+                <View
+                  style={{
+                    ...styles.bookingInfoRightStatusComplete,
+                    width: "100%",
+                    height: 2,
+                  }}
+                />
+              </View>
+            )}
           </View>
         </TouchableOpacity>
         <View style={styles.totalPrice}>
@@ -424,47 +479,65 @@ export default function CartView({ goback }) {
             {formatPrice(paymentPrice)} VNĐ
           </Text>
         </View>
-        <View style={styles.totalPrice}>
+        {/* <View style={styles.totalPrice}>
           <Text style={styles.saveText}>Saved for later</Text>
           <Text style={styles.saveText}>6 items</Text>
-        </View>
-        <View style={styles.savePlantList}>
+        </View> */}
+        {/* <View style={styles.savePlantList}>
           {savePlantList.map((item, key) => (
             <PlantBookingCard item={item} key={key} />
           ))}
-        </View>
+        </View> */}
       </ScrollView>
-      <LinearGradient
-        colors={["#0B845C", "#0D986A"]} // Set the gradient colors
-        start={{ x: 1, y: 0 }} // Start from the right
-        end={{ x: 0, y: 0 }} // End at the left
-        style={{
-          ...styles.bottomCartSheet,
-          bottom: Platform.OS === "android" ? 0 : "9.5%",
-        }}
-      >
-        <TouchableOpacity
-          style={styles.bottomCartSheetContainer}
-          onPress={() => {
-            dispatch(getCartItemsThunk());
-            navigation.navigate("Checkout", {
-              cart: cart,
-              deliveryMethod: deliveryMethod,
-              currentCart: cartRedux.cartList[0],
-            });
+      {paymentPrice - (deliveryMethod?.price || 0) !== 0 && (
+        <LinearGradient
+          colors={["#0B845C", "#0D986A"]} // Set the gradient colors
+          start={{ x: 1, y: 0 }} // Start from the right
+          end={{ x: 0, y: 0 }} // End at the left
+          style={{
+            ...styles.bottomCartSheet,
+            bottom: Platform.OS === "android" ? "8%" : "6%",
           }}
         >
-          <View style={styles.bottomCartSheetContainerLeft}>
-            <Text style={styles.bottomCartSheetContainerRight}>Checkout</Text>
-          </View>
-          <Text style={styles.bottomCartSheetContainerRight}>
-            {formatPrice(paymentPrice || 0)} VNĐ
-          </Text>
-        </TouchableOpacity>
-      </LinearGradient>
-      {loading && <SpinnerLoading />}
-
-      {renderChooseDeliveryMethodBottomSheet()}
+          <TouchableOpacity
+            style={styles.bottomCartSheetContainer}
+            onPress={() => {
+              dispatch(getCartItemsThunk());
+              navigation.navigate("Checkout", {
+                cart: cart,
+                deliveryMethod: deliveryMethod,
+                coupon: coupon,
+                currentCart: cartRedux.cartList[0],
+              });
+            }}
+          >
+            <View style={styles.bottomCartSheetContainerLeft}>
+              <Text style={styles.bottomCartSheetContainerRight}>Checkout</Text>
+            </View>
+            <Text style={styles.bottomCartSheetContainerRight}>
+              {formatPrice(paymentPrice || 0)} VND
+            </Text>
+          </TouchableOpacity>
+        </LinearGradient>
+      )}
+      {/* {loading && <SpinnerLoading />} */}
+      <CollectionListBottomSheet
+        visible={chooseCollectionVisible}
+        onClose={() => setChooseCollectionVisible(false)}
+        chooseCollection={(item) => handleChangeCollections(item)}
+      />
+      <DeliveryListBottomSheet
+        visible={chooseDeliveryVisible}
+        deliveryMethodList={deliveryMethodList}
+        onClose={() => setChooseDeliveryVisible(false)}
+        chooseCollection={(item) => handleChangeDeliveryMethod(item)}
+      />
+      <CouponListBottomSheet
+        visible={chooseCouponVisible}
+        couponList={couponList}
+        onClose={() => setChooseCouponVisible(false)}
+        chooseCollection={(item) => handleChangeCoupon(item)}
+      />
     </View>
   );
 }
@@ -475,7 +548,7 @@ const styles = StyleSheet.create({
     height: HEIGHT,
     width: WIDTH,
     overflow: "visible",
-    marginBottom: 100,
+    // marginBottom: 100,
     backgroundColor: "#FFFFFF",
     // zIndex: 11,
   },
@@ -523,7 +596,7 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   bookingInfoRightTitle: {
-    width: "20%",
+    width: "17.5%",
     fontSize: 15,
     fontWeight: "bold",
     color: "#002140",
