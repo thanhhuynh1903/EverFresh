@@ -89,7 +89,10 @@ export default function CartView({ goback }) {
         return {
           ...cartItem,
           selected: true,
-          plantDetail: response.data,
+          product: {
+            ...cartItem.product,
+            quantity: cartItem.quantity,
+          },
         };
       })
     );
@@ -117,11 +120,14 @@ export default function CartView({ goback }) {
     cart
       .filter((item) => item.selected)
       .map((item) => {
-        totalPrice += item?.quantity * item?.plantDetail?.price;
+        totalPrice += item?.quantity * item?.product?.price;
       });
-    totalPrice =
-      totalPrice -
-      (totalPrice * (coupon ? Number(coupon?.voucher_discount) : 0)) / 100;
+    if (coupon) {
+      coupon.is_percent
+        ? (totalPrice -= (totalPrice * coupon?.voucher_discount) / 100)
+        : (totalPrice -= coupon?.voucher_discount);
+    }
+
     if (deliveryMethod) {
       totalPrice += deliveryMethod?.price;
     }
@@ -135,44 +141,6 @@ export default function CartView({ goback }) {
   const plantIdListinGalery = useMemo(() => {
     return getPlantIdListinGalery(galleryRedux.galleries);
   }, [galleryRedux]);
-  const savePlantList = [
-    {
-      image: require("../../assets/cart/plant2.png"),
-      name: "Watermelon Peperomia",
-      price: 170000,
-      bookmark: true,
-    },
-    {
-      image: require("../../assets/cart/plant1.png"),
-      name: "Peperomia Obtusfolia",
-      price: 200000,
-      bookmark: true,
-    },
-    {
-      image: require("../../assets/cart/plant5.png"),
-      name: "Cactus",
-      price: 170000,
-      bookmark: true,
-    },
-    {
-      image: require("../../assets/cart/plant2.png"),
-      name: "Watermelon Peperomia",
-      price: 170000,
-      bookmark: true,
-    },
-    {
-      image: require("../../assets/cart/plant1.png"),
-      name: "Peperomia Obtusfolia",
-      price: 200000,
-      bookmark: true,
-    },
-    {
-      image: require("../../assets/cart/plant5.png"),
-      name: "Cactus",
-      price: 170000,
-      bookmark: true,
-    },
-  ];
 
   const hanldeChangeAmount = async (item, amount) => {
     const response = await updateCartItem(item?._id, amount);
@@ -184,6 +152,11 @@ export default function CartView({ goback }) {
           return {
             ...cartItem,
             quantity: cartItem?._id === item?._id ? amount : cartItem.quantity,
+            product: {
+              ...cartItem.product,
+              quantity:
+                cartItem?._id === item?._id ? amount : cartItem.quantity,
+            },
           };
         })
       );
@@ -199,7 +172,6 @@ export default function CartView({ goback }) {
         dispatch(getCartItemsThunk());
       }, 3000);
     } else {
-      console.log(response?.response?.data);
       await dispatch(getCartItemsThunk());
     }
   };
@@ -239,7 +211,7 @@ export default function CartView({ goback }) {
   };
 
   const handleAddToCollection = async (item) => {
-    const response = await addToCollections(item.plantDetail?._id);
+    const response = await addToCollections(item.product?._id);
     if (response.status === 201) {
       showToast({
         title: "Success",
@@ -283,11 +255,11 @@ export default function CartView({ goback }) {
   const handleRemoveToCollection = async (item) => {
     const collectionId = getCollectionIdFromPlantId(
       galleryRedux.galleries,
-      item.plantDetail?._id
+      item.product?._id
     );
 
     const response = await removePlantFromCollections(
-      item.plantDetail?._id,
+      item.product?._id,
       collectionId
     );
     if (response.status === 200) {
@@ -311,7 +283,7 @@ export default function CartView({ goback }) {
 
   const handleChangeCollections = async (collection) => {
     const response = await changeCollections(
-      focusPlant.plantDetail?._id,
+      focusPlant.product?._id,
       collection.collection_name
     );
     if (response.status === 201) {
@@ -342,7 +314,7 @@ export default function CartView({ goback }) {
   };
 
   const renderCardBooking = (item, key) => {
-    item.bookmark = plantIdListinGalery.includes(item.plantDetail?._id);
+    item.bookmark = plantIdListinGalery.includes(item.product?._id);
 
     return (
       <TouchableOpacity
@@ -356,16 +328,20 @@ export default function CartView({ goback }) {
           <Icon name="checkbox-blank-outline" size={32} color="#8688BC" />
         )}
         <PlantBookingCard
-          plant={item}
-          hanldeIncrease={() => hanldeChangeAmount(item, item.quantity + 1)}
-          hanldeDecrease={() => hanldeChangeAmount(item, item.quantity - 1)}
-          handleDelete={() => handleDeteteCartItem(item)}
-          handleAddToCollection={() =>
-            item.bookmark
-              ? handleRemoveToCollection(item)
-              : handleAddToCollection(item)
+          plant={item?.product}
+          hanldeIncrease={() =>
+            hanldeChangeAmount(item?.product, item.quantity + 1)
           }
-          onPress={() => handleChangeSelected(item)}
+          hanldeDecrease={() =>
+            hanldeChangeAmount(item?.product, item.quantity - 1)
+          }
+          handleDelete={() => handleDeteteCartItem(item?.product)}
+          handleAddToCollection={() =>
+            item?.product.bookmark
+              ? handleRemoveToCollection(item?.product)
+              : handleAddToCollection(item?.product)
+          }
+          onPress={() => handleChangeSelected(item?.product)}
         />
       </TouchableOpacity>
     );
@@ -458,7 +434,11 @@ export default function CartView({ goback }) {
               Apply Coupon
             </Text>
             {coupon ? (
-              <View>
+              <View
+                style={{
+                  width: "45%",
+                }}
+              >
                 <Text>
                   {coupon.voucher_name} ({coupon.voucher_discount}%)
                 </Text>

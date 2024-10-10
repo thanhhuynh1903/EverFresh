@@ -18,6 +18,8 @@ const HEIGHT = Dimensions.get("window").height;
 
 export default function OrderComplete({ route }) {
   const navigation = useNavigation();
+  console.log(route?.params?.order);
+
   return (
     <View style={styles.container}>
       <View style={styles.congratuContainer}>

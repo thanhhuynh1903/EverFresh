@@ -8,7 +8,7 @@ import {
   Image,
   ImageBackground,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { formatPrice } from "../../utils/utils";
 
@@ -33,8 +33,8 @@ export default function PlantBookingCard({
     <TouchableOpacity style={styles.container} onPress={onPress && onPress}>
       <Image
         source={
-          item?.plantDetail?.img_url && item?.plantDetail?.img_url[0]
-            ? { uri: item?.plantDetail?.img_url[0] || "" }
+          item?.img_url && item?.img_url[0]
+            ? { uri: item?.img_url[0] || "" }
             : require("../../assets/cart/plant1.png")
         }
         resizeMode="stretch"
@@ -42,7 +42,7 @@ export default function PlantBookingCard({
       />
       <View style={styles.center}>
         <View style={styles.centerFuncional}>
-          <Text style={styles.centerTitle}>{item?.plantDetail?.name}</Text>
+          <Text style={styles.centerTitle}>{item?.name}</Text>
           <TouchableOpacity
             style={styles.flexRow}
             onPress={handleAddToCollection && handleAddToCollection}
@@ -84,10 +84,7 @@ export default function PlantBookingCard({
             />
           </TouchableOpacity>
           <Text style={styles.centerPrice}>
-            {formatPrice(
-              (item?.plantDetail?.price || 1) * (item?.quantity || 1)
-            )}{" "}
-            VNĐ
+            {formatPrice((item?.price || 1) * (item?.quantity || 1))} VNĐ
           </Text>
         </View>
       </View>

@@ -71,6 +71,7 @@ export default function LoginPage() {
 
   const loadRedux = async () => {
     await dispatch(getCartItemsThunk());
+    await dispatch(getNotificationThunk());
     await dispatch(getGaleryThunk()).then((response) => {
       dispatch(getAllPlantsFromGalleryThunk(response.payload));
     });

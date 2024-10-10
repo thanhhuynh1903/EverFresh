@@ -32,6 +32,7 @@ export default function NotificationModal({ visible, onCancle }) {
   const [notificationList, setNotificationList] = useState(
     notificationRedux?.notificateList || []
   );
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
   useEffect(() => {
     setNotificationList(notificationRedux?.notificateList || []);
@@ -96,13 +97,7 @@ export default function NotificationModal({ visible, onCancle }) {
   const deleteAllNotification = async () => {
     const responsive = await deleteNotificateAll();
     if (responsive.status >= 200 && responsive.status < 300) {
-      dispatch(
-        setNotificateList(
-          notificationList.filter((item) => {
-            item._id !== id;
-          })
-        )
-      );
+      dispatch(setNotificateList([]));
     }
   };
 
@@ -162,8 +157,63 @@ export default function NotificationModal({ visible, onCancle }) {
     <Modal visible={visible} animationType="fade" transparent={true}>
       <TouchableOpacity style={styles.layout} onPress={handleCancel} />
       <ScrollView style={styles.container}>
+        <View
+          style={{
+            ...styles.flexRow,
+            paddingHorizontal: "5%",
+            marginBottom: 24,
+          }}
+        >
+          <TouchableOpacity
+            style={styles.threeDots}
+            activeOpacity={1}
+            onPress={() => setDropdownVisible(true)}
+          >
+            <Icon name="dots-horizontal" size={22} color="black" />
+            {dropdownVisible && (
+              <View style={styles.dropdownAction}>
+                <TouchableOpacity
+                  style={{
+                    ...styles.flexRow,
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    gap: 12,
+                  }}
+                  onPress={async () => {
+                    setDropdownVisible(false);
+                    await seenAllNotification();
+                  }}
+                >
+                  <Icon name="delete-forever-outline" size={22} color="black" />
+                  <Text>Delete all</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    ...styles.flexRow,
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    gap: 12,
+                  }}
+                  onPress={async () => {
+                    setDropdownVisible(false);
+                    await deleteAllNotification();
+                  }}
+                >
+                  <Icon name="check-all" size={22} color="black" />
+                  <Text>Mark read all</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              handleCancel();
+            }}
+          >
+            <Icon name="close" size={22} color="black" />
+          </TouchableOpacity>
+        </View>
         {notificationList.map((item, key) => renderNotificainCard(item, key))}
-
         {!notificationList[0] && (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -195,6 +245,30 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: "rgba(0,0,0,0.1)",
+  },
+  threeDots: {
+    position: "relative",
+  },
+  dropdownAction: {
+    position: "absolute",
+    width: WIDTH * 0.4,
+    top: "100%",
+    left: "50%",
+    padding: 8,
+    borderRadius: 6,
+    gap: 12,
+
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
+    zIndex: 999,
   },
 
   notificateCard: {
@@ -241,5 +315,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#FEE4E2",
     padding: 3,
     borderRadius: 50,
+  },
+
+  flexRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    zIndex: 10,
   },
 });

@@ -16,7 +16,11 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
 import HomeHeader from "../../components/HomeHeader";
 import MenuModal from "../../components/Modal/MenuModal/MenuModal";
-import { formatPrice, normalizeString } from "../../utils/utils.js";
+import {
+  formatPrice,
+  normalizeString,
+  successfulStatus,
+} from "../../utils/utils.js";
 import { getPlants } from "../../api/plant.js";
 import SpinnerLoading from "../../components/SpinnerLoading/SpinnerLoading.js";
 import useCustomToast from "../../components/ToastNotification/ToastNotification.js";
@@ -61,8 +65,14 @@ export default function ShopPage() {
   };
 
   const handleAddToCart = async (item) => {
-    const response = await addToCart(item._id);
-    if (response.status === 201) {
+    const data = {
+      product_id: item._id,
+      product_type: "Plant",
+      custom_color: "#FFD2B6",
+      quantity: 1,
+    };
+    const response = await addToCart(data);
+    if (successfulStatus(response.status)) {
       showToast({
         title: "Success",
         message: `Add plant to cart successfull`,
@@ -71,10 +81,11 @@ export default function ShopPage() {
       await dispatch(getCartItemsThunk());
     } else {
       showToast({
-        title: "SuFailccess",
+        title: "Fail",
         message: `Add plant to cart fail`,
         type: "error",
       });
+      console.log(response?.response?.data);
     }
   };
 

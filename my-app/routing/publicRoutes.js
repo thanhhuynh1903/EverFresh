@@ -19,6 +19,8 @@ import ScanCamera from "../screens/ScanCamera/ScanCamera";
 import OrderList from "../screens/OrderList/OrderList";
 import PlantReport from "../screens/PlantReport/PlantReport";
 import Galery from "../screens/Galery/Galery";
+import Personal from "../screens/Personal/Personal";
+import Timer from "../screens/Timer/Timer";
 export const publicRoutes = [
   {
     name: "Welcome",
@@ -103,5 +105,13 @@ export const publicRoutes = [
   {
     name: "Galery",
     component: Galery,
+  },
+  {
+    name: "Personal",
+    component: Personal,
+  },
+  {
+    name: "Timer",
+    component: Timer,
   },
 ];

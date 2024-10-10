@@ -9,3 +9,13 @@ export const paymentMomo = async (data) => {
     return error;
   }
 };
+
+export const paymentStripe = async (data) => {
+  try {
+    const response = await api.post(`/payment/stripe`, data);
+    return response;
+  } catch (error) {
+    console.log("paymentStripe in service/payment error : ", error);
+    return error;
+  }
+};

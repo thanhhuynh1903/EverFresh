@@ -21,6 +21,8 @@ import PackagePlan from "../screens/PackagePlan/PackagePlan.js";
 import signin from "../screens/signin/signin";
 import PlantReport from "../screens/PlantReport/PlantReport.js";
 import Galery from "../screens/Galery/Galery.js";
+import Personal from "../screens/Personal/Personal.jsx";
+import Timer from "../screens/Timer/Timer.jsx";
 // import Category from '../screens/Category';
 
 export const RoutesList = [
@@ -46,8 +48,8 @@ export const RoutesList = [
     },
   },
   {
-    name: "Home2",
-    component: Home,
+    name: "Timer",
+    component: Timer,
     options: {
       tabBarIcon: ({ color, focused }) => (
         <Icon name="alarm" size={32} color={color} />
@@ -58,8 +60,8 @@ export const RoutesList = [
     },
   },
   {
-    name: "Home3",
-    component: Home,
+    name: "Personal",
+    component: Personal,
     options: {
       tabBarIcon: ({ color, focused }) => (
         <Icon name="account-outline" size={32} color={color} />

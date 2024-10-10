@@ -63,7 +63,14 @@ export default function PlantDetail({ route }) {
   }, [plant]);
 
   const handleAddToCart = async (item) => {
-    const response = await addToCart(item._id);
+    const data = {
+      product_id: item._id,
+      product_type: "Plant",
+      custom_color: "#FFD2B6",
+      quantity: 1,
+    };
+
+    const response = await addToCart(data);
     if (response.status === 201) {
       showToast({
         title: "Success",

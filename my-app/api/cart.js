@@ -20,12 +20,12 @@ export const createCart = async () => {
   }
 };
 
-export const addToCart = async (id, amount) => {
+export const addToCart = async (data) => {
   try {
-    const data = {
-      plant_id: id,
-      quantity: amount || 1,
-    };
+    // const data = {
+    //   plant_id: id,
+    //   quantity: amount || 1,
+    // };
     const response = await api.post(`/cart-items`, data);
     return response;
   } catch (error) {

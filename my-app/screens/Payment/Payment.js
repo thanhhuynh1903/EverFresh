@@ -11,51 +11,184 @@ import {
   Linking,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import React, { useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import BottomSheet from "@gorhom/bottom-sheet";
-import { paymentMomo } from "../../api/payment";
+import { paymentMomo, paymentStripe } from "../../api/payment";
 import { createOrder } from "../../api/order";
 import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
 import { useDispatch } from "react-redux";
+import { formatPrice, successfulStatus } from "../../utils/utils";
+import AddCardBottomSheet from "../../components/AddCardBottomSheet/AddCardBottomSheet";
+import { useStripe } from "@stripe/stripe-react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getPaymentMethod } from "../../api/linkedInformation";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
-const data = [
-  {
-    id: "1",
-    title: "Item 1",
-    imageUrl: require("../../assets/utilsImage/card-1.png"),
-  },
-  // {
-  //   id: "2",
-  //   title: "Item 2",
-  //   imageUrl: require("../../assets/visaCard.png"),
-  // },
-  // {
-  //   id: "3",
-  //   title: "Item 3",
-  //   imageUrl: require("../../assets/utilsImage/card-1.png"),
-  // },
-];
+const momoMethod = {
+  _id: "1",
+  title: "Item 1",
+  type: "MOMO",
+  imageUrl: require("../../assets/utilsImage/card-1.png"),
+};
 
 export default function Payment({ route }) {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [paymentMethodList, setPaymentMethodList] = useState([]);
   const flatListRef = useRef(null);
   const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ["25%", "50%"], []);
 
   const [cart, setCart] = useState(route.params.cart);
-  const [deliveryMethod, setDeliveryMethod] = useState(
-    route.params.deliveryMethod
+
+  const { handleURLCallback } = useStripe();
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
+  useEffect(() => {
+    loadPaymentMethod();
+  }, []);
+
+  const deliveryMethod = useMemo(() => {
+    return route.params.deliveryMethod;
+  }, [route.params.deliveryMethod]);
+
+  const voucher = useMemo(() => {
+    return route.params.voucher;
+  }, [route.params.voucher]);
+
+  const deliveryInformation = useMemo(() => {
+    return route.params.deliveryInformation;
+  }, [route.params.deliveryInformation]);
+
+  const paymentPrice = useMemo(() => {
+    let totalPrice = 0;
+    cart
+      .filter((item) => item.selected)
+      .map((item) => {
+        totalPrice += item?.quantity * item?.product?.price;
+      });
+    if (voucher) {
+      voucher.is_percent
+        ? (totalPrice -= (totalPrice * voucher?.voucher_discount) / 100)
+        : (totalPrice -= voucher?.voucher_discount);
+    }
+
+    return totalPrice;
+  }, [cart, voucher]);
+
+  const loadPaymentMethod = async () => {
+    const response = await getPaymentMethod();
+    if (successfulStatus(response.status)) {
+      setPaymentMethodList([
+        momoMethod,
+        ...response.data.map((item) => {
+          return {
+            ...item,
+            type: "STRIPE",
+            imageUrl: require("../../assets/visaCard.png"),
+          };
+        }),
+      ]);
+    } else {
+      console.log(response?.response?.data);
+    }
+  };
+
+  // stripe
+  const handleDeepLink = useCallback(
+    async (url) => {
+      if (url) {
+        const stripeHandled = await handleURLCallback(url);
+        console.log(stripeHandled);
+        if (stripeHandled) {
+          // This was a Stripe URL - you can return or add extra handling here as you see fit
+        } else {
+          // This was NOT a Stripe URL – handle as you normally would
+        }
+      }
+    },
+    [handleURLCallback]
   );
-  const [deliveryInformation, setDeliveryInformationList] = useState(
-    route.params.deliveryInformation
-  );
+
+  useEffect(() => {
+    const getUrlAsync = async () => {
+      const initialUrl = await Linking.getInitialURL();
+      handleDeepLink(initialUrl);
+    };
+
+    getUrlAsync();
+
+    const deepLinkListener = Linking.addEventListener("url", (event) => {
+      handleDeepLink(event.url);
+    });
+
+    return () => deepLinkListener.remove();
+  }, [handleDeepLink]);
+
+  const fetchPaymentSheetParams = async () => {
+    const accessToken = await AsyncStorage.getItem("accessToken");
+    const response = await fetch(
+      "https://everfresh-server.onrender.com/api/payment/stripe",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const { paymentIntent, ephemeralKey, customer } = await response.json();
+
+    return {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    };
+  };
+
+  const initializePaymentSheet = async () => {
+    const { paymentIntent, ephemeralKey, customer } =
+      await fetchPaymentSheetParams();
+
+    const { error } = await initPaymentSheet({
+      merchantDisplayName: "Example, Inc.",
+      customerId: customer,
+      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: paymentIntent,
+      // Set allowsDelayedPaymentMethods to true if your business can handle payment
+      //methods that complete payment after a delay, like SEPA Debit and Sofort.
+      allowsDelayedPaymentMethods: true,
+      defaultBillingDetails: {
+        name: "Jane Doe",
+      },
+    });
+    if (!error) {
+      setLoading(true);
+    }
+  };
+
+  const openPaymentSheet = async () => {
+    const { error } = await presentPaymentSheet();
+
+    if (error) {
+      Alert.alert(error.message);
+    } else {
+      Alert.alert("Success", "Your order is confirmed!");
+    }
+  };
+
+  useEffect(() => {
+    initializePaymentSheet();
+  }, []);
 
   const handlePayment = async () => {
     const data = {
@@ -63,12 +196,41 @@ export default function Payment({ route }) {
       delivery_information_id: deliveryInformation._id,
       cart_id: route.params.currentCart._id,
     };
+    if (route.params.voucher) {
+      data.voucher_id = route.params.voucher._id;
+    }
     const response = await paymentMomo(data);
 
-    if (response.status === 200) {
+    if (successfulStatus(response.status)) {
       await Linking.openURL(response?.data?.deeplink);
       console.log(response?.data?.deeplink);
       console.log(response?.data?.payUrl);
+    } else {
+      console.log(response?.response?.data);
+    }
+  };
+
+  const handlePaymentStripe = async () => {
+    const data = {
+      delivery_method_id: deliveryMethod._id,
+      delivery_information_id: deliveryInformation._id,
+      cart_id: route.params.currentCart._id,
+      linked_information_id: "66ffcf324bff98afff2cb039",
+    };
+    if (route.params.voucher) {
+      data.voucher_id = route.params.voucher._id;
+    }
+    console.log(data);
+
+    const response = await paymentStripe(data);
+
+    if (successfulStatus(response.status)) {
+      console.log(response?.data);
+
+      await Linking.openURL(response?.data?.url);
+    } else {
+      console.log(response?.data);
+      console.log(response?.response?.data);
     }
   };
 
@@ -79,19 +241,19 @@ export default function Payment({ route }) {
       delivery_information_id: deliveryInformation._id,
       cart_id: route.params.currentCart._id,
     };
-    // if (voucher) {
-    // data.voucher_id= voucher._id
-    // }
-    const response = await createOrder(data);
-    if (response.status === 201) {
-      await dispatch(getCartItemsThunk());
-      navigation.navigate("OrderComplete", { order: response.data });
+    if (route.params.voucher) {
+      data.voucher_id = route.params.voucher._id;
     }
-  };
 
-  const closeBottomSheet = () => {
-    bottomSheetRef.current?.close();
-    setBottomSheetVisible(false);
+    const response = await createOrder(data);
+    if (successfulStatus(response.status)) {
+      await dispatch(getCartItemsThunk());
+      console.log(response.data);
+
+      navigation.navigate("OrderComplete", { order: response.data });
+    } else {
+      console.log(response?.response?.data);
+    }
   };
 
   const renderCarouselItem = ({ item }) => (
@@ -101,13 +263,40 @@ export default function Payment({ route }) {
         style={styles.carouselImage}
         resizeMode="stretch"
       />
+      {item.type !== "MOMO" && (
+        <View style={styles.textOverlay}>
+          <Text style={{ ...styles.carouselText, right: "8%" }}>
+            {item.card_number % 10000}
+          </Text>
+          <Text
+            style={{
+              ...styles.carouselText,
+              left: "8%",
+              bottom: "15%",
+              fontSize: 12,
+            }}
+          >
+            {item.author}
+          </Text>
+          <Text
+            style={{
+              ...styles.carouselText,
+              right: "8%",
+              bottom: "15%",
+              fontSize: 12,
+            }}
+          >
+            {item.expiration_date}
+          </Text>
+        </View>
+      )}
     </View>
   );
 
   // Render dots for the carousel
-  const renderDots = () => (
+  const renderDots = (paymentMethodList) => (
     <View style={styles.dotContainer}>
-      {data.map((_, index) => (
+      {paymentMethodList.map((_, index) => (
         <View
           key={index}
           style={[
@@ -145,33 +334,32 @@ export default function Payment({ route }) {
               <Icon name="circle-slice-8" size={32} color="#8688BC" />
             </View>
           </View>
-          <View style={styles.shippingAddressChange}>
-            <Text style={styles.shippingAddressChangetText}>Change</Text>
-          </View>
         </View>
 
         {/* Carousel */}
         <FlatList
           ref={flatListRef}
-          data={data}
+          data={paymentMethodList}
           renderItem={renderCarouselItem}
           horizontal
           pagingEnabled={true} // Disable default paging since we are customizing it
           // snapToInterval={WIDTH} // Width of card + margins
           decelerationRate="fast" // Fast snapping behavior
           snapToAlignment="center" // Snap the card to the center
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={(event) => {
             const newIndex = Math.floor(
-              event.nativeEvent.contentOffset.x / (WIDTH * 0.8)
+              event.nativeEvent.contentOffset.x / WIDTH
             );
+            console.log(newIndex);
+
             setCurrentIndex(newIndex);
           }}
         />
 
         {/* Dots */}
-        {renderDots()}
+        {renderDots(paymentMethodList)}
 
         <View style={styles.paymentTitle}>
           <Text style={styles.paymentTitleText}>Payment </Text>
@@ -191,18 +379,22 @@ export default function Payment({ route }) {
         <View style={styles.paymentDetail}>
           <View style={{ ...styles.flexRow, justifyContent: "space-between" }}>
             <Text style={styles.paymentDetailTitle}>Order</Text>
-            <Text style={styles.paymentDetailText}>495.000 VNĐ</Text>
+            <Text style={styles.paymentDetailText}>
+              {formatPrice(paymentPrice || 0)} VNĐ
+            </Text>
           </View>
           <View style={{ ...styles.flexRow, justifyContent: "space-between" }}>
-            <Text style={styles.paymentDetailTitle}>Order</Text>
-            <Text style={styles.paymentDetailText}>30.000 VNĐ</Text>
+            <Text style={styles.paymentDetailTitle}>Delivery</Text>
+            <Text style={styles.paymentDetailText}>
+              {formatPrice(deliveryMethod?.price)} VNĐ
+            </Text>
           </View>
           <View style={{ ...styles.flexRow, justifyContent: "space-between" }}>
             <Text style={{ ...styles.paymentDetailTitle, fontSize: 16 }}>
               Summary
             </Text>
             <Text style={{ ...styles.paymentDetailText, fontSize: 16 }}>
-              525.000 VNĐ
+              {formatPrice((paymentPrice || 0) + deliveryMethod?.price)} VNĐ
             </Text>
           </View>
         </View>
@@ -210,69 +402,30 @@ export default function Payment({ route }) {
         <TouchableOpacity
           style={styles.proceedButton}
           onPress={() => {
-            handlePayment();
+            currentIndex === 0 ? handlePayment() : handlePaymentStripe();
+            // handlePayment();
+            // handlePaymentStripe();
+            // openPaymentSheet();
           }}
           onLongPress={handleCreateOrder}
         >
           <Text style={styles.buttonText}>Pay Now</Text>
         </TouchableOpacity>
       </ScrollView>
-
-      {/* Bottom sheet */}
-      {bottomSheetVisible && (
-        <TouchableOpacity
-          style={styles.overlay}
-          activeOpacity={1}
-          onPress={closeBottomSheet}
-        />
-      )}
-
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        style={{ zIndex: 999 }}
-      >
-        <View style={styles.sheetContent}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={closeBottomSheet}
-          >
-            <Text style={styles.closeText}>×</Text>
-          </TouchableOpacity>
-          <Text style={styles.title}>Add New Card</Text>
-          <Text style={styles.label}>Name on card</Text>
-          <TextInput style={styles.input} placeholder="Nguyen Thuong Huyen" />
-          <Text style={styles.label}>Card number</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="1234 4567 7890 1234"
-            keyboardType="numeric"
-          />
-          <View style={styles.row}>
-            <View style={styles.col}>
-              <Text style={styles.label}>Expiry date</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="02/24"
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.col}>
-              <Text style={styles.label}>CVV</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="•••"
-                keyboardType="numeric"
-                secureTextEntry
-              />
-            </View>
-          </View>
-          <TouchableOpacity style={styles.addButton}>
-            <Text style={styles.addButtonText}>Add Card</Text>
-          </TouchableOpacity>
-        </View>
-      </BottomSheet>
+      <AddCardBottomSheet
+        visible={bottomSheetVisible}
+        onClose={() => setBottomSheetVisible(false)}
+        onSubmit={(item) => {
+          setPaymentMethodList([
+            ...paymentMethodList,
+            {
+              ...item,
+              type: "STRIPE",
+              imageUrl: require("../../assets/visaCard.png"),
+            },
+          ]);
+        }}
+      />
     </View>
   );
 }
@@ -450,15 +603,7 @@ const styles = StyleSheet.create({
   col: {
     width: "48%",
   },
-  addButton: {
-    paddingVertical: 14,
-    backgroundColor: "#0D986A",
-    borderRadius: 4,
-  },
-  addButtonText: {
-    textAlign: "center",
-    color: "white",
-  },
+
   carouselItem: {
     width: WIDTH, // Set width to 60% of the screen width
     // marginHorizontal: WIDTH * 0.1, // Set margin to 10% of the screen width on both sides
@@ -467,6 +612,24 @@ const styles = StyleSheet.create({
   carouselImage: {
     width: "100%",
     height: "100%",
+  },
+  textOverlay: {
+    position: "absolute", // Overlay the text on top of the image
+    top: "7%",
+    bottom: "11%",
+    left: "6%",
+    right: "6%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  carouselText: {
+    position: "absolute",
+    fontSize: 20,
+    fontWeight: "bold",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+    color: "white",
   },
   dotContainer: {
     flexDirection: "row",

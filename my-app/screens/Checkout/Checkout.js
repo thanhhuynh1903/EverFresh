@@ -10,14 +10,15 @@ import {
   Button,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import BottomSheetHeader from "../../components/BottomSheetHeader/BottomSheetHeader";
 import PlantBookingCard from "../../components/PlantBookingCard/PlantBookingCard";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { selectCart } from "../../redux/selector/selector";
+import { selectCart, selectUser } from "../../redux/selector/selector";
 import { useSelector } from "react-redux";
 import { formatPrice } from "../../utils/utils";
 import { getDeliveryInformation } from "../../api/delivery";
+import DeliveryInfomationBottomSheet from "../../components/DeliveryInfomationBottomSheet/DeliveryInfomationBottomSheet";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -25,18 +26,30 @@ const HEIGHT = Dimensions.get("window").height;
 export default function Checkout({ route }) {
   const navigation = useNavigation();
   const cartRedux = useSelector(selectCart);
+  const userRedux = useSelector(selectUser);
   const [cart, setCart] = useState(route.params.cart);
-  const [deliveryMethod, setDeliveryMethod] = useState(
-    route.params.deliveryMethod
-  );
-  const [coupon, setCoupon] = useState(route.params.coupon);
+  const [deliveryInformation, setDeliveryInformation] = useState({});
   const [deliveryInformationList, setDeliveryInformationList] = useState([]);
+  const [deliveryInfomationVisible, setDeliveryInfomationVisible] =
+    useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
       loadDeliveryInformationList();
     }, [])
   );
+
+  useEffect(() => {
+    setDeliveryInformation(deliveryInformationList[0]);
+  }, [deliveryInformationList]);
+
+  const deliveryMethod = useMemo(() => {
+    return route.params.deliveryMethod;
+  }, [route.params.deliveryMethod]);
+
+  const coupon = useMemo(() => {
+    return route.params.coupon;
+  }, [route.params.coupon]);
 
   const loadDeliveryInformationList = async () => {
     const response = await getDeliveryInformation();
@@ -50,16 +63,24 @@ export default function Checkout({ route }) {
     cart
       .filter((item) => item.selected)
       .map((item) => {
-        totalPrice += item?.quantity * item?.plantDetail?.price;
+        totalPrice += item?.quantity * item?.product?.price;
       });
     if (coupon) {
-      totalPrice =
-        totalPrice -
-        (totalPrice * (coupon ? Number(coupon?.voucher_discount) : 0)) / 100;
+      coupon.is_percent
+        ? (totalPrice -= (totalPrice * coupon?.voucher_discount) / 100)
+        : (totalPrice -= coupon?.voucher_discount);
+    }
+
+    if (deliveryMethod) {
+      totalPrice += deliveryMethod?.price;
     }
 
     return totalPrice;
   }, [cart, coupon, deliveryMethod]);
+
+  const chooseDeliveryInfo = (item) => {
+    setDeliveryInformation(item);
+  };
 
   return (
     <View style={styles.container}>
@@ -70,7 +91,7 @@ export default function Checkout({ route }) {
       <ScrollView style={styles.contentContainer}>
         <View style={styles.plantList}>
           {cart.map((item, key) => (
-            <PlantBookingCard plant={item} key={key} />
+            <PlantBookingCard plant={item.product} key={key} />
           ))}
         </View>
         <View style={styles.totalPrice}>
@@ -81,20 +102,27 @@ export default function Checkout({ route }) {
         </View>
         <View style={styles.shippingAddress}>
           <Text style={styles.shippingAddressTitle}>Shipping address</Text>
-          <TouchableOpacity style={styles.shippingAddressDetail}>
+          <TouchableOpacity
+            style={styles.shippingAddressDetail}
+            onPress={() => setDeliveryInfomationVisible(true)}
+          >
             <View style={styles.shippingAddressDetailLeft}>
               <Text style={styles.shippingAddressDetailLeftText}>
-                Thuong Huyen - 0979084700
+                {userRedux?.user?.name} - {deliveryInformation?.phone_number}
               </Text>
               <Text style={styles.shippingAddressDetailLeftText}>
-                B10-12, chung cu 9View So 1, duong So 1, PLB, TP.TD, TP.HCM
+                {deliveryInformation?.address_detail}{" "}
+                {deliveryInformation?.address}
               </Text>
             </View>
             <View style={styles.shippingAddressDetailRight}>
               <Icon name="circle-slice-8" size={32} color="#8688BC" />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.shippingAddressChange}>
+          <TouchableOpacity
+            style={styles.shippingAddressChange}
+            onPress={() => setDeliveryInfomationVisible(true)}
+          >
             <Text style={styles.shippingAddressChangetText}>Change</Text>
           </TouchableOpacity>
         </View>
@@ -105,6 +133,7 @@ export default function Checkout({ route }) {
               cart: cart,
               deliveryInformation: deliveryInformationList[0],
               deliveryMethod: deliveryMethod,
+              voucher: coupon,
               currentCart: route.params.currentCart,
             });
           }}
@@ -113,6 +142,13 @@ export default function Checkout({ route }) {
         </TouchableOpacity>
         {/* {loading && <SpinnerLoading />} */}
       </ScrollView>
+      <DeliveryInfomationBottomSheet
+        visible={deliveryInfomationVisible}
+        chooseDeliveryInfo={chooseDeliveryInfo}
+        deliveryInfoList={deliveryInformationList}
+        setDeliveryInfoList={setDeliveryInformationList}
+        onClose={() => setDeliveryInfomationVisible(false)}
+      />
     </View>
   );
 }

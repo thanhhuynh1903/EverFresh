@@ -66,7 +66,10 @@ export default function CouponListBottomSheet({
         />
         <View style={styles.collectionCardInfor}>
           <Text style={styles.collectionName}>{item?.voucher_name}</Text>
-          <Text>Discount {item?.voucher_discount}%</Text>
+          <Text>
+            Discount {item?.voucher_discount}
+            {item.is_percent ? "%" : "VND"}
+          </Text>
         </View>
         <View style={styles.chevronIcon}>
           <Icon name="chevron-right" size={30} color="rgba(0,0,0,0.5)" />
@@ -172,9 +175,11 @@ const styles = StyleSheet.create({
   },
   collectionCardInfor: {
     height: "100%",
+    width: "100%",
     justifyContent: "space-around",
   },
   collectionName: {
+    width: "60%",
     fontWeight: "bold",
     fontSize: 16,
   },
