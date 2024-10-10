@@ -8,6 +8,28 @@ export function formatDate(isoDateString) {
   return date?.toLocaleDateString("en-US", options);
 }
 
+export function formatTime(isoString) {
+  const date = new Date(isoString);
+  let hours = date.getUTCHours();
+  const minutes = date.getUTCMinutes();
+
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // if hour is 0, set it to 12 for 12-hour format
+
+  const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+
+  return `${hours}:${formattedMinutes} ${ampm}`;
+}
+
+export function formatDateMonthYear(isoString) {
+  const date = new Date(isoString);
+  const month = date.getUTCMonth() + 1; // Months are 0-based, so we add 1
+  const year = date.getUTCFullYear();
+
+  return `${month < 10 ? "0" + month : month}/${year}`;
+}
+
 export const normalizeString = (str) => {
   return str
     .normalize("NFD")
@@ -37,4 +59,8 @@ export const getCollectionIdFromPlantId = (galleryData, plantId) => {
     }
   }
   return null; // Return null if the plant ID is not found
+};
+
+export const successfulStatus = (status) => {
+  return status >= 200 && status < 300;
 };

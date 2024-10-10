@@ -20,6 +20,7 @@ import Registerverify from "../screens/Registerverify/Registerverify.js";
 import PackagePlan from "../screens/PackagePlan/PackagePlan.js";
 import signin from "../screens/signin/signin";
 import PlantReport from "../screens/PlantReport/PlantReport.js";
+import Galery from "../screens/Galery/Galery.js";
 // import Category from '../screens/Category';
 
 export const RoutesList = [
@@ -34,8 +35,8 @@ export const RoutesList = [
     },
   },
   {
-    name: "Home1",
-    component: Home,
+    name: "Galery",
+    component: Galery,
     options: {
       tabBarIcon: ({ color, focused }) => (
         <Icon name="view-grid-outline" size={32} color={color} />

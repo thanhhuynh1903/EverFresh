@@ -8,14 +8,15 @@ import {
   Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
 import HomeHeader from "../../components/HomeHeader";
 import MenuModal from "../../components/Modal/MenuModal/MenuModal";
-import { useSelector } from "react-redux";
-import { selectUser } from "../../redux/selector/selector";
+import { useDispatch, useSelector } from "react-redux";
+import { selectGallery, selectUser } from "../../redux/selector/selector";
+import { getNotificationThunk } from "../../redux/thunk/notificationThunk";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -81,6 +82,8 @@ const seasonalPlantCardDemo = [
 
 export default function Homepage() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const galleryRedux = useSelector(selectGallery);
   const userRedux = useSelector(selectUser);
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -109,7 +112,10 @@ export default function Homepage() {
         key={key}
         onPress={() => navigation.navigate("savedplant", { savedPlant: item })}
       >
-        <Image source={item.img} style={styles.savedPlantCardImage} />
+        <Image
+          source={{ uri: item?.img_url[0] || "" }}
+          style={styles.savedPlantCardImage}
+        />
       </TouchableOpacity>
     );
   };
@@ -201,9 +207,11 @@ export default function Homepage() {
             </TouchableOpacity>
           </View>
           <View style={styles.savedPlandContainer}>
-            {savedPlantCardDemo.map((item, key) =>
-              renderSavedPlantCard(item, key)
-            )}
+            {galleryRedux?.plantList &&
+              galleryRedux?.plantList[0] &&
+              galleryRedux?.plantList.map((item, key) =>
+                renderSavedPlantCard(item, key)
+              )}
           </View>
           <View style={styles.deviderLine} />
           <View style={styles.yourPland}>

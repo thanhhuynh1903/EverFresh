@@ -6,17 +6,23 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useMemo, useState } from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import NotificationModal from "../NotificationModal/NotificationModal";
+import { selectNotificate } from "../../redux/selector/selector";
+import { useSelector } from "react-redux";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
-export default function HomeHeader({
-  navigation,
-  handleMenuToggle,
-  backgroundColor,
-}) {
+export default function HomeHeader({ handleMenuToggle, backgroundColor }) {
+  const notificationRedux = useSelector(selectNotificate);
+  const [notificateModalVisible, setNotificateModalVisible] = useState(false);
+  const newNotifiticate = useMemo(() => {
+    return notificationRedux.notificateList.some(
+      (notification) => notification.is_new === true
+    );
+  }, [notificationRedux.notificateList]);
   return (
     <View
       style={{
@@ -29,8 +35,14 @@ export default function HomeHeader({
         style={styles.iconstyle}
       />
       <View style={styles.fetureList}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setNotificateModalVisible(true);
+          }}
+          style={{ position: "relative" }}
+        >
           <Icon name="bell-outline" size={32} color="#FCCC1F" />
+          {newNotifiticate && <View style={styles.newdot} />}
         </TouchableOpacity>
         <TouchableOpacity onPress={handleMenuToggle}>
           <Icon name="menu" size={32} color="#0D986A" />
@@ -38,6 +50,12 @@ export default function HomeHeader({
       </View>
       {/* <BackButton navigation={navigation} />
             <LogoCorner /> */}
+      <NotificationModal
+        visible={notificateModalVisible}
+        onCancle={() => {
+          setNotificateModalVisible(false);
+        }}
+      />
     </View>
   );
 }
@@ -71,5 +89,14 @@ const styles = StyleSheet.create({
     height: HEIGHT * 0.05,
     gap: 12,
     marginRight: 12,
+  },
+  newdot: {
+    position: "absolute",
+    top: "10%",
+    right: "10%",
+    width: 10,
+    height: 10,
+    backgroundColor: "red",
+    borderRadius: 50,
   },
 });

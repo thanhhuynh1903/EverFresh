@@ -18,6 +18,7 @@ import LoginPage from "../screens/login/login";
 import ScanCamera from "../screens/ScanCamera/ScanCamera";
 import OrderList from "../screens/OrderList/OrderList";
 import PlantReport from "../screens/PlantReport/PlantReport";
+import Galery from "../screens/Galery/Galery";
 export const publicRoutes = [
   {
     name: "Welcome",
@@ -98,5 +99,9 @@ export const publicRoutes = [
   {
     name: "PlantReport",
     component: PlantReport,
+  },
+  {
+    name: "Galery",
+    component: Galery,
   },
 ];

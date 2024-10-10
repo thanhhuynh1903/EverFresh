@@ -35,7 +35,10 @@ import {
   changeCollections,
   removePlantFromCollections,
 } from "../../api/collection";
-import { getGaleryThunk } from "../../redux/thunk/galleryThunk";
+import {
+  getAllPlantsFromGalleryThunk,
+  getGaleryThunk,
+} from "../../redux/thunk/galleryThunk";
 import CollectionListBottomSheet from "../../components/CollectionListBottomSheet/CollectionListBottomSheet";
 import DeliveryListBottomSheet from "../../components/DeliveryListBottomSheet/DeliveryListBottomSheet";
 import CouponListBottomSheet from "../../components/CouponListBottomSheet/CouponListBottomSheet";
@@ -265,7 +268,9 @@ export default function CartView({ goback }) {
         type: "success",
         // position: "bottom",
       });
-      await dispatch(getGaleryThunk());
+      await dispatch(getGaleryThunk()).then((response) => {
+        dispatch(getAllPlantsFromGalleryThunk(response.payload));
+      });
     } else {
       showToast({
         title: "Fail",
@@ -292,7 +297,9 @@ export default function CartView({ goback }) {
         type: "success",
         // position: "bottom",
       });
-      await dispatch(getGaleryThunk());
+      await dispatch(getGaleryThunk()).then((response) => {
+        dispatch(getAllPlantsFromGalleryThunk(response.payload));
+      });
     } else {
       showToast({
         title: "Fail",
@@ -314,7 +321,9 @@ export default function CartView({ goback }) {
         type: "success",
         // position: "bottom",
       });
-      await dispatch(getGaleryThunk());
+      await dispatch(getGaleryThunk()).then((response) => {
+        dispatch(getAllPlantsFromGalleryThunk(response.payload));
+      });
     } else {
       showToast({
         title: "Fail",

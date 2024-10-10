@@ -8,7 +8,11 @@ import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SpinnerLoading from "../../components/SpinnerLoading/SpinnerLoading";
 import { getGallery } from "../../api/gallery";
-import { getGaleryThunk } from "../../redux/thunk/galleryThunk";
+import {
+  getAllPlantsFromGalleryThunk,
+  getGaleryThunk,
+} from "../../redux/thunk/galleryThunk";
+import { getNotificationThunk } from "../../redux/thunk/notificationThunk";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -33,8 +37,7 @@ export default function LoginPage() {
       userResponse.meta.requestStatus === "fulfilled" &&
       userResponse.payload.status === 200
     ) {
-      await dispatch(getCartItemsThunk());
-      await dispatch(getGaleryThunk());
+      await loadRedux();
       navigation.navigate("Main");
     } else {
       console.log("Failed to fetch user data or invalid status");
@@ -55,9 +58,8 @@ export default function LoginPage() {
         userResponse.meta.requestStatus === "fulfilled" &&
         userResponse.payload.status === 200
       ) {
-        const cartResponse = await dispatch(getCartItemsThunk());
-        await dispatch(getGaleryThunk());
-        navigation.navigate("Main"); // Redirect to homepage
+        await loadRedux();
+        navigation.navigate("Main");
       } else {
         console.log("Failed to fetch user data or invalid status");
       }
@@ -65,6 +67,13 @@ export default function LoginPage() {
       console.log("Login failed: ", response.payload); // Handle error
     }
     setLoading(false);
+  };
+
+  const loadRedux = async () => {
+    await dispatch(getCartItemsThunk());
+    await dispatch(getGaleryThunk()).then((response) => {
+      dispatch(getAllPlantsFromGalleryThunk(response.payload));
+    });
   };
 
   return (
