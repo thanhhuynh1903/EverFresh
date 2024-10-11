@@ -208,10 +208,9 @@ export default function Homepage() {
           </View>
           <View style={styles.savedPlandContainer}>
             {galleryRedux?.plantList &&
-              galleryRedux?.plantList[0] &&
-              galleryRedux?.plantList.map((item, key) =>
-                renderSavedPlantCard(item, key)
-              )}
+              galleryRedux?.plantList
+                .slice(0, 3)
+                .map((item, key) => renderSavedPlantCard(item, key))}
           </View>
           <View style={styles.deviderLine} />
           <View style={styles.yourPland}>

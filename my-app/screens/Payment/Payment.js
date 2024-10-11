@@ -352,8 +352,6 @@ export default function Payment({ route }) {
             const newIndex = Math.floor(
               event.nativeEvent.contentOffset.x / WIDTH
             );
-            console.log(newIndex);
-
             setCurrentIndex(newIndex);
           }}
         />

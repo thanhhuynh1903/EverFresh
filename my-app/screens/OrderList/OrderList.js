@@ -65,38 +65,39 @@ export default function OrderList() {
         <View style={styles.orderItemInfo}>
           <Image
             source={
-              item?.list_cart_item_id[0]?.plant_id?.img_url[0]
-                ? {
-                    uri: item?.list_cart_item_id[0]?.plant_id?.img_url[0] || "",
-                  }
-                : require("../../assets/cart/plant1.png")
+              // item?.list_cart_item_id[0]?.plant_id?.img_url[0]
+              //   ? {
+              //       uri: item?.list_cart_item_id[0]?.plant_id?.img_url[0] || "",
+              //     }
+              //   :
+              require("../../assets/cart/plant1.png")
             }
             resizeMode="stretch"
             style={styles.image}
           />
           <View style={styles.orderItemInfoBody}>
-            <>
-              {item?.list_cart_item_id?.map((plant, index) => {
-                return (
-                  <View key={index}>
+            {item?.list_cart_item_id?.map((plant, index) => {
+              return (
+                <View style={styles.orderItemPlant} key={index}>
+                  {plant?.plant_id?.name && (
                     <Text style={styles.plantName}>
                       {plant?.plant_id?.name}
                     </Text>
-                    <View
-                      style={{
-                        ...styles.flexRow,
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text style={styles.plantPrice}>
-                        {formatPrice(plant?.plant_id?.price)} VNĐ
-                      </Text>
-                      <Text style={styles.plantPrice}>x {plant?.quantity}</Text>
-                    </View>
+                  )}
+                  <View
+                    style={{
+                      ...styles.flexRow,
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Text style={styles.plantPrice}>
+                      {formatPrice(plant?.item_total_price)} VNĐ
+                    </Text>
+                    <Text style={styles.plantPrice}>x {plant?.quantity}</Text>
                   </View>
-                );
-              })}
-            </>
+                </View>
+              );
+            })}
             <View style={styles.orderItemInfoBottom}>
               <Text style={styles.totalPrice}>
                 Total {formatPrice(totalPrice || 0)} VNĐ
@@ -117,7 +118,7 @@ export default function OrderList() {
       />
       <ScrollView style={styles.container}>
         {!loading ? (
-          orderList.map((item, key) => renderOrderItem(item, key))
+          orderList?.map((item, key) => renderOrderItem(item, key))
         ) : (
           <SpinnerLoading />
         )}
@@ -192,6 +193,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingRight: 0,
     justifyContent: "space-between",
+  },
+  orderItemPlant: {
+    // height: "20%",
+    // flexDirection: "row",
   },
   plantName: {
     fontSize: 13,

@@ -10,6 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
 import HomeHeader from "../../components/HomeHeader";
@@ -17,63 +18,71 @@ import MenuModal from "../../components/Modal/MenuModal/MenuModal";
 import { useDispatch, useSelector } from "react-redux";
 import { selectGallery, selectUser } from "../../redux/selector/selector";
 import { getNotificationThunk } from "../../redux/thunk/notificationThunk";
+import Photos from "./tabViews/photos";
+import Products from "./tabViews/products";
+import Reviews from "./tabViews/reviews";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
-const popularPlantCardDemo = [
-  {
-    status: "Fits well",
-    name: "Happy David Rosemary",
-    img: require("../../assets/homeImg/plant1.png"),
-  },
-  {
-    status: "Fits well",
-    name: "Lovely Gracie Betel grass",
-    img: require("../../assets/homeImg/plant2.png"),
-    textStroke: "",
-  },
-];
+const FirstRoute = () => (
+  <ScrollView
+    style={[styles.scene, styles.paddingContainer, { backgroundColor: "#fff" }]}
+    nestedScrollEnabled={true}
+  >
+    <Photos />
+  </ScrollView>
+);
 
-const guidePlantCardDemo = [
-  {
-    name: "Lily",
-    img: require("../../assets/homeImg/guidePlant1.png"),
-  },
-  {
-    name: "Common Yarrow",
-    img: require("../../assets/homeImg/guidePlant2.png"),
-  },
-  {
-    name: "Zinnia",
-    img: require("../../assets/homeImg/guidePlant3.png"),
-  },
-];
+const SecondRoute = () => (
+  <ScrollView
+    style={[styles.scene, styles.paddingContainer, { backgroundColor: "#fff" }]}
+    nestedScrollEnabled={true}
+  >
+    <Products />
+  </ScrollView>
+);
 
-const seasonalPlantCardDemo = [
-  {
-    description: "Summer plant less water required for growth",
-    name: "Yarrow",
-    img: require("../../assets/homeImg/seasonalPlant1.png"),
-  },
-  {
-    description: "Winter plant minimum water required for growth",
-    name: "Ageratum",
-    img: require("../../assets/homeImg/seasonalPlant2.png"),
-  },
-  {
-    description: "Winter plant minimum water required for growth",
-    name: "Bacopa",
-    img: require("../../assets/homeImg/seasonalPlant3.png"),
-  },
-];
+const ThirdRoute = () => (
+  <ScrollView
+    style={[styles.scene, styles.paddingContainer, { backgroundColor: "#fff" }]}
+    nestedScrollEnabled={true}
+  >
+    <Reviews />
+  </ScrollView>
+);
 
 export default function Personal() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const galleryRedux = useSelector(selectGallery);
   const userRedux = useSelector(selectUser);
+  const [index, setIndex] = useState(0);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [routes] = useState([
+    { key: "plants", title: "Photos" },
+    { key: "log", title: "Products" },
+    { key: "settings", title: "Reviews" },
+  ]);
+
+  const renderScene = SceneMap({
+    plants: FirstRoute,
+    log: SecondRoute,
+    settings: ThirdRoute,
+  });
+
+  const renderTabBar = (props) => (
+    <TabBar
+      {...props}
+      indicatorStyle={styles.indicatorStyle}
+      style={styles.tabBar}
+      renderLabel={({ route, focused }) => (
+        <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>
+          {route.title}
+        </Text>
+      )}
+    />
+  );
 
   return (
     <>
@@ -83,8 +92,58 @@ export default function Personal() {
           handleMenuToggle={() => setMenuVisible(!menuVisible)}
           backgroundColor={menuVisible && "#0B845C"}
         />
-        <ScrollView style={styles.container}>
-          <Text>profile</Text>
+        <ScrollView
+          style={styles.container}
+          nestedScrollEnabled={true}
+          stickyHeaderIndices={[2]}
+        >
+          <View style={styles.profileHeader}>
+            <Image
+              source={require("../../assets/utilsImage/personalBackfround.png")}
+              resizeMode="contain"
+              style={styles.profileBackgroundImage}
+            />
+            <View style={styles.profileAvt}>
+              <Image
+                source={{ uri: userRedux?.user?.avatar_url || "" }}
+                resizeMode="contain"
+                style={styles.profileAvtImage}
+              />
+            </View>
+          </View>
+          <View style={styles.profileInfo}>
+            <View
+              style={{
+                position: "relative",
+                overflow: "visible",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={styles.profileInfoName}>
+                {userRedux?.user?.name}
+              </Text>
+              <TouchableOpacity style={styles.profileInfoEdit}>
+                <Text style={styles.profileInfoEditText}>Edit</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.profileInfoDetail}>Expert in planting</Text>
+            <View style={styles.flexRow}>
+              <Icon name="map-marker" size={20} color="#544C4C" />
+              <Text style={styles.profileInfoDetail}>
+                {userRedux?.user?.country}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.tabViewContainer}>
+            <TabView
+              navigationState={{ index, routes }}
+              renderScene={renderScene}
+              onIndexChange={setIndex}
+              renderTabBar={renderTabBar}
+              initialLayout={{ width: WIDTH }}
+            />
+          </View>
         </ScrollView>
       </View>
       <MenuModal
@@ -101,208 +160,92 @@ const styles = StyleSheet.create({
   container: {
     height: HEIGHT,
     width: WIDTH,
-    overflow: "visible",
+    // overflow: "visible",
     backgroundColor: "white",
   },
-  yourPland: {
-    width: WIDTH,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    marginBottom: 28,
-  },
-  yourPlandTitle: {
-    width: "90%",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  yourPlandViewAll: {
-    textAlign: "right",
-    alignItems: "flex-end",
-    justifyContent: "flex-end",
-  },
-  yourPlandViewAllText: {
-    textAlign: "right",
-    fontSize: 12,
-    color: "#0D986A",
-    textDecorationLine: "underline",
-  },
-  // popilar plant
-  popularPlandContainer: {
-    width: WIDTH,
-    flexDirection: "row",
-    marginBottom: 28,
-    paddingHorizontal: 20,
-  },
-  popularPlantCard: {
-    position: "relative",
-    flexDirection: "row",
-    width: "47.5%",
-    height: 140,
-    padding: 7.5,
-    borderWidth: 1,
-    borderColor: "#DADADA",
-    borderRadius: 12,
-    marginRight: "5%",
-    backgroundColor: "#F8F8F8",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 }, // X: 0, Y: 4
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  popularPlantCardDetail: {
-    width: "60%",
-    justifyContent: "flex-end",
-  },
-  popularPlantCardDetailStatus: {
-    color: "#61AF2B",
-    fontWeight: "medium",
-    fontSize: 10,
-  },
-  popularPlantCardDetailName: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  popularPlantCardImage: {
-    position: "relative",
-    alignItems: "flex-end",
-    justifyContent: "flex-end",
-  },
-  popularPlantCardImagePlant: {
-    position: "absolute",
-    left: -15,
-  },
-  //popular Pland Infor
-  popularPlandInfor: {
-    width: WIDTH - 20 * 2,
-    height: "auto",
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 12,
-    marginHorizontal: 20,
-    marginBottom: 28,
-    // borderWidth: 1,
 
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#0C9359",
-    shadowOffset: { width: 0, height: 8 }, // X: 0, Y: 4
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 8,
-  },
-  popularPlandInforRow: {
-    flexDirection: "row",
-    gap: 12,
-    height: 25,
-  },
-  popularPlandInforRowText: {
-    color: "#06492C",
-    fontSize: 14,
-  },
-  deviderLine: {
-    width: WIDTH - 20 * 2,
-    height: 1,
-    backgroundColor: "#D9D9D9",
-    marginBottom: 28,
-    marginHorizontal: 20,
-  },
-  // saved pland
-  savedPlandContainer: {
-    width: WIDTH - 2 * 15,
-    marginHorizontal: 15,
-    marginBottom: 28,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  savedPlantCard: {
-    width: WIDTH * 0.28,
-    borderRadius: 12,
-
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 4,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  savedPlantCardImage: {
-    width: "100%",
-    height: WIDTH * 0.28,
-    resizeMode: "contain",
-  },
-  // guidePlantCard
-  guidePlantCard: {
-    flexDirection: "row",
-    width: WIDTH * 0.4,
-    borderRadius: 8,
-    marginVertical: 6,
-    marginHorizontal: 6,
+  profileHeader: {
+    position: "relative",
     alignItems: "center",
-    gap: 14,
-
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 }, // X: 0, Y: 4
-    shadowOpacity: 0.25,
-    shadowRadius: 50,
-    elevation: 4,
+    marginBottom: WIDTH * 0.2,
   },
-  guidePlantCardImage: {
-    width: "30%",
-    height: HEIGHT * 0.08,
-    resizeMode: "cover",
-    borderTopLeftRadius: 8,
-    borderBottomLeftRadius: 8,
+  profileAvt: {
+    position: "absolute",
+    width: WIDTH * 0.38,
+    height: WIDTH * 0.38,
+    bottom: 0,
+    transform: [{ translateY: WIDTH * 0.175 }],
   },
-  guidePlantCardText: {
-    width: "70%",
-    fontSize: 18,
-    fontWeight: "bold",
+  profileAvtImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: "100%",
   },
-  //seasonalPlantCard
-  seasonalPlandContainer: {
-    width: WIDTH - 2 * 15,
-    marginHorizontal: 15,
-    marginBottom: 28,
-    flexDirection: "row",
+  profileInfo: {
+    justifyContent: "center",
+    alignItems: "center",
     overflow: "visible",
+    gap: 4,
   },
-  seasonalPlantCard: {
-    width: WIDTH * 0.4,
-    padding: 6,
-    borderRadius: 8,
-    marginVertical: 6,
-    marginHorizontal: 6,
-
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "rgba(218,218,218,0)",
-    shadowColor: "#000",
-    shadowOffset: { width: 4, height: 4 }, // X: 0, Y: 4
-    shadowOpacity: 0.25,
-    shadowRadius: 50,
-    elevation: 4,
-  },
-  seasonalPlantCardImage: {
-    width: "100%",
-    marginBottom: 10,
-  },
-  seasonalPlantCardImagePlant: {
-    width: "100%",
-    resizeMode: "cover",
-    borderRadius: 6,
-  },
-  seasonalPlantCardDetailnName: {
-    color: "#002140",
-    fontSize: 18,
+  profileInfoName: {
+    color: "#242760",
     fontWeight: "bold",
-    marginBottom: 10,
+    fontSize: 18,
   },
-  seasonalPlantCardDetailDesc: {
-    color: "#002140",
-    fontSize: 12,
+  profileInfoEdit: {
+    position: "absolute",
+    left: "22.5%",
+    backgroundColor: "#009E71",
+    height: "100%",
+    paddingHorizontal: 12,
+    justifyContent: "center",
+    borderRadius: 12,
+  },
+  profileInfoEditText: {
+    color: "white",
+  },
+  profileInfoDetail: {
+    color: "#544C4C",
+    fontWeight: "semibold",
+    fontSize: 13,
+  },
+  tabViewContainer: {
+    height: HEIGHT, // Set the height to fit the screen
+    backgroundColor: "#fff",
+  },
+
+  // tabBar
+  tabBar: {
+    width: WIDTH * 0.9,
+    backgroundColor: "#FAFAFA",
+    borderRadius: 12,
+    margin: 10,
+    marginHorizontal: WIDTH * 0.05,
+    elevation: 0,
+    borderWidth: 1,
+    borderColor: "#E7E7E7",
+    // paddingHorizontal: 5,
+    justifyContent: "center",
+  },
+  indicatorStyle: {
+    backgroundColor: "#009E71",
+    height: "90%",
+    width: "32.5%",
+    marginVertical: "5%",
+    marginHorizontal: "0.833333333%",
+    borderRadius: 12,
+  },
+  tabLabel: {
+    color: "#88B797",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  tabLabelFocused: {
+    color: "white",
+  },
+
+  flexRow: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });

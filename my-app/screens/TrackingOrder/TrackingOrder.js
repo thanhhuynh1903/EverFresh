@@ -79,6 +79,7 @@ export default function TrackingOrder({ route }) {
   useEffect(() => {
     setOrderDetail(route.params.orderDetail);
   }, [route.params.orderDetail]);
+  console.log(orderDetail);
 
   const renderBookingCard = (item, key) => {
     return (
