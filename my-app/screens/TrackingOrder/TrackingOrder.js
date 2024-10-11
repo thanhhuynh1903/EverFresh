@@ -172,7 +172,9 @@ export default function TrackingOrder({ route }) {
             <Text style={styles.orderInfoTabTitle}>Payment</Text>
             <View style={styles.flexRow}>
               <Text style={styles.orderInfoTabText}>
-                {orderDetail?.payment_method}
+                {orderDetail?.payment_method === "MOMO"
+                  ? orderDetail?.payment_method
+                  : "VISA"}
               </Text>
               <Image
                 source={

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -10,16 +10,34 @@ import {
   ImageBackground,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import IdentifyBottomSheet from "../../components/IdentifyBottomSheet/IdentifyBottomSheet";
+import { useFocusEffect } from "@react-navigation/native";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
 const PlantReport = ({ navigation, route }) => {
   const [selectedImage, setSelectedImage] = useState(route?.params?.image);
+  const [identifyReportVisible, setIdentifyReportVisible] = useState(false);
 
   useEffect(() => {
     setSelectedImage(route?.params?.image);
   }, [route?.params?.image]);
+
+  const type = useMemo(() => {
+    return route.params.type;
+  }, [route.params]);
+
+  useFocusEffect(React.useCallback(() => {}, []));
+
+  useEffect(() => {
+    setTimeout(() => {
+      console.log(route?.params?.type);
+      route?.params?.type === "identify" && setIdentifyReportVisible(true);
+    }, 1000);
+  }, [type]);
+
+  // route?.params?.type
 
   return (
     <View style={styles.container}>
@@ -39,21 +57,29 @@ const PlantReport = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
         <View style={styles.containerBody}>
-          <TouchableOpacity
-            style={styles.viewDetailButton}
-            onPress={() =>
-              navigation.navigate("PlantGuide", {
-                plant: {
-                  name: "Lily",
-                  img: require("../../assets/homeImg/guidePlant1.png"),
-                },
-              })
-            }
-          >
-            <Text style={styles.viewDetailText}>View more tips</Text>
-          </TouchableOpacity>
+          {route?.params?.type === "scan" && (
+            <TouchableOpacity
+              style={styles.viewDetailButton}
+              onPress={() =>
+                navigation.navigate("PlantGuide", {
+                  plant: {
+                    name: "Lily",
+                    img: require("../../assets/homeImg/guidePlant1.png"),
+                  },
+                })
+              }
+            >
+              <Text style={styles.viewDetailText}>View more tips</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ImageBackground>
+      <IdentifyBottomSheet
+        visible={identifyReportVisible}
+        onClose={() => {
+          setIdentifyReportVisible(false);
+        }}
+      />
     </View>
   );
 };

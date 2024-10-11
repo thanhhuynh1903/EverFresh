@@ -22,12 +22,13 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { paymentMomo, paymentStripe } from "../../api/payment";
 import { createOrder } from "../../api/order";
 import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { formatPrice, successfulStatus } from "../../utils/utils";
 import AddCardBottomSheet from "../../components/AddCardBottomSheet/AddCardBottomSheet";
 import { useStripe } from "@stripe/stripe-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getPaymentMethod } from "../../api/linkedInformation";
+import { selectUser } from "../../redux/selector/selector";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -42,6 +43,7 @@ const momoMethod = {
 export default function Payment({ route }) {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const userRedux = useSelector(selectUser);
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [paymentMethodList, setPaymentMethodList] = useState([]);
@@ -49,13 +51,6 @@ export default function Payment({ route }) {
   const bottomSheetRef = useRef(null);
 
   const [cart, setCart] = useState(route.params.cart);
-
-  const { handleURLCallback } = useStripe();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-
-  useEffect(() => {
-    loadPaymentMethod();
-  }, []);
 
   const deliveryMethod = useMemo(() => {
     return route.params.deliveryMethod;
@@ -85,6 +80,10 @@ export default function Payment({ route }) {
     return totalPrice;
   }, [cart, voucher]);
 
+  useEffect(() => {
+    loadPaymentMethod();
+  }, []);
+
   const loadPaymentMethod = async () => {
     const response = await getPaymentMethod();
     if (successfulStatus(response.status)) {
@@ -104,46 +103,32 @@ export default function Payment({ route }) {
   };
 
   // stripe
-  const handleDeepLink = useCallback(
-    async (url) => {
-      if (url) {
-        const stripeHandled = await handleURLCallback(url);
-        console.log(stripeHandled);
-        if (stripeHandled) {
-          // This was a Stripe URL - you can return or add extra handling here as you see fit
-        } else {
-          // This was NOT a Stripe URL – handle as you normally would
-        }
-      }
-    },
-    [handleURLCallback]
-  );
 
-  useEffect(() => {
-    const getUrlAsync = async () => {
-      const initialUrl = await Linking.getInitialURL();
-      handleDeepLink(initialUrl);
-    };
-
-    getUrlAsync();
-
-    const deepLinkListener = Linking.addEventListener("url", (event) => {
-      handleDeepLink(event.url);
-    });
-
-    return () => deepLinkListener.remove();
-  }, [handleDeepLink]);
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [loading, setLoading] = useState(false);
 
   const fetchPaymentSheetParams = async () => {
     const accessToken = await AsyncStorage.getItem("accessToken");
+
+    const data = {
+      delivery_method_id: deliveryMethod._id,
+      delivery_information_id: deliveryInformation._id,
+      cart_id: route.params.currentCart._id,
+      linked_information_id: "66ffcf324bff98afff2cb039",
+    };
+    if (route.params.voucher) {
+      data.voucher_id = route.params.voucher._id;
+    }
+
     const response = await fetch(
-      "https://everfresh-server.onrender.com/api/payment/stripe",
+      "https://everfresh-server.onrender.com/api/payment/stripe/payment-sheet",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
+        body: JSON.stringify(data),
       }
     );
     const { paymentIntent, ephemeralKey, customer } = await response.json();
@@ -160,7 +145,7 @@ export default function Payment({ route }) {
       await fetchPaymentSheetParams();
 
     const { error } = await initPaymentSheet({
-      merchantDisplayName: "Example, Inc.",
+      merchantDisplayName: "Jane Doe",
       customerId: customer,
       customerEphemeralKeySecret: ephemeralKey,
       paymentIntentClientSecret: paymentIntent,
@@ -185,10 +170,6 @@ export default function Payment({ route }) {
       Alert.alert("Success", "Your order is confirmed!");
     }
   };
-
-  useEffect(() => {
-    initializePaymentSheet();
-  }, []);
 
   const handlePayment = async () => {
     const data = {
@@ -324,10 +305,11 @@ export default function Payment({ route }) {
           <View style={styles.shippingAddressDetail}>
             <View style={styles.shippingAddressDetailLeft}>
               <Text style={styles.shippingAddressDetailLeftText}>
-                Thuong Huyen - 0979084700
+                {userRedux?.user?.name} - {deliveryInformation?.phone_number}
               </Text>
               <Text style={styles.shippingAddressDetailLeftText}>
-                B10-12, chung cu 9View So 1, duong So 1, PLB, TP.TD, TP.HCM
+                {deliveryInformation?.address_detail}{" "}
+                {deliveryInformation?.address}
               </Text>
             </View>
             <View style={styles.shippingAddressDetailRight}>
@@ -399,11 +381,23 @@ export default function Payment({ route }) {
 
         <TouchableOpacity
           style={styles.proceedButton}
-          onPress={() => {
-            currentIndex === 0 ? handlePayment() : handlePaymentStripe();
+          onPress={async () => {
+            // currentIndex === 0 ? handlePayment() : handlePaymentStripe();
             // handlePayment();
             // handlePaymentStripe();
-            // openPaymentSheet();
+            console.log("get innnn");
+            try {
+              await initializePaymentSheet().then(async () => {
+                console.log("get in");
+
+                await openPaymentSheet();
+                console.log("get in 2");
+              });
+            } catch (error) {
+              console.log(error);
+            }
+
+            // console.log(paymentMethodList);
           }}
           onLongPress={handleCreateOrder}
         >

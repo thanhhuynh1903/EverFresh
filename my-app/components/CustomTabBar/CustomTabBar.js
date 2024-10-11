@@ -140,7 +140,12 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
               start={{ x: 0, y: 0 }}
               end={{ x: 0, y: 1 }}
             >
-              <TouchableOpacity style={styles.scanIcon}>
+              <TouchableOpacity
+                style={styles.scanIcon}
+                onPress={() =>
+                  navigation.navigate("ScanCamera", { type: "identify" })
+                }
+              >
                 <Icon name="line-scan" size={28} color="#fff" />
               </TouchableOpacity>
               <TouchableOpacity style={styles.imageIcon}>

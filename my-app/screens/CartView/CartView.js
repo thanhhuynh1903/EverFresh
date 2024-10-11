@@ -134,6 +134,16 @@ export default function CartView({ goback }) {
     return totalPrice;
   }, [cart, coupon, deliveryMethod]);
 
+  const basePrice = useMemo(() => {
+    let totalPrice = 0;
+    cart
+      .filter((item) => item.selected)
+      .map((item) => {
+        totalPrice += item?.quantity * item?.product?.price;
+      });
+    return totalPrice;
+  }, [cart]);
+
   const slectedItems = useMemo(() => {
     return cart.filter((item) => item.selected);
   }, [cart]);
@@ -440,7 +450,11 @@ export default function CartView({ goback }) {
                 }}
               >
                 <Text>
-                  {coupon.voucher_name} ({coupon.voucher_discount}%)
+                  {coupon.voucher_name} (
+                  {coupon.is_percent
+                    ? coupon.voucher_discount
+                    : formatPrice(coupon.voucher_discount)}
+                  {coupon.is_percent ? "%" : "VND"})
                 </Text>
               </View>
             ) : (
@@ -478,14 +492,14 @@ export default function CartView({ goback }) {
           ))}
         </View> */}
       </ScrollView>
-      {paymentPrice - (deliveryMethod?.price || 0) !== 0 && (
+      {basePrice !== 0 && (
         <LinearGradient
           colors={["#0B845C", "#0D986A"]} // Set the gradient colors
           start={{ x: 1, y: 0 }} // Start from the right
           end={{ x: 0, y: 0 }} // End at the left
           style={{
             ...styles.bottomCartSheet,
-            bottom: Platform.OS === "android" ? "8%" : "6%",
+            bottom: Platform.OS === "android" ? "0%" : "6%",
           }}
         >
           <TouchableOpacity

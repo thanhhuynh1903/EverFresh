@@ -16,10 +16,10 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
-const ScanCamera = ({ navigation }) => {
+const ScanCamera = ({ navigation, route }) => {
   const [facing, setFacing] = useState("by");
   const [permission, requestPermission] = useCameraPermissions();
-  const [cameraType, setCameraType] = useState("scan");
+  const [cameraType, setCameraType] = useState(route?.params?.type || "scan");
   const [selectedImage, setSelectedImage] = useState(null);
   const cameraRef = useRef(null); // Create a reference for the Camera
 
@@ -34,6 +34,10 @@ const ScanCamera = ({ navigation }) => {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    setCameraType(route?.params?.type || "scan");
+  }, [route?.params?.type]);
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -60,7 +64,12 @@ const ScanCamera = ({ navigation }) => {
     if (cameraRef.current) {
       const photo = await cameraRef.current.takePictureAsync();
       setSelectedImage(photo.uri); // Optionally display the captured image
-      navigation.navigate("PlantReport", { image: photo.uri }); // Navigate with the image
+      console.log("type ", cameraType);
+
+      navigation.navigate("PlantReport", {
+        image: photo.uri,
+        type: cameraType,
+      }); // Navigate with the image
     }
   };
 

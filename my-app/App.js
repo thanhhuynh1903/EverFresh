@@ -6,17 +6,20 @@ import MainStack from "./routing/MainStack";
 import store from "./store/common";
 import { ToastProvider } from "react-native-toast-notifications";
 import SafeAreaWrapper from "./components/SafeAreaWrapper";
+import { StripeProvider } from "@stripe/stripe-react-native";
 
 export default function App() {
   return (
     <SafeAreaWrapper>
-      <ToastProvider>
-        <Provider store={store}>
-          <NavigationContainer>
-            <MainStack />
-          </NavigationContainer>
-        </Provider>
-      </ToastProvider>
+      <StripeProvider publishableKey={process.env.STRIPE_PUBLIC_KEY}>
+        <ToastProvider>
+          <Provider store={store}>
+            <NavigationContainer>
+              <MainStack />
+            </NavigationContainer>
+          </Provider>
+        </ToastProvider>
+      </StripeProvider>
     </SafeAreaWrapper>
   );
 }

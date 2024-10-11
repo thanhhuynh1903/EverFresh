@@ -35,18 +35,6 @@ const popularPlantCardDemo = [
   },
 ];
 
-const savedPlantCardDemo = [
-  {
-    img: require("../../assets/homeImg/plantImage1.png"),
-  },
-  {
-    img: require("../../assets/homeImg/plantImage2.png"),
-  },
-  {
-    img: require("../../assets/homeImg/plantImage3.png"),
-  },
-];
-
 const guidePlantCardDemo = [
   {
     name: "Lily",
@@ -371,7 +359,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     marginBottom: 28,
     flexDirection: "row",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
+    // gap: "5%",
   },
   savedPlantCard: {
     width: WIDTH * 0.28,
