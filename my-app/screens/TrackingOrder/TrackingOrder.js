@@ -79,7 +79,6 @@ export default function TrackingOrder({ route }) {
   useEffect(() => {
     setOrderDetail(route.params.orderDetail);
   }, [route.params.orderDetail]);
-  console.log(orderDetail);
 
   const renderBookingCard = (item, key) => {
     return (
@@ -92,13 +91,12 @@ export default function TrackingOrder({ route }) {
         <View style={styles.imageContainer}>
           <Image
             source={
-              orderDetail?.list_cart_item_id[0]?.plant_id?.img_url[0]
-                ? {
-                    uri:
-                      orderDetail?.list_cart_item_id[0]?.plant_id?.img_url[0] ||
-                      "",
-                  }
-                : require("../../assets/cart/plant1.png")
+              // orderDetail?.list_cart_item_id[0]?.img_url[0]
+              //   ? {
+              //       uri: orderDetail?.list_cart_item_id[0]?.img_url[0] || "",
+              //     }
+              //   :
+              require("../../assets/cart/plant1.png")
             }
             resizeMode="stretch"
             style={styles.image}
@@ -107,17 +105,17 @@ export default function TrackingOrder({ route }) {
 
         <View style={styles.center}>
           <View style={styles.centerFuncional}>
-            <Text style={styles.centerTitle}>{item?.plant_id?.name}</Text>
+            <Text style={styles.centerTitle}>{item?.name}</Text>
             <Text style={styles.centerPrice}>
-              {formatPrice(item?.item_total_price || 0)} VNĐ
+              {formatPrice(item?.price || 0)} VNĐ
             </Text>
           </View>
           <View
             style={{ ...styles.centerFuncional, justifyContent: "flex-start" }}
           >
-            <Text style={styles.amount}>{item?.plant_id?.uses}</Text>
+            <Text style={styles.amount}>{item?.uses}</Text>
             <View style={styles.split} />
-            <Text style={styles.amount}>{item?.plant_id?.growth_rate}</Text>
+            <Text style={styles.amount}>{item?.growth_rate}</Text>
             <View style={styles.split} />
             <Text style={styles.amount}>35 cm</Text>
             <Text
@@ -164,7 +162,7 @@ export default function TrackingOrder({ route }) {
         </View>
         <View style={styles.dashLine} />
         {orderDetail?.list_cart_item_id?.map((item, key) =>
-          renderBookingCard(item, key)
+          renderBookingCard(item.product, key)
         )}
         <View style={styles.dashLine} />
         <View style={styles.orderInfo}>
@@ -273,7 +271,18 @@ export default function TrackingOrder({ route }) {
                 Discount
               </Text>
               <Text style={{ ...styles.orderInfoTabText, color: "#475467" }}>
-                {formatPrice(0)} VNĐ
+                {formatPrice(
+                  (orderDetail.voucher_id?._id &&
+                    (orderDetail.voucher_id?.is_percent
+                      ? ((orderDetail.total_price -
+                          orderDetail.delivery_method?.price) *
+                          orderDetail.voucher_id.voucher_discount) /
+                        100
+                      : orderDetail.total_price -
+                        orderDetail.voucher_id.voucher_discount)) ||
+                    0
+                )}{" "}
+                VNĐ
               </Text>
             </View>
             <View
@@ -398,9 +407,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 12,
+    padding: 8,
     paddingVertical: 20,
-    paddingTop: 0,
+    // paddingTop: 0,
     backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
 

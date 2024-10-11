@@ -382,20 +382,20 @@ export default function Payment({ route }) {
         <TouchableOpacity
           style={styles.proceedButton}
           onPress={async () => {
-            // currentIndex === 0 ? handlePayment() : handlePaymentStripe();
+            currentIndex === 0 ? handlePayment() : handlePaymentStripe();
             // handlePayment();
             // handlePaymentStripe();
-            console.log("get innnn");
-            try {
-              await initializePaymentSheet().then(async () => {
-                console.log("get in");
+            // console.log("get innnn");
+            // try {
+            //   await initializePaymentSheet().then(async () => {
+            //     console.log("get in");
 
-                await openPaymentSheet();
-                console.log("get in 2");
-              });
-            } catch (error) {
-              console.log(error);
-            }
+            //     await openPaymentSheet();
+            //     console.log("get in 2");
+            //   });
+            // } catch (error) {
+            //   console.log(error);
+            // }
 
             // console.log(paymentMethodList);
           }}
