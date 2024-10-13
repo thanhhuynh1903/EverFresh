@@ -19,3 +19,13 @@ export const paymentStripe = async (data) => {
     return error;
   }
 };
+
+export const paymentStripeUprank = async () => {
+  try {
+    const response = await api.post(`/payment/stripe/up-rank`);
+    return response;
+  } catch (error) {
+    console.log("paymentStripe in service/payment error : ", error);
+    return error;
+  }
+};

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Linking,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
@@ -21,6 +22,8 @@ import { getNotificationThunk } from "../../redux/thunk/notificationThunk";
 import Photos from "./tabViews/photos";
 import Products from "./tabViews/products";
 import Reviews from "./tabViews/reviews";
+import { successfulStatus } from "../../utils/utils";
+import { paymentStripeUprank } from "../../api/payment";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -91,6 +94,14 @@ export default function Personal() {
     />
   );
 
+  const paymentPremium = async () => {
+    const response = await paymentStripeUprank();
+    if (successfulStatus(response.status)) {
+      console.log(response?.data);
+      await Linking.openURL(response?.data?.url);
+    }
+  };
+
   return (
     <>
       <View>
@@ -102,7 +113,7 @@ export default function Personal() {
         <ScrollView
           style={styles.container}
           nestedScrollEnabled={true}
-          stickyHeaderIndices={[2]}
+          stickyHeaderIndices={[userRedux?.user?.rank !== "Premium" ? 3 : 2]}
         >
           <View style={styles.profileHeader}>
             <Image
@@ -149,6 +160,43 @@ export default function Personal() {
               </Text>
             </View>
           </View>
+          {userRedux?.user?.rank !== "Premium" && (
+            <View
+              style={{
+                ...styles.flexRow,
+                justifyContent: "space-between",
+                padding: 10,
+                paddingVertical: 10,
+                borderRadius: 6,
+                margin: 20,
+                marginVertical: 10,
+                backgroundColor: "white",
+
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+
+                elevation: 5,
+              }}
+            >
+              <Text style={{ fontWeight: "bold" }}>Upto premium user</Text>
+              <TouchableOpacity
+                style={{
+                  padding: 15,
+                  backgroundColor: "#009E71",
+                  borderRadius: 4,
+                }}
+                onPress={paymentPremium}
+              >
+                <Text style={{ color: "white" }}>Purchange</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           <View style={styles.tabViewContainer}>
             <TabView
               navigationState={{ index, routes }}

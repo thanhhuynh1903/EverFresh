@@ -4,17 +4,38 @@ import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RoutesList } from "../../routing/routes";
+import { selectUser } from "../../redux/selector/selector";
+import { useSelector } from "react-redux";
+import useCustomToast from "../ToastNotification/ToastNotification";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
 const CustomTabBar = ({ state, descriptors, navigation }) => {
+  const userRedux = useSelector(selectUser);
+  const showToast = useCustomToast();
   const [isOpenCircelMenu, setIsOpenCircelMenu] = useState(false);
   const routeItem = useMemo(() => {
     return RoutesList[state.index];
   }, [state.index]);
 
+  const isPremium = useMemo(() => {
+    return userRedux.user.rank === "Premium";
+  }, [userRedux.user]);
+
   if (routeItem.hiddenBottomTab) return;
+
+  const checkPremium = (funciton) => {
+    if (!isPremium) {
+      showToast({
+        title: "Premium requirement",
+        message: "You need up to premium to continue",
+        type: "warning",
+      });
+      return false;
+    }
+    return true;
+  };
 
   return (
     <View
@@ -142,9 +163,10 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
             >
               <TouchableOpacity
                 style={styles.scanIcon}
-                onPress={() =>
-                  navigation.navigate("ScanCamera", { type: "identify" })
-                }
+                onPress={() => {
+                  checkPremium() &&
+                    navigation.navigate("ScanCamera", { type: "identify" });
+                }}
               >
                 <Icon name="line-scan" size={28} color="#fff" />
               </TouchableOpacity>
@@ -153,7 +175,9 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.videoIcon}
-                onPress={() => navigation.navigate("ScanCamera")}
+                onPress={() => {
+                  checkPremium() && navigation.navigate("ScanCamera");
+                }}
               >
                 <Icon name="video-outline" size={30} color="#fff" />
               </TouchableOpacity>

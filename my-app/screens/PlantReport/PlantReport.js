@@ -9,6 +9,7 @@ import {
   Image,
   ImageBackground,
   Modal,
+  LogBox,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import IdentifyBottomSheet from "../../components/IdentifyBottomSheet/IdentifyBottomSheet";
@@ -32,6 +33,11 @@ const PlantReport = ({ navigation, route }) => {
   const [searchedPlant, setSearchedPlant] = useState(null);
   const [identifyReportVisible, setIdentifyReportVisible] = useState(false);
   const [undefinedModal, setUndefinedModal] = useState(false);
+
+  useEffect(() => {
+    LogBox.ignoreAllLogs(); // Disable all logs
+    return () => LogBox.ignoreAllLogs(false); // Re-enable logs when the component unmounts
+  }, []);
 
   useEffect(() => {
     setSelectedImage(route?.params?.image);
@@ -62,11 +68,14 @@ const PlantReport = ({ navigation, route }) => {
     const searchPlant = plantType.find(
       (item) => item.vn === responseImage.class_name
     );
+    if (!searchPlant) {
+      setUndefinedModal(true);
+      return;
+    }
     const response = await getPlantByName(searchPlant.plantName);
     if (successfulStatus(response.status)) {
       setSearchedPlant(response?.data[0]);
     } else {
-      setUndefinedModal(true);
     }
   };
 
@@ -85,20 +94,26 @@ const PlantReport = ({ navigation, route }) => {
     }
   };
 
+  const handleGoback = () => {
+    setUndefinedModal(false);
+    setIdentifyReportVisible(false);
+    setSearchedPlant(null);
+    setResponseImage(null);
+    setSelectedImage(undefined);
+    navigation.goBack();
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={responseImage ? responseImage : { uri: selectedImage || "" }}
+        source={{ uri: selectedImage || "" }}
         // source={require("../../assets/utilsImage/plantReportBackgroundImage.png")}
         style={styles.imageBackground}
         resizeMode="cover"
       >
         <View style={styles.containerHeader}>
           <Text style={styles.containerHeaderTitle}>Report</Text>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={navigation.goBack}
-          >
+          <TouchableOpacity style={styles.closeButton} onPress={handleGoback}>
             <Icon name="close" size={32} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -141,7 +156,10 @@ const PlantReport = ({ navigation, route }) => {
           <Text style={styles.modalContainerDesciption}>
             The camera cannot recognize the plant, please try again!!
           </Text>
-          <TouchableOpacity style={styles.modalContainerButton}>
+          <TouchableOpacity
+            style={styles.modalContainerButton}
+            onPress={handleGoback}
+          >
             <Text style={styles.modalContainerText}>OK</Text>
           </TouchableOpacity>
         </View>
@@ -200,9 +218,14 @@ const styles = StyleSheet.create({
 
   //modalContainer
   modalContainer: {
-    width: WIDTH * 0.8,
+    position: "absolute",
+    top: HEIGHT * 0.4,
+    left: WIDTH * 0.1,
+    right: WIDTH * 0.1,
     backgroundColor: "white",
     padding: 20,
+    borderRadius: 12,
+    gap: 24,
   },
   modalContainerTitle: {
     fontSize: 18,
@@ -216,10 +239,13 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 20,
     backgroundColor: "#0D986A",
+    borderRadius: 12,
+    justifyContent: "center",
   },
   modalContainerText: {
     fontSize: 16,
     color: "white",
+    textAlign: "center",
   },
 });
 

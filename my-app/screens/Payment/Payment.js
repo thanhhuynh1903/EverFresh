@@ -20,7 +20,7 @@ import React, {
 } from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { paymentMomo, paymentStripe } from "../../api/payment";
-import { createOrder } from "../../api/order";
+import { createOrder, getNewestOrder } from "../../api/order";
 import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
 import { useDispatch, useSelector } from "react-redux";
 import { formatPrice, successfulStatus } from "../../utils/utils";
@@ -102,6 +102,18 @@ export default function Payment({ route }) {
     }
   };
 
+  let intervalId;
+
+  const checkPaymentSuccess = async () => {
+    const response = await getNewestOrder();
+    if (successfulStatus(response.status)) {
+      if (response.data.is_new) {
+        clearInterval(intervalId);
+        navigation.navigate("OrderComplete", { order: response.data });
+      }
+    }
+  };
+  intervalId = setInterval(checkPaymentSuccess, 3000);
   // stripe
 
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
@@ -382,8 +394,7 @@ export default function Payment({ route }) {
         <TouchableOpacity
           style={styles.proceedButton}
           onPress={async () => {
-            // currentIndex === 0 ? handlePayment() : handlePaymentStripe();
-            console.log(currentIndex);
+            currentIndex === 0 ? handlePayment() : handlePaymentStripe();
 
             // handlePayment();
             // handlePaymentStripe();

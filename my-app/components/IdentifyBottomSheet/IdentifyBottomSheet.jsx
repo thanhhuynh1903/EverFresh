@@ -207,7 +207,6 @@ export default function IdentifyBottomSheet({
       </View>
     );
   };
-  console.log(galleryRedux.plantList);
 
   return (
     <>

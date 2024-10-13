@@ -12,13 +12,19 @@ import {
 } from "react-native";
 import React, { useMemo, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { formatPrice } from "../../utils/utils";
+import { updateNewestOrder } from "../../api/order";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
 export default function OrderComplete({ route }) {
   const navigation = useNavigation();
-  console.log(route?.params?.order);
+
+  const handleNavigate = async (naviFunction) => {
+    naviFunction;
+    await updateNewestOrder();
+  };
 
   return (
     <View style={styles.container}>
@@ -37,18 +43,26 @@ export default function OrderComplete({ route }) {
         <View style={styles.paymentDetail}>
           <View style={{ ...styles.flexRow, justifyContent: "space-between" }}>
             <Text style={styles.paymentDetailTitle}>Order</Text>
-            <Text style={styles.paymentDetailText}>495.000 VNĐ</Text>
+            <Text style={styles.paymentDetailText}>
+              {formatPrice(
+                route?.params?.order?.total_price -
+                  route?.params?.order?.delivery_method?.price
+              )}{" "}
+              VNĐ
+            </Text>
           </View>
           <View style={{ ...styles.flexRow, justifyContent: "space-between" }}>
-            <Text style={styles.paymentDetailTitle}>Order</Text>
-            <Text style={styles.paymentDetailText}>30.000 VNĐ</Text>
+            <Text style={styles.paymentDetailTitle}>Delivery</Text>
+            <Text style={styles.paymentDetailText}>
+              {formatPrice(route?.params?.order?.delivery_method?.price)} VNĐ
+            </Text>
           </View>
           <View style={{ ...styles.flexRow, justifyContent: "space-between" }}>
             <Text style={{ ...styles.paymentDetailTitle, fontSize: 16 }}>
               Summary
             </Text>
             <Text style={{ ...styles.paymentDetailText, fontSize: 16 }}>
-              525.000 VNĐ
+              {formatPrice(route?.params?.order?.total_price)} VNĐ
             </Text>
           </View>
         </View>
@@ -56,7 +70,7 @@ export default function OrderComplete({ route }) {
       <TouchableOpacity
         style={styles.proceedButton}
         onPress={() => {
-          navigation.navigate("homepage");
+          handleNavigate(navigation.navigate("homepage"));
         }}
       >
         <Text style={styles.buttonText}>Continue Shopping</Text>
@@ -69,9 +83,11 @@ export default function OrderComplete({ route }) {
           borderColor: "#0D986A",
         }}
         onPress={() => {
-          navigation.navigate("TrackingOrder", {
-            orderDetail: route.params.order || {},
-          });
+          handleNavigate(
+            navigation.navigate("TrackingOrder", {
+              orderDetail: route.params.order || {},
+            })
+          );
         }}
       >
         <Text style={{ ...styles.buttonText, color: "#0D986A" }}>

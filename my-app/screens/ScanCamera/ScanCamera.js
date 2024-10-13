@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
   Platform,
+  LogBox,
 } from "react-native";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera"; // Use Camera instead of CameraView
 import * as ImagePicker from "expo-image-picker";
@@ -22,6 +23,11 @@ const ScanCamera = ({ navigation, route }) => {
   const [cameraType, setCameraType] = useState(route?.params?.type || "scan");
   const [selectedImage, setSelectedImage] = useState(null);
   const cameraRef = useRef(null); // Create a reference for the Camera
+
+  useEffect(() => {
+    LogBox.ignoreAllLogs(); // Disable all logs
+    return () => LogBox.ignoreAllLogs(false); // Re-enable logs when the component unmounts
+  }, []);
 
   useEffect(() => {
     (async () => {
