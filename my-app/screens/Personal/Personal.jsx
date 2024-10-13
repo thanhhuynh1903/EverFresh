@@ -183,7 +183,7 @@ export default function Personal() {
                 elevation: 5,
               }}
             >
-              <Text style={{ fontWeight: "bold" }}>Upto premium user</Text>
+              <Text style={{ fontWeight: "bold" }}>Experience exciting features only available at Everfresh</Text>
               <TouchableOpacity
                 style={{
                   padding: 15,
@@ -192,7 +192,7 @@ export default function Personal() {
                 }}
                 onPress={paymentPremium}
               >
-                <Text style={{ color: "white" }}>Purchange</Text>
+                <Text style={{ color: "white" }}>Purchasing Now!</Text>
               </TouchableOpacity>
             </View>
           )}
