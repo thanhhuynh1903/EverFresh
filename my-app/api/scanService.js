@@ -11,15 +11,19 @@ export const classifyImage = async (imageUri) => {
   const formData = new FormData();
   formData.append("file", {
     uri: imageUri,
-    type: "image/jpeg", // Adjust the type if necessary
-    name: "image.jpg", // You can use any name you want
+    type: "image/jpeg",
+    name: "image.jpg",
   });
 
   try {
+    console.log("get in");
+
     const response = await axiosInstance.post("/classify_image/", formData);
-    return response.data; // Adjust based on your response structure
+    console.log("get out");
+
+    return response.data;
   } catch (error) {
     console.error("Error uploading image:", error);
-    throw error; // Rethrow to handle it where you call this function
+    throw error;
   }
 };

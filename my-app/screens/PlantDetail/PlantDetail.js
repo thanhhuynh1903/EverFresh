@@ -8,9 +8,11 @@ import {
   Image,
   TextInput,
   ImageBackground,
+  Animated,
+  Easing,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
 import HomeHeader from "../../components/HomeHeader";
@@ -22,34 +24,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../api/cart";
 import useCustomToast from "../../components/ToastNotification/ToastNotification";
 import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
+import ChangeColorWheel from "./ChangeColorWheel";
 // import { Tooltip, lightColors } from '@rneui/themed';
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
-
-const planterList = [
-  {
-    image: require("../../assets/plant details/pot6.png"),
-  },
-  {
-    image: require("../../assets/plant details/pot5.png"),
-  },
-  {
-    image: require("../../assets/plant details/pot4.png"),
-  },
-  {
-    image: require("../../assets/plant details/pot6.png"),
-  },
-  {
-    image: require("../../assets/plant details/pot3.png"),
-  },
-  {
-    image: require("../../assets/plant details/pot3.png"),
-  },
-  {
-    image: require("../../assets/plant details/pot3.png"),
-  },
-];
 
 export default function PlantDetail({ route }) {
   const navigation = useNavigation();
@@ -212,41 +191,6 @@ export default function PlantDetail({ route }) {
     );
   };
 
-  const renderChangingWheel = () => {
-    return (
-      <View style={styles.changingWheel}>
-        {planterList.map((item, index) => renderPot(item, index))}
-      </View>
-    );
-  };
-
-  const renderPot = (item, index) => {
-    const k = 110 / 8 / 5; // Hằng số cho độ cong
-    const vertexY = 50 / 9; // Giá trị y tại đỉnh của hàm
-    const maxHeight = 90; // Chiều cao tối đa
-    const numPots = 7; // Số chậu (hoặc điểm)
-
-    // Tính toán vị trí dưới (bottomPositionValue)
-    const bottomPositionValue = (maxHeight / numPots) * (index + 0.5);
-
-    // Tính toán vị trí bên trái (leftPositionValue)
-    const leftPositionValue =
-      k * Math.pow(index - (numPots - 1) / 2, 2) + vertexY;
-
-    return (
-      <View
-        style={{
-          ...styles.pot,
-          bottom: `${bottomPositionValue}%`,
-          left: `${leftPositionValue}%`,
-        }}
-        key={index}
-      >
-        <Image source={item.image} resizeMode="contain" />
-      </View>
-    );
-  };
-
   const similarPlant = [
     {
       img: require("../../assets/plant details/plant1.png"),
@@ -395,9 +339,11 @@ export default function PlantDetail({ route }) {
                   colorChangerVisible && styles.changeColorVisible,
                 ]}
               >
-                {!colorChangerVisible
-                  ? renderChangeColor()
-                  : renderChangingWheel()}
+                {!colorChangerVisible ? (
+                  renderChangeColor()
+                ) : (
+                  <ChangeColorWheel />
+                )}
               </View>
             </View>
           </View>
@@ -596,12 +542,10 @@ const styles = StyleSheet.create({
     width: WIDTH * 1.2,
     height: "100%",
     backgroundColor: "white",
-    // justifyContent: "center",
-    // alignItems: "center",
-
     borderWidth: 4,
     borderColor: "#203901",
     borderRadius: 500,
+    position: "relative",
   },
   pot: {
     width: WIDTH * 0.1,

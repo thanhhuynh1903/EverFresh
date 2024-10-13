@@ -41,7 +41,8 @@ export default function EditProfile() {
   );
   const [showDatePicker, setShowDatePicker] = useState(false); // State for showing date picker
   const [country, setCountry] = useState(userRedux?.user?.country || "NG");
-  const [countryCode, setCountryCode] = useState("NG");
+  const [countryCode, setCountryCode] = useState("VN");
+  console.log(userRedux?.user);
 
   const handleSaveChanges = async () => {
     const data = {
