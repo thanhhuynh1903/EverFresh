@@ -21,7 +21,7 @@ import {
   normalizeString,
   successfulStatus,
 } from "../../utils/utils.js";
-import { getPlants } from "../../api/plant.js";
+import { getPlanters, getPlants, getSeeds } from "../../api/plant.js";
 import SpinnerLoading from "../../components/SpinnerLoading/SpinnerLoading.js";
 import useCustomToast from "../../components/ToastNotification/ToastNotification.js";
 import { useDispatch } from "react-redux";
@@ -38,20 +38,38 @@ export default function ShopPage() {
   const [tabIndex, setTabIndex] = useState(0);
   const [menuVisible, setMenuVisible] = useState(false);
   const [plantList, setPlantList] = useState([]);
+  const [planterList, setPlanterList] = useState([]);
+  const [seedList, setSeedList] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const displayList = useMemo(() => {
+    switch (tabIndex) {
+      case 0:
+        return plantList;
+      case 1:
+        return planterList;
+      case 2:
+        return seedList;
+
+      default:
+        return plantList;
+    }
+  }, [plantList, planterList, seedList, tabIndex]);
+
   const filterPlantList = useMemo(() => {
     const normalizedSearchValue = normalizeString(searchValue); // Normalize search value
-    return plantList.filter((item) => {
+    return displayList.filter((item) => {
       const normalizedName = normalizeString(item.name); // Normalize item name
       return normalizedName.includes(normalizedSearchValue); // Check if item name contains search value
     });
-  }, [searchValue, plantList]);
+  }, [searchValue, displayList]);
 
   useFocusEffect(
     React.useCallback(() => {
       loadPlantList();
+      loadPlanterList();
+      loadSeedList();
     }, [])
   );
 
@@ -60,6 +78,22 @@ export default function ShopPage() {
     const response = await getPlants();
     if (response?.status === 200) {
       setPlantList(response.data);
+    }
+    setLoading(false);
+  };
+
+  const loadPlanterList = async () => {
+    const response = await getPlanters();
+    if (response?.status === 200) {
+      setPlanterList(response.data);
+    }
+    setLoading(false);
+  };
+
+  const loadSeedList = async () => {
+    const response = await getSeeds();
+    if (response?.status === 200) {
+      setSeedList(response.data);
     }
     setLoading(false);
   };
@@ -176,11 +210,9 @@ export default function ShopPage() {
   };
 
   const tabList = [
-    { label: "Top Pick" },
-    { label: "Indoor" },
-    { label: "Outdoor" },
+    { label: "Plant" },
+    { label: "Planter" },
     { label: "Seeds" },
-    { label: "Planters" },
   ];
 
   return (
@@ -331,7 +363,7 @@ const styles = StyleSheet.create({
     width: WIDTH,
     paddingHorizontal: 12,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     marginVertical: 12,
   },
   // tabContainer: {

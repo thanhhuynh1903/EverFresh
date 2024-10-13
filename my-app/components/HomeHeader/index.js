@@ -11,11 +11,13 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import NotificationModal from "../NotificationModal/NotificationModal";
 import { selectNotificate } from "../../redux/selector/selector";
 import { useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
 export default function HomeHeader({ handleMenuToggle, backgroundColor }) {
+  const navigation = useNavigation();
   const notificationRedux = useSelector(selectNotificate);
   const [notificateModalVisible, setNotificateModalVisible] = useState(false);
   const newNotifiticate = useMemo(() => {
@@ -30,10 +32,12 @@ export default function HomeHeader({ handleMenuToggle, backgroundColor }) {
         backgroundColor: backgroundColor ? backgroundColor : "white",
       }}
     >
-      <Image
-        source={require("../../assets/img/logo.png")}
-        style={styles.iconstyle}
-      />
+      <TouchableOpacity onPress={() => navigation.navigate("homepage")}>
+        <Image
+          source={require("../../assets/img/logo.png")}
+          style={styles.iconstyle}
+        />
+      </TouchableOpacity>
       <View style={styles.fetureList}>
         <TouchableOpacity
           onPress={() => {

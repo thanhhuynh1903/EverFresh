@@ -60,7 +60,7 @@ export default function MenuModal({ visible, closeModal }) {
   useEffect(() => {
     async function prepare() {
       if (fontsLoaded) {
-        await SplashScreen.hideAsync();
+        await SplashScreen?.hideAsync();
       }
     }
     prepare();

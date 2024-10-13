@@ -71,6 +71,13 @@ export default function Personal() {
     settings: ThirdRoute,
   });
 
+  const [editButtonWidth, setEditButtonWidth] = useState(0);
+
+  const handleLayout = (event) => {
+    const { width } = event.nativeEvent.layout;
+    setEditButtonWidth(width);
+  };
+
   const renderTabBar = (props) => (
     <TabBar
       {...props}
@@ -123,7 +130,14 @@ export default function Personal() {
               <Text style={styles.profileInfoName}>
                 {userRedux?.user?.name}
               </Text>
-              <TouchableOpacity style={styles.profileInfoEdit}>
+              <TouchableOpacity
+                style={[
+                  styles.profileInfoEdit,
+                  { transform: [{ translateX: editButtonWidth + 10 }] },
+                ]}
+                onPress={() => navigation.navigate("EditProfile")}
+                onLayout={handleLayout}
+              >
                 <Text style={styles.profileInfoEditText}>Edit</Text>
               </TouchableOpacity>
             </View>
@@ -188,13 +202,14 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   profileInfoName: {
+    width: "100%",
     color: "#242760",
     fontWeight: "bold",
     fontSize: 18,
   },
   profileInfoEdit: {
     position: "absolute",
-    left: "22.5%",
+    right: 0,
     backgroundColor: "#009E71",
     height: "100%",
     paddingHorizontal: 12,

@@ -18,6 +18,7 @@ import {
   formatPrice,
   getCollectionIdFromPlantId,
   getPlantIdListinGalery,
+  successfulStatus,
 } from "../../utils/utils";
 import BottomSheetHeader from "../../components/BottomSheetHeader/BottomSheetHeader";
 import PlantBookingCard from "../../components/PlantBookingCard/PlantBookingCard";
@@ -153,23 +154,33 @@ export default function CartView({ goback }) {
   }, [galleryRedux]);
 
   const hanldeChangeAmount = async (item, amount) => {
+    if (amount > 5) {
+      showToast("Warning", "Max quantity is 5", "warning");
+      return;
+    }
+
     const response = await updateCartItem(item?._id, amount);
-    if (amount === 0) {
-      setCart(cart.filter((cartItem) => cartItem?._id !== item?._id));
-    } else {
-      setCart(
-        cart.map((cartItem) => {
-          return {
-            ...cartItem,
-            quantity: cartItem?._id === item?._id ? amount : cartItem.quantity,
-            product: {
-              ...cartItem.product,
+    if (successfulStatus(response?.status)) {
+      if (amount === 0) {
+        setCart(cart.filter((cartItem) => cartItem?._id !== item?._id));
+      } else {
+        setCart(
+          cart.map((cartItem) => {
+            return {
+              ...cartItem,
               quantity:
                 cartItem?._id === item?._id ? amount : cartItem.quantity,
-            },
-          };
-        })
-      );
+              product: {
+                ...cartItem.product,
+                quantity:
+                  cartItem?._id === item?._id ? amount : cartItem.quantity,
+              },
+            };
+          })
+        );
+      }
+    } else {
+      console.log(response?.response?.data);
     }
   };
 

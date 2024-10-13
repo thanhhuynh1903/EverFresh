@@ -7,19 +7,21 @@ import store from "./store/common";
 import { ToastProvider } from "react-native-toast-notifications";
 import SafeAreaWrapper from "./components/SafeAreaWrapper";
 import { StripeProvider } from "@stripe/stripe-react-native";
+import NotificationSocket from "./socket/notificateSocket/NotificationSocket";
 
 export default function App() {
   return (
     <SafeAreaWrapper>
-      <StripeProvider publishableKey={process.env.STRIPE_PUBLIC_KEY}>
-        <ToastProvider>
-          <Provider store={store}>
+      <Provider store={store}>
+        <StripeProvider publishableKey={process.env.STRIPE_PUBLIC_KEY}>
+          <ToastProvider>
+            <NotificationSocket />
             <NavigationContainer>
               <MainStack />
             </NavigationContainer>
-          </Provider>
-        </ToastProvider>
-      </StripeProvider>
+          </ToastProvider>
+        </StripeProvider>
+      </Provider>
     </SafeAreaWrapper>
   );
 }

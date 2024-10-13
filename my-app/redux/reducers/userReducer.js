@@ -19,7 +19,7 @@ const userSlice = createSlice({
   initialState: initState,
   reducers: {
     setUserInfo: (state, action) => {
-      state.data = action.payload;
+      state.user = action.payload;
     },
   },
   extraReducers: (builder) => {

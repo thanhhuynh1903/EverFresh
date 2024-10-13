@@ -23,6 +23,7 @@ import PlantReport from "../screens/PlantReport/PlantReport.js";
 import Galery from "../screens/Galery/Galery.js";
 import Personal from "../screens/Personal/Personal.jsx";
 import Timer from "../screens/Timer/Timer.jsx";
+import EditProfile from "../screens/EditProfile/EditProfile.jsx";
 // import Category from '../screens/Category';
 
 export const RoutesList = [
@@ -197,6 +198,14 @@ export const RoutesList = [
   {
     name: "PlantReport",
     component: PlantReport,
+    options: {
+      tabBarButton: () => null,
+    },
+    hiddenBottomTab: true,
+  },
+  {
+    name: "EditProfile",
+    component: EditProfile,
     options: {
       tabBarButton: () => null,
     },

@@ -12,6 +12,7 @@ import {
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import IdentifyBottomSheet from "../../components/IdentifyBottomSheet/IdentifyBottomSheet";
 import { useFocusEffect } from "@react-navigation/native";
+import { classifyImage } from "../../api/scanService";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -28,8 +29,6 @@ const PlantReport = ({ navigation, route }) => {
     return route.params.type;
   }, [route.params]);
 
-  useFocusEffect(React.useCallback(() => {}, []));
-
   useEffect(() => {
     setTimeout(() => {
       console.log(route?.params?.type);
@@ -38,6 +37,19 @@ const PlantReport = ({ navigation, route }) => {
   }, [type]);
 
   // route?.params?.type
+
+  const handleImageUpload = async () => {
+    // Classify the selected image
+    try {
+      const classificationResult = await classifyImage(selectedImage);
+      console.log("Classification Result:", classificationResult);
+      // Alert.alert('Classification Result', JSON.stringify(classificationResult, null, 2));
+    } catch (error) {
+      // Alert.alert('Error', 'Failed to classify image');
+      console.error("Classification Error:", error, error?.response);
+      console.error(error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -57,21 +69,22 @@ const PlantReport = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
         <View style={styles.containerBody}>
-          {route?.params?.type === "scan" && (
-            <TouchableOpacity
-              style={styles.viewDetailButton}
-              onPress={() =>
-                navigation.navigate("PlantGuide", {
-                  plant: {
-                    name: "Lily",
-                    img: require("../../assets/homeImg/guidePlant1.png"),
-                  },
-                })
-              }
-            >
-              <Text style={styles.viewDetailText}>View more tips</Text>
-            </TouchableOpacity>
-          )}
+          {/* {route?.params?.type === "scan" && ( */}
+          <TouchableOpacity
+            style={styles.viewDetailButton}
+            onPress={() =>
+              // navigation.navigate("PlantGuide", {
+              //   plant: {
+              //     name: "Lily",
+              //     img: require("../../assets/homeImg/guidePlant1.png"),
+              //   },
+              // })
+              handleImageUpload()
+            }
+          >
+            <Text style={styles.viewDetailText}>View more tips</Text>
+          </TouchableOpacity>
+          {/* )} */}
         </View>
       </ImageBackground>
       <IdentifyBottomSheet

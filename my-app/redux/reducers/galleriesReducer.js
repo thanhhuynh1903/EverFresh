@@ -36,7 +36,7 @@ const galleriesSlice = createSlice({
       })
       .addCase(getAllPlantsFromGalleryThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.plantList = action.payload;
+        state.plantList = action.payload.reverse();
       })
       .addCase(getAllPlantsFromGalleryThunk.rejected, (state) => {
         state.loading = false;

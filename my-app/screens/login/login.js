@@ -94,6 +94,7 @@ export default function LoginPage() {
           style={{ width: "90%", padding: 6, borderWidth: 1 }}
           onChangeText={setEmail}
           value={email}
+          keyboardType="email-address"
         />
         <Text>Password</Text>
         <TextInput

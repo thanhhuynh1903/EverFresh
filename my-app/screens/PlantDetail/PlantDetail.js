@@ -27,6 +27,30 @@ import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
+const planterList = [
+  {
+    image: require("../../assets/plant details/pot6.png"),
+  },
+  {
+    image: require("../../assets/plant details/pot5.png"),
+  },
+  {
+    image: require("../../assets/plant details/pot4.png"),
+  },
+  {
+    image: require("../../assets/plant details/pot6.png"),
+  },
+  {
+    image: require("../../assets/plant details/pot3.png"),
+  },
+  {
+    image: require("../../assets/plant details/pot3.png"),
+  },
+  {
+    image: require("../../assets/plant details/pot3.png"),
+  },
+];
+
 export default function PlantDetail({ route }) {
   const navigation = useNavigation();
   const cartRedux = useSelector(selectCart);
@@ -34,6 +58,7 @@ export default function PlantDetail({ route }) {
   const dispatch = useDispatch();
   const [plant, setPlant] = useState(route.params.plant || {});
   const [menuVisible, setMenuVisible] = useState(false);
+  const [colorChangerVisible, setColorChangerVisible] = useState(true);
   const [modalVisible, setModalVisible] = useState({
     cartViewVisible: false,
   });
@@ -109,7 +134,13 @@ export default function PlantDetail({ route }) {
 
   const renderOverviewItem = (item, key) => {
     return (
-      <View style={styles.plantOverviewItem} key={key}>
+      <View
+        style={[
+          styles.plantOverviewItem,
+          colorChangerVisible && styles.smallPlantOverviewItem,
+        ]}
+        key={key}
+      >
         <Image
           // source={require('../../assets/plant details/drop.png')}
           source={item.img}
@@ -173,6 +204,49 @@ export default function PlantDetail({ route }) {
     );
   };
 
+  const renderChangeColor = () => {
+    return (
+      <TouchableOpacity style={styles.unionImageContainer}>
+        <Image source={require("../../assets/utilsImage/Union.png")} />
+      </TouchableOpacity>
+    );
+  };
+
+  const renderChangingWheel = () => {
+    return (
+      <View style={styles.changingWheel}>
+        {planterList.map((item, index) => renderPot(item, index))}
+      </View>
+    );
+  };
+
+  const renderPot = (item, index) => {
+    const k = 110 / 8 / 5; // Hằng số cho độ cong
+    const vertexY = 50 / 9; // Giá trị y tại đỉnh của hàm
+    const maxHeight = 90; // Chiều cao tối đa
+    const numPots = 7; // Số chậu (hoặc điểm)
+
+    // Tính toán vị trí dưới (bottomPositionValue)
+    const bottomPositionValue = (maxHeight / numPots) * (index + 0.5);
+
+    // Tính toán vị trí bên trái (leftPositionValue)
+    const leftPositionValue =
+      k * Math.pow(index - (numPots - 1) / 2, 2) + vertexY;
+
+    return (
+      <View
+        style={{
+          ...styles.pot,
+          bottom: `${bottomPositionValue}%`,
+          left: `${leftPositionValue}%`,
+        }}
+        key={index}
+      >
+        <Image source={item.image} resizeMode="contain" />
+      </View>
+    );
+  };
+
   const similarPlant = [
     {
       img: require("../../assets/plant details/plant1.png"),
@@ -200,7 +274,7 @@ export default function PlantDetail({ route }) {
         handleMenuToggle={() => setMenuVisible(!menuVisible)}
         backgroundColor={menuVisible && "#0B845C"}
       />
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.plantDetailHeader}>
           <Image
             source={require("../../assets/plant details/headerBackground.png")} // Change this to your image path
@@ -238,39 +312,52 @@ export default function PlantDetail({ route }) {
             </View>
             <View style={styles.headerPlant}>
               <View style={styles.headerPlantPrice}>
-                <View style={styles.headerPlantInfo}>
-                  <Text style={styles.headerPlantPriceTitle}>Price</Text>
-                  <Text style={styles.headerPlantPriceText}>
-                    {formatPrice(plant.price || 0)} VNĐ
-                  </Text>
-                </View>
-                <View style={styles.headerPlantInfo}>
-                  <Text style={styles.headerPlantPriceTitle}>Size</Text>
-                  <Text style={styles.headerPlantPriceText}>
-                    {plant.height || "Unknown"}
-                  </Text>
-                </View>
+                {!colorChangerVisible && (
+                  <>
+                    <View style={styles.headerPlantInfo}>
+                      <Text style={styles.headerPlantPriceTitle}>Price</Text>
+                      <Text style={styles.headerPlantPriceText}>
+                        {formatPrice(plant.price || 0)} VNĐ
+                      </Text>
+                    </View>
+                    <View style={styles.headerPlantInfo}>
+                      <Text style={styles.headerPlantPriceTitle}>Size</Text>
+                      <Text style={styles.headerPlantPriceText}>
+                        {plant.height || "Unknown"}
+                      </Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.headerPlantFeature,
+                        styles.headerPlantInfo,
+                      ]}
+                    >
+                      <TouchableOpacity>
+                        <Image
+                          source={require("../../assets/shopping/heartIcon.png")}
+                          style={styles.headerPlantFeatureIcon}
+                        />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          handleAddToCart(plant);
+                        }}
+                      >
+                        <Image
+                          source={require("../../assets/shopping/shopIcon.png")}
+                          style={styles.headerPlantFeatureIcon}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </>
+                )}
+
                 <View
-                  style={[styles.headerPlantFeature, styles.headerPlantInfo]}
+                  style={[
+                    styles.headerPlantContainer,
+                    colorChangerVisible && styles.headerPlantOnlyContainer,
+                  ]}
                 >
-                  <TouchableOpacity>
-                    <Image
-                      source={require("../../assets/shopping/heartIcon.png")}
-                      style={styles.headerPlantFeatureIcon}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      handleAddToCart(plant);
-                    }}
-                  >
-                    <Image
-                      source={require("../../assets/shopping/shopIcon.png")}
-                      style={styles.headerPlantFeatureIcon}
-                    />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.headerPlantContainer}>
                   <Image
                     source={
                       plant?.img_url && plant?.img_url[0]
@@ -279,39 +366,59 @@ export default function PlantDetail({ route }) {
                     }
                     style={styles.headerPlantImage}
                   />
-                  <View style={styles.headerPlantDetailTooltip}>
-                    <View
-                      style={{
-                        position: "relative",
-                        alignSelf: "center",
-                        alignItems: "center",
-                        backgroundColor: "#FFFFFF",
-                        shadowColor: "#000",
-                        shadowOffset: { width: 4, height: 4 }, // X: 0, Y: 4
-                        shadowOpacity: 0.25,
-                        shadowRadius: 50,
-                        elevation: 8,
-                        borderRadius: 12,
-                      }}
-                    >
-                      {renderTooltipView()}
-                      <View style={styles.tooltipArrow} />
+                  {!colorChangerVisible && (
+                    <View style={styles.headerPlantDetailTooltip}>
+                      <View
+                        style={{
+                          position: "relative",
+                          alignSelf: "center",
+                          alignItems: "center",
+                          backgroundColor: "#FFFFFF",
+                          shadowColor: "#000",
+                          shadowOffset: { width: 4, height: 4 }, // X: 0, Y: 4
+                          shadowOpacity: 0.25,
+                          shadowRadius: 50,
+                          elevation: 8,
+                          borderRadius: 12,
+                        }}
+                      >
+                        {renderTooltipView()}
+                        <View style={styles.tooltipArrow} />
+                      </View>
                     </View>
-                  </View>
+                  )}
                 </View>
+              </View>
+              <View
+                style={[
+                  styles.changeColorContainer,
+                  colorChangerVisible && styles.changeColorVisible,
+                ]}
+              >
+                {!colorChangerVisible
+                  ? renderChangeColor()
+                  : renderChangingWheel()}
               </View>
             </View>
           </View>
         </View>
-        <View style={styles.plantOverview}>
+        <View
+          style={[
+            styles.plantOverview,
+            colorChangerVisible && styles.smallPlantOverview,
+          ]}
+        >
           <Text style={styles.plantOverviewTitle}>Overview</Text>
           {OverviewItems.map((item, key) => renderOverviewItem(item, key))}
+        </View>
+        <View style={styles.plantOverview}>
           <Text style={styles.plantOverviewTitle}>Plant Bio</Text>
           <Text style={styles.plantPlantBioDes}>
             No green thumb required to keep our artificial watermelon peperomia
             plant looking lively and lush anywhere you place it.
           </Text>
         </View>
+
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -388,7 +495,8 @@ const styles = StyleSheet.create({
   plantDetailHeader: {
     position: "relative",
     width: WIDTH,
-    height: HEIGHT * 0.42,
+    // height: HEIGHT * 0.42,
+    // minHeight: HEIGHT * 0.42,
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0)",
   },
@@ -409,6 +517,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 18,
+    paddingRight: 0,
   },
   headerContentPlantType: {
     width: "100%",
@@ -438,6 +547,7 @@ const styles = StyleSheet.create({
     padding: 6,
     paddingHorizontal: 12,
     borderRadius: 50,
+    marginRight: 18,
     gap: 24,
   },
   // headerPlantName
@@ -453,12 +563,53 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   headerPlant: {
+    position: "relative",
     width: "100%",
     height: "75%",
     overflow: "visible",
     transform: [{ translateY: -40 }],
     zIndex: 1,
+    borderWidth: 1,
   },
+
+  // change color contaienr
+  changeColorContainer: {
+    position: "absolute",
+    width: "10%",
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  changeColorVisible: {
+    right: "40%",
+    bottom: "-100%",
+  },
+  unionImageContainer: {
+    position: "absolute",
+    width: "100%",
+    bottom: 0,
+    // right
+  },
+
+  // changingWheel
+  changingWheel: {
+    width: WIDTH * 1.2,
+    height: "100%",
+    backgroundColor: "white",
+    // justifyContent: "center",
+    // alignItems: "center",
+
+    borderWidth: 4,
+    borderColor: "#203901",
+    borderRadius: 500,
+  },
+  pot: {
+    width: WIDTH * 0.1,
+    height: WIDTH * 0.1,
+    position: "absolute",
+    bottom: "0%",
+  },
+
   headerPlantPrice: {
     position: "relative",
     width: "100%",
@@ -499,9 +650,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 1,
   },
+  headerPlantOnlyContainer: {
+    position: "static",
+    width: "40%",
+    marginTop: "10%",
+  },
   headerPlantImage: {
-    width: "100%",
-    height: "100%",
+    width: "80%",
+    height: "80%",
+    borderRadius: 12,
   },
   headerPlantDetailTooltip: {
     position: "absolute",
@@ -551,6 +708,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
+  smallPlantOverview: {
+    width: WIDTH * 0.3,
+  },
   plantOverviewTitle: {
     width: "100%",
     fontSize: 14,
@@ -563,6 +723,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 16,
     alignItems: "center",
+  },
+  smallPlantOverviewItem: {
+    width: "100%",
+    justifyContent: "center",
+    marginBottom: 24,
   },
   plantOverviewItemDetail: {},
   plantOverviewItemDetailValue: {

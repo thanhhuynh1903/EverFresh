@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     marginBottom: 28,
     flexDirection: "row",
     // justifyContent: "space-between",
-    // gap: "5%",
+    gap: WIDTH * 0.05,
   },
   savedPlantCard: {
     width: WIDTH * 0.28,
@@ -379,6 +379,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: WIDTH * 0.28,
     resizeMode: "contain",
+    borderRadius: 12,
   },
   // guidePlantCard
   guidePlantCard: {
