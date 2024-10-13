@@ -7,10 +7,11 @@ import {
   Easing,
   Dimensions,
 } from "react-native";
+import ColorBar from "./ColorBar";
 
 const WIDTH = Dimensions.get("window").width;
 
-export default function ChangeColorWheel() {
+export default function ChangeColorWheel({ setCustomPlant }) {
   const [planterList, setPlanterList] = useState([
     { image: require("../../assets/plant details/pot6.png") },
     { image: require("../../assets/plant details/pot5.png") },
@@ -133,7 +134,14 @@ export default function ChangeColorWheel() {
         key={index}
       >
         <TouchableOpacity onPress={() => handlePress(index)}>
-          <Image source={item.image} resizeMode="contain" />
+          <Image
+            source={
+              index === 3
+                ? require("../../assets/plant details/activePot1.png")
+                : item.image
+            }
+            resizeMode="contain"
+          />
         </TouchableOpacity>
       </Animated.View>
     );
@@ -148,6 +156,7 @@ export default function ChangeColorWheel() {
       }}
     >
       {planterList.map((item, index) => renderPot(item, index))}
+      <ColorBar setCustomPlant={setCustomPlant} />
     </View>
   );
 }

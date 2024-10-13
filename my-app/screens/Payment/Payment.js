@@ -382,7 +382,9 @@ export default function Payment({ route }) {
         <TouchableOpacity
           style={styles.proceedButton}
           onPress={async () => {
-            currentIndex === 0 ? handlePayment() : handlePaymentStripe();
+            // currentIndex === 0 ? handlePayment() : handlePaymentStripe();
+            console.log(currentIndex);
+
             // handlePayment();
             // handlePaymentStripe();
             // console.log("get innnn");

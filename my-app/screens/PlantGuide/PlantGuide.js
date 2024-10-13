@@ -107,7 +107,10 @@ export default function PlantGuide({ route }) {
     return (
       <TouchableOpacity style={styles.seasonalPlantCard} key={key}>
         <View style={styles.seasonalPlantCardImage}>
-          <Image source={item.img} style={styles.seasonalPlantCardImagePlant} />
+          <Image
+            source={item.uri ? { uri: item.img } : item.img}
+            style={styles.seasonalPlantCardImagePlant}
+          />
         </View>
         <View style={styles.seasonalPlantCardDetail}>
           <Text style={styles.seasonalPlantCardDetailnName}>
@@ -133,12 +136,18 @@ export default function PlantGuide({ route }) {
       </View>
       <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
         <View style={styles.plantDetail}>
-          <Text style={styles.plantDetailTitle}>‘Banana Boat’ daylily</Text>
+          <Text style={styles.plantDetailTitle}>
+            {plant.name || "‘Banana Boat’ daylily"}
+          </Text>
           <Text style={styles.plantDetailName}>Hemerocallis ‘Banana Boat’</Text>
           <Text style={styles.plantDetailClass}>hem-er-oh-KAL-iss</Text>
           <Image
-            source={require("../../assets/utilsImage/plantGuideImage.png")}
-            resizeMode="contain"
+            source={
+              plant.uri
+                ? { uri: plant.img_url[0] }
+                : require("../../assets/utilsImage/plantGuideImage.png")
+            }
+            resizeMode="cover"
             style={styles.plantDetailImage}
           />
         </View>
@@ -251,7 +260,9 @@ const styles = StyleSheet.create({
   },
   plantDetailImage: {
     width: WIDTH * 0.7,
+    height: WIDTH * 0.5,
     marginHorizontal: WIDTH * 0.15,
+    borderRadius: 12,
   },
   yourPland: {
     width: WIDTH,

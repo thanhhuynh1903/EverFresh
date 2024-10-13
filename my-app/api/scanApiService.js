@@ -12,18 +12,18 @@ const instance = axios.create({
   responseType: "json",
 });
 
-instance.interceptors.request.use(
-  async (config) => {
-    const accessToken = await AsyncStorage.getItem("accessToken");
-    // console.log(accessToken);
-    if (accessToken) {
-      config.headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// instance.interceptors.request.use(
+//   async (config) => {
+//     const accessToken = await AsyncStorage.getItem("accessToken");
+//     // console.log(accessToken);
+//     if (accessToken) {
+//       config.headers["Authorization"] = `Bearer ${accessToken}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 export default instance;

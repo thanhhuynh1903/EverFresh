@@ -37,13 +37,19 @@ export default function PlantDetail({ route }) {
   const dispatch = useDispatch();
   const [plant, setPlant] = useState(route.params.plant || {});
   const [menuVisible, setMenuVisible] = useState(false);
-  const [colorChangerVisible, setColorChangerVisible] = useState(true);
+  const [colorChangerVisible, setColorChangerVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState({
     cartViewVisible: false,
   });
 
+  const [customPlant, setCustomPlant] = useState({
+    planter: "",
+    planterColor: "#FFD2B6",
+  });
+
   useEffect(() => {
     setPlant(route.params.plant);
+    setColorChangerVisible(false);
   }, [route.params.plant]);
 
   const OverviewItems = useMemo(() => {
@@ -185,7 +191,12 @@ export default function PlantDetail({ route }) {
 
   const renderChangeColor = () => {
     return (
-      <TouchableOpacity style={styles.unionImageContainer}>
+      <TouchableOpacity
+        style={styles.unionImageContainer}
+        onPress={() => {
+          setColorChangerVisible(true);
+        }}
+      >
         <Image source={require("../../assets/utilsImage/Union.png")} />
       </TouchableOpacity>
     );
@@ -310,6 +321,17 @@ export default function PlantDetail({ route }) {
                     }
                     style={styles.headerPlantImage}
                   />
+                  {colorChangerVisible && (
+                    <View
+                      style={{
+                        position: "absolute",
+                        width: "50%",
+                        height: "30%",
+                        bottom: "22%",
+                        backgroundColor: customPlant.planterColor,
+                      }}
+                    ></View>
+                  )}
                   {!colorChangerVisible && (
                     <View style={styles.headerPlantDetailTooltip}>
                       <View
@@ -342,7 +364,7 @@ export default function PlantDetail({ route }) {
                 {!colorChangerVisible ? (
                   renderChangeColor()
                 ) : (
-                  <ChangeColorWheel />
+                  <ChangeColorWheel setCustomPlant={setCustomPlant} />
                 )}
               </View>
             </View>
@@ -443,8 +465,6 @@ const styles = StyleSheet.create({
     width: WIDTH,
     // height: HEIGHT * 0.42,
     // minHeight: HEIGHT * 0.42,
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0)",
   },
   plantDetailHeaderBackground: {
     width: WIDTH,
@@ -515,7 +535,6 @@ const styles = StyleSheet.create({
     overflow: "visible",
     transform: [{ translateY: -40 }],
     zIndex: 1,
-    borderWidth: 1,
   },
 
   // change color contaienr

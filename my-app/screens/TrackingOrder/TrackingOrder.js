@@ -44,11 +44,12 @@ export default function TrackingOrder({ route }) {
   const navigation = useNavigation();
 
   const [orderDetail, setOrderDetail] = useState(route.params.orderDetail);
+
   const orderStatusList = useMemo(() => {
     return [
       {
         name: "Order Confirmed",
-        date: "Wed, 1 lth July",
+        date: formatDate(orderDetail.createdAt),
         checked: [
           "Confirmed",
           "Shipped",
@@ -58,19 +59,19 @@ export default function TrackingOrder({ route }) {
       },
       {
         name: "Shipped",
-        date: "Wed, 1 lth July",
+        date: formatDate(orderDetail?.tracking_status_dates[0]?.value || ""),
         checked: ["Shipped", "Out Of Delivery", "Delivered"].includes(
           orderDetail.status
         ),
       },
       {
         name: "Out For Delivery",
-        date: "Wed, 1 lth July",
+        date: formatDate(orderDetail?.tracking_status_dates[1]?.value || ""),
         checked: ["Out Of Delivery", "Delivered"].includes(orderDetail.status),
       },
       {
         name: "Delivered ",
-        date: "Wed, 1 lth July",
+        date: formatDate(orderDetail?.tracking_status_dates[2]?.value || ""),
         checked: ["Delivered"].includes(orderDetail.status),
       },
     ];
