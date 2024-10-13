@@ -12,8 +12,19 @@ import {
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import BottomSheet from "@gorhom/bottom-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { addToCollections } from "../../api/collection";
+import {
+  addToCollections,
+  removePlantFromCollections,
+} from "../../api/collection";
 import { useNavigation } from "@react-navigation/native";
+import {
+  getAllPlantsFromGalleryThunk,
+  getGaleryThunk,
+} from "../../redux/thunk/galleryThunk";
+import useCustomToast from "../ToastNotification/ToastNotification";
+import { selectGallery } from "../../redux/selector/selector";
+import { useDispatch, useSelector } from "react-redux";
+import { getCollectionIdFromPlantId } from "../../utils/utils";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -51,9 +62,18 @@ const savedPlantNeeded = [
 
 const savedPlantTypes = ["Indoor", "Pet friendly", "Papaveraceae"];
 
-export default function IdentifyBottomSheet({ visible, onSubmit, onClose }) {
+export default function IdentifyBottomSheet({
+  plant,
+  visible,
+  onSubmit,
+  onClose,
+}) {
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const [plantDetail, setPlantDetail] = useState(false);
   const [descriptionReadmore, setDescriptionReadmore] = useState(false);
+  const showToast = useCustomToast();
+  const dispatch = useDispatch();
+  const galleryRedux = useSelector(selectGallery);
   const snapPoints = useMemo(() => ["25%", "50%", "90%"], []);
   const bottomSheetRef = useRef(null);
   const navigation = useNavigation();
@@ -66,6 +86,10 @@ export default function IdentifyBottomSheet({ visible, onSubmit, onClose }) {
     }
   }, [visible]);
 
+  useEffect(() => {
+    setPlantDetail(plant);
+  }, [plant]);
+
   const openBottomSheet = () => {
     bottomSheetRef.current?.expand();
     setBottomSheetVisible(true);
@@ -77,47 +101,74 @@ export default function IdentifyBottomSheet({ visible, onSubmit, onClose }) {
     if (onClose) onClose();
   };
 
-  const handleAddToCollection = async (item) => {
-    closeBottomSheet();
-    navigation.navigate("Galery");
-    // const response = await addToCollections(item.product?._id);
-    // if (response.status === 201) {
-    //   showToast({
-    //     title: "Success",
-    //     message: (
-    //       <View
-    //         style={{
-    //           width: WIDTH * 0.75,
-    //           flex: 1,
-    //           flexDirection: "row",
-    //           justifyContent: "space-between",
-    //         }}
-    //       >
-    //         <Text>Add to collection successfully</Text>
-    //         <TouchableOpacity
-    //           onPress={() => {
-    //             setChooseCollectionVisible(true);
-    //           }}
-    //         >
-    //           <Text style={{ color: "#4287f5", fontWeight: "bold" }}>
-    //             Manager
-    //           </Text>
-    //         </TouchableOpacity>
-    //       </View>
-    //     ),
-    //     type: "success",
-    //     // position: "bottom",
-    //   });
-    //   await dispatch(getGaleryThunk()).then((response) => {
-    //     dispatch(getAllPlantsFromGalleryThunk(response.payload));
-    //   });
-    // } else {
-    //   showToast({
-    //     title: "Fail",
-    //     message: `Add plant to collection fail`,
-    //     type: "error",
-    //   });
-    // }
+  const handleAddToCollection = async () => {
+    const response = await addToCollections(plantDetail?._id);
+    if (response.status === 201) {
+      showToast({
+        title: "Success",
+        message: "Add to collection successfully",
+        // <View
+        //   style={{
+        //     width: WIDTH * 0.75,
+        //     flex: 1,
+        //     flexDirection: "row",
+        //     justifyContent: "space-between",
+        //   }}
+        // >
+        //   <Text>Add to collection successfully</Text>
+        //   <TouchableOpacity
+        //     onPress={() => {
+        //       setChooseCollectionVisible(true);
+        //       setFocusPlant(item);
+        //     }}
+        //   >
+        //     <Text style={{ color: "#4287f5", fontWeight: "bold" }}>
+        //       Manager
+        //     </Text>
+        //   </TouchableOpacity>
+        // </View>
+        type: "success",
+        // position: "bottom",
+      });
+      await dispatch(getGaleryThunk()).then((response) => {
+        dispatch(getAllPlantsFromGalleryThunk(response.payload));
+      });
+    } else {
+      showToast({
+        title: "Fail",
+        message: `Add plant to collection fail`,
+        type: "error",
+      });
+    }
+  };
+
+  const handleRemoveToCollection = async () => {
+    const collectionId = getCollectionIdFromPlantId(
+      galleryRedux.galleries,
+      plantDetail?._id
+    );
+
+    const response = await removePlantFromCollections(
+      plantDetail._id,
+      collectionId
+    );
+    if (response.status === 200) {
+      showToast({
+        title: "Success",
+        message: "Remove from collection successfully",
+        type: "success",
+        // position: "bottom",
+      });
+      await dispatch(getGaleryThunk()).then((response) => {
+        dispatch(getAllPlantsFromGalleryThunk(response.payload));
+      });
+    } else {
+      showToast({
+        title: "Fail",
+        message: `Remove plant from collection fail`,
+        type: "error",
+      });
+    }
   };
 
   const renderPlantType = (item, key) => {
@@ -156,6 +207,7 @@ export default function IdentifyBottomSheet({ visible, onSubmit, onClose }) {
       </View>
     );
   };
+  console.log(galleryRedux.plantList);
 
   return (
     <>
@@ -201,12 +253,16 @@ export default function IdentifyBottomSheet({ visible, onSubmit, onClose }) {
                 marginVertical: 18,
               }}
             >
-              Papaver Somniferum
+              {plantDetail?.name}
             </Text>
             <View style={styles.plantType}>
-              {savedPlantTypes.map((item, key) =>
-                renderPlantType(item, item + key)
-              )}
+              {plantDetail &&
+                savedPlantTypes.map((item, key) =>
+                  renderPlantType(
+                    plantDetail?.uses?.split(", ")?.map((item) => item.trim()),
+                    item + key
+                  )
+                )}
             </View>
             <Text
               style={{
@@ -221,13 +277,14 @@ export default function IdentifyBottomSheet({ visible, onSubmit, onClose }) {
             </Text>
             <Text
               style={styles.descriptionDetail}
-              numberOfLines={descriptionReadmore ? 0 : 5}
+              numberOfLines={descriptionReadmore ? 0 : 2}
             >
-              Ginkgo biloba first appeared over 290 million years ago, and
+              {plantDetail?.describe}
+              {/* Ginkgo biloba first appeared over 290 million years ago, and
               fossils very similar to the living species, back to the Middle
               Jurassic epoch approximately 170 million years ago. The tree was
               cultivated early in human history and remains commonly planted,
-              and is widely regarded as a living fossil....
+              and is widely regarded as a living fossil.... */}
             </Text>
             <TouchableOpacity>
               <Text
@@ -250,10 +307,22 @@ export default function IdentifyBottomSheet({ visible, onSubmit, onClose }) {
                 ...styles.addButton,
                 justifyContent: "center",
               }}
-              onPress={handleAddToCollection}
+              onPress={
+                galleryRedux.plantList?.find(
+                  (item) => item._id === plantDetail?._id
+                )
+                  ? handleRemoveToCollection
+                  : handleAddToCollection
+              }
             >
               <Icon name="bookmark-outline" size={30} color="white" />
-              <Text style={styles.addButtonText}>Save this plant</Text>
+              <Text style={styles.addButtonText}>
+                {galleryRedux.plantList?.find(
+                  (item) => item._id === plantDetail?._id
+                )
+                  ? "Remove this plant"
+                  : "Save this plant"}
+              </Text>
             </TouchableOpacity>
           </View>
         </BottomSheet>

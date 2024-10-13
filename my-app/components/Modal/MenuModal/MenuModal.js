@@ -18,6 +18,7 @@ import {
 } from "@expo-google-fonts/philosopher";
 import * as SplashScreen from "expo-splash-screen";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -89,6 +90,11 @@ export default function MenuModal({ visible, closeModal }) {
     );
   };
 
+  const handeLogout = async () => {
+    await AsyncStorage.removeItem("accessToken");
+    navigation.navigate("Welcome");
+  };
+
   return (
     <Modal
       visible={visible}
@@ -153,6 +159,18 @@ export default function MenuModal({ visible, closeModal }) {
             </View>
             <Text style={styles.tabName}>cart</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.tabCard}
+            onPress={() => {
+              closeModal(), handeLogout();
+            }}
+          >
+            <View style={styles.tabIcon}>
+              <Icon name="logout" size={28} color="rgba(256,256,256,0.7)" />
+            </View>
+            <Text style={styles.tabName}>Logout</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.getDirtContainer}>
           <Text style={styles.getDirtTitle}>Get the dirt.</Text>
@@ -199,7 +217,7 @@ const styles = StyleSheet.create({
   tabContainer: {
     width: "100%",
     paddingHorizontal: "27.5%",
-    gap: 38,
+    gap: 28,
   },
   tabCard: {
     flexDirection: "row",

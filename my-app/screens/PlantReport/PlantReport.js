@@ -17,6 +17,11 @@ import { classifyImage, detectAndSegment } from "../../api/scanService";
 import { plantType } from "../../constant/plantType";
 import { successfulStatus } from "../../utils/utils";
 import { getPlantByName } from "../../api/plant";
+import {
+  getAllPlantsFromGalleryThunk,
+  getGaleryThunk,
+} from "../../redux/thunk/galleryThunk";
+import { addToCollections } from "../../api/collection";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -46,11 +51,10 @@ const PlantReport = ({ navigation, route }) => {
   }, [route.params]);
 
   useEffect(() => {
-    setTimeout(() => {
-      console.log(route?.params?.type);
-      route?.params?.type === "identify" && setIdentifyReportVisible(true);
-    }, 1000);
-  }, [type]);
+    route?.params?.type === "identify" &&
+      searchedPlant &&
+      setIdentifyReportVisible(true);
+  }, [searchedPlant]);
 
   // route?.params?.type
 
@@ -99,7 +103,7 @@ const PlantReport = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
         <View style={styles.containerBody}>
-          {route?.params?.type === "scan" && searchedPlant && (
+          {route?.params?.type === "scan" && (
             <TouchableOpacity
               style={styles.viewDetailButton}
               onPress={() => {
@@ -119,6 +123,7 @@ const PlantReport = ({ navigation, route }) => {
         </View>
       </ImageBackground>
       <IdentifyBottomSheet
+        plant={searchedPlant}
         visible={identifyReportVisible}
         onClose={() => {
           setIdentifyReportVisible(false);
