@@ -1,14 +1,48 @@
-import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import React from "react";
+import {
+  StyleSheet,
+  Platform,
+  View,
+  StatusBar,
+  Dimensions,
+} from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+
+const HEIGHT = Dimensions.get("window").height;
 
 const SafeAreaWrapper = ({ children }) => {
-  return <SafeAreaView style={styles.container}>{children}</SafeAreaView>;
+  // const insets = useSafeAreaInsets();
+  return (
+    <>
+      <StatusBar
+        barStyle={Platform.OS === "ios" ? "dark-content" : "light-content"}
+      />
+      {Platform.OS === "android" ? (
+        <View style={styles.AndroidSafeArea}>{children}</View>
+      ) : (
+        <SafeAreaView
+          style={{ ...styles.container }}
+          edges={["top", "bottom", "left", "right"]}
+        >
+          {children}
+        </SafeAreaView>
+      )}
+    </>
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:"#FFF"
+    backgroundColor: "#FFF",
+    paddingTop: HEIGHT * 0.06,
+  },
+  AndroidSafeArea: {
+    flex: 1,
+    backgroundColor: "#FFF",
   },
 });
 

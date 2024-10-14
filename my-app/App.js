@@ -1,12 +1,27 @@
 // App.js
-import 'react-native-gesture-handler';
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import MainStack from './routing/MainStack';
+import React from "react";
+import { Provider } from "react-redux";
+import { NavigationContainer } from "@react-navigation/native";
+import MainStack from "./routing/MainStack";
+import store from "./store/common";
+import { ToastProvider } from "react-native-toast-notifications";
+import SafeAreaWrapper from "./components/SafeAreaWrapper";
+import { StripeProvider } from "@stripe/stripe-react-native";
+import NotificationSocket from "./socket/notificateSocket/NotificationSocket";
+
 export default function App() {
   return (
-    <NavigationContainer>
-      <MainStack />
-    </NavigationContainer>
+    <SafeAreaWrapper>
+      <Provider store={store}>
+        <StripeProvider publishableKey={process.env.STRIPE_PUBLIC_KEY}>
+          <ToastProvider>
+            <NotificationSocket />
+            <NavigationContainer>
+              <MainStack />
+            </NavigationContainer>
+          </ToastProvider>
+        </StripeProvider>
+      </Provider>
+    </SafeAreaWrapper>
   );
 }
