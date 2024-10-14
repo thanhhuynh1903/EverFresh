@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-import { View, Text, TextInput, Button, Dimensions } from "react-native";
-=======
+
 import {
   View,
   Text,
@@ -10,7 +8,6 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
->>>>>>> 5ff9f72a9ff3d9bdc33b36ba8057cc1343f70868
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -25,11 +22,8 @@ import {
   getGaleryThunk,
 } from "../../redux/thunk/galleryThunk";
 import { getNotificationThunk } from "../../redux/thunk/notificationThunk";
-<<<<<<< HEAD
-=======
 import { TouchableOpacity } from "react-native-gesture-handler";
 import LogoCorner from "../../components/logo-corner";
->>>>>>> 5ff9f72a9ff3d9bdc33b36ba8057cc1343f70868
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -95,13 +89,8 @@ export default function LoginPage() {
   };
 
   return (
-<<<<<<< HEAD
-    <SafeAreaWrapper>
-      <View
-=======
     <View style={styles.container}>
       {/* <View
->>>>>>> 5ff9f72a9ff3d9bdc33b36ba8057cc1343f70868
         style={{
           flex: 1,
           alignItems: "center",
@@ -133,13 +122,6 @@ export default function LoginPage() {
           color="#841584"
           accessibilityLabel="Login"
         />
-<<<<<<< HEAD
-      </View>
-      {loading && <SpinnerLoading />}
-    </SafeAreaWrapper>
-  );
-}
-=======
       </View> */}
 
       <View style={styles.logoContainer}>
@@ -238,4 +220,3 @@ const styles = StyleSheet.create({
     height: 200,
   },
 });
->>>>>>> 5ff9f72a9ff3d9bdc33b36ba8057cc1343f70868

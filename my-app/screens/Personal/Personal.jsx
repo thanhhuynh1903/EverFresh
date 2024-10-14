@@ -24,10 +24,7 @@ import Products from "./tabViews/products";
 import Reviews from "./tabViews/reviews";
 import { successfulStatus } from "../../utils/utils";
 import { paymentStripeUprank } from "../../api/payment";
-<<<<<<< HEAD
-=======
 import LogoCorner from "../../components/logo-corner";
->>>>>>> 5ff9f72a9ff3d9bdc33b36ba8057cc1343f70868
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -167,11 +164,7 @@ export default function Personal() {
           {userRedux?.user?.rank !== "Premium" && (
             <View
               style={{
-<<<<<<< HEAD
-                ...styles.flexRow,
-=======
                 ...styles.flexCol,
->>>>>>> 5ff9f72a9ff3d9bdc33b36ba8057cc1343f70868
                 justifyContent: "space-between",
                 padding: 10,
                 paddingVertical: 10,
@@ -191,31 +184,22 @@ export default function Personal() {
                 elevation: 5,
               }}
             >
-<<<<<<< HEAD
-              <Text style={{ fontWeight: "bold" }}>Experience exciting features only available at Everfresh</Text>
-              <TouchableOpacity
-                style={{
-                  padding: 15,
-                  backgroundColor: "#009E71",
-                  borderRadius: 4,
-                }}
-                onPress={paymentPremium}
-              >
-                <Text style={{ color: "white" }}>Purchasing Now!</Text>
-=======
               <LogoCorner />
-              <Text style={{ fontWeight: "bold", textAlign: "center" }}>Experience exciting features only available at Everfresh</Text>
+              <Text style={{ fontWeight: "bold", textAlign: "center" }}>
+                Experience exciting features only available at Everfresh
+              </Text>
               <TouchableOpacity
                 style={{
                   padding: 10,
                   backgroundColor: "#009E71",
                   borderRadius: 4,
-                  marginTop: 5
+                  marginTop: 5,
                 }}
                 onPress={paymentPremium}
               >
-                <Text style={{ color: "white", fontSize: 15 }}>Purchasing Now!</Text>
->>>>>>> 5ff9f72a9ff3d9bdc33b36ba8057cc1343f70868
+                <Text style={{ color: "white", fontSize: 15 }}>
+                  Purchasing Now!
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -334,11 +318,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-<<<<<<< HEAD
-=======
   flexCol: {
     flexDirection: "col",
     alignItems: "center",
-  }
->>>>>>> 5ff9f72a9ff3d9bdc33b36ba8057cc1343f70868
+  },
 });

@@ -2,16 +2,8 @@
   "expo": {
     "name": "My App",
     "slug": "my-app",
-<<<<<<< HEAD
     "platforms": ["ios", "android", "web"],
     "jsEngine": "hermes",
-=======
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
->>>>>>> 5ff9f72a9ff3d9bdc33b36ba8057cc1343f70868
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,9 +15,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -37,13 +27,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-<<<<<<< HEAD
-      "package": "com.konosuba2324.myapp"
-=======
-      "permissions": [
-        "CAMERA"
-      ]
->>>>>>> 5ff9f72a9ff3d9bdc33b36ba8057cc1343f70868
+      "package": "com.konosuba2324.myapp",
+      "permissions": ["CAMERA"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
