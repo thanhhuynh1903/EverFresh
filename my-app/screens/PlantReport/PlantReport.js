@@ -77,11 +77,13 @@ const PlantReport = ({ route }) => {
     try {
       if (!selectedImage) return;
 
-      const fileInfo = await FileSystem.getInfoAsync(selectedImage.uri);
-      if (!fileInfo.exists) {
-        console.error("File not found at path:", selectedImage.uri);
-        return;
-      }
+      // const fileInfo = await FileSystem.getInfoAsync(selectedImage);
+      // if (!fileInfo.exists) {
+      //   console.log(fileInfo);
+
+      //   console.error("File not found at path:", selectedImage);
+      //   return;
+      // }
       // Call the classifyImage function
       const classificationResult = await classifyImage(selectedImage);
 

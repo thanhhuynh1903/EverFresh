@@ -45,6 +45,7 @@
         "expo-camera",
         {
           "cameraPermission": "Allow Ever fresh to access your camera",
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
           "microphonePermission": "Allow Ever fresh to access your microphone",
           "recordAudioAndroid": true
         }

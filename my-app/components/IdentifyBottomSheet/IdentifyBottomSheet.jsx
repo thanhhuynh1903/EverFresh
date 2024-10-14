@@ -31,37 +31,6 @@ import CollectionListBottomSheet from "../CollectionListBottomSheet/CollectionLi
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
-const savedPlantNeeded = [
-  {
-    name: "Height",
-    value: "Small",
-    icon: require("../../assets/savedPlant/Ruler.png"),
-    backgroundColor: "#EEF7E8",
-    color: "#4B8364",
-  },
-  {
-    name: "Water",
-    value: "333ml",
-    icon: require("../../assets/savedPlant/Vector.png"),
-    backgroundColor: "#E6EAFA",
-    color: "#7C95E4",
-  },
-  {
-    name: "Light",
-    value: "Normal",
-    icon: require("../../assets/savedPlant/Sun.png"),
-    backgroundColor: "#FCF1E3",
-    color: "#E6B44C",
-  },
-  {
-    name: "Humidity",
-    value: "56%",
-    icon: require("../../assets/savedPlant/Temprature.png"),
-    backgroundColor: "#F8E8F8",
-    color: "#C390E6",
-  },
-];
-
 const savedPlantTypes = ["Indoor", "Pet friendly", "Papaveraceae"];
 
 export default function IdentifyBottomSheet({
@@ -125,7 +94,7 @@ export default function IdentifyBottomSheet({
       <View
         style={{
           ...styles.plantNeedCard,
-          paddingLeft: key % 2 === 0 ? 0 : "15%",
+          paddingLeft: key % 2 === 0 ? 0 : "5%",
         }}
         key={key}
       >
@@ -146,6 +115,37 @@ export default function IdentifyBottomSheet({
       </View>
     );
   };
+
+  const savedPlantNeeded = [
+    {
+      name: "Height",
+      value: plantDetail?.height,
+      icon: require("../../assets/savedPlant/Ruler.png"),
+      backgroundColor: "#EEF7E8",
+      color: "#4B8364",
+    },
+    {
+      name: "Water",
+      value: plantDetail?.water,
+      icon: require("../../assets/savedPlant/Vector.png"),
+      backgroundColor: "#E6EAFA",
+      color: "#7C95E4",
+    },
+    {
+      name: "Light",
+      value: plantDetail?.light,
+      icon: require("../../assets/savedPlant/Sun.png"),
+      backgroundColor: "#FCF1E3",
+      color: "#E6B44C",
+    },
+    {
+      name: "Humidity",
+      value: plantDetail?.humidity,
+      icon: require("../../assets/savedPlant/Temprature.png"),
+      backgroundColor: "#F8E8F8",
+      color: "#C390E6",
+    },
+  ];
 
   return (
     <>
@@ -369,6 +369,7 @@ const styles = StyleSheet.create({
   plantNeedValue: {
     fontSize: 18,
     fontWeight: "medium",
+    width: "90%",
   },
   savedPlantImage: {
     fontSize: 20,

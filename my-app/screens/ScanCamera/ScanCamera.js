@@ -11,6 +11,7 @@ import {
   LogBox,
 } from "react-native";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera"; // Use Camera instead of CameraView
+// import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -28,6 +29,18 @@ const ScanCamera = ({ navigation, route }) => {
     LogBox.ignoreAllLogs(); // Disable all logs
     return () => LogBox.ignoreAllLogs(false); // Re-enable logs when the component unmounts
   }, []);
+
+  // useEffect(() => {
+  //   // Request permissions when the component mounts
+  //   requestPermissions();
+  // }, []);
+
+  // const requestPermissions = async () => {
+  //   const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+  //   if (status !== "granted") {
+  //     console.log("Permission to access camera roll denied");
+  //   }
+  // };
 
   useEffect(() => {
     (async () => {
