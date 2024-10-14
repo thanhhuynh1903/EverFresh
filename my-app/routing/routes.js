@@ -24,6 +24,7 @@ import Galery from "../screens/Galery/Galery.js";
 import Personal from "../screens/Personal/Personal.jsx";
 import Timer from "../screens/Timer/Timer.jsx";
 import EditProfile from "../screens/EditProfile/EditProfile.jsx";
+import PlanterDetail from "../screens/PlanterDetail/PlantDetail.js";
 // import Category from '../screens/Category';
 
 export const RoutesList = [
@@ -103,6 +104,14 @@ export const RoutesList = [
   {
     name: "PlantDetail",
     component: PlantDetail,
+    options: {
+      tabBarButton: () => null,
+    },
+    hiddenBottomTab: true,
+  },
+  {
+    name: "PlanterDetail",
+    component: PlanterDetail,
     options: {
       tabBarButton: () => null,
     },

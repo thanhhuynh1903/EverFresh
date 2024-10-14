@@ -50,7 +50,6 @@ export default function PlantBookingCard({
             {!item?.bookmark && (
               <Text style={styles.centerStock}>In stock</Text>
             )}
-
             <Image
               source={
                 item?.bookmark

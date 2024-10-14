@@ -11,9 +11,9 @@ import {
 } from "react-native";
 import CountryPicker from "react-native-country-picker-modal";
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
-import CustomButton from "../../components/CustomButton";
 import Header from "../../components/header";
-import "react-async-hook"; // Ensure this is imported if required
+import { auth } from "../../firebaseConfig"; // Adjust the path to your firebaseConfig file
+import { PhoneAuthProvider } from "firebase/auth"; // Import PhoneAuthProvider from Firebase Auth
 
 export default function LoginScreen({ navigation }) {
   const [countryCode, setCountryCode] = useState("VN");
@@ -22,6 +22,7 @@ export default function LoginScreen({ navigation }) {
   const [syncContacts, setSyncContacts] = useState(false);
   const [callingCode, setCallingCode] = useState("+84");
   const [countryName, setCountryName] = useState("Vietnam");
+  const [verificationId, setVerificationId] = useState(null);
 
   const onSelect = (country) => {
     setCountryCode(country.cca2);
@@ -30,17 +31,43 @@ export default function LoginScreen({ navigation }) {
     setCallingCode(country.callingCode[0]);
   };
 
+  const handleLogin = async () => {
+    const fullPhoneNumber = callingCode + phoneNumber;
+    try {
+      // Create a new Phone Auth Provider instance
+      const provider = new PhoneAuthProvider(auth);
+      const confirmation = await provider.verifyPhoneNumber({
+        phoneNumber: fullPhoneNumber,
+        // Optionally, set the application verifier for reCAPTCHA here if needed
+      });
+      // Store the verification ID to use later when confirming the code
+      setVerificationId(confirmation.verificationId);
+      // Navigate to code verification screen
+      navigation.navigate("VerifyCode", {
+        verificationId: confirmation.verificationId,
+      });
+    } catch (error) {
+      console.error("Error during login: ", error);
+      alert("Failed to send verification code. Please try again.");
+    }
+  };
+
   return (
     <SafeAreaWrapper>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
-        <Header navigation={navigation}/>
+        <Header navigation={navigation} />
         <Text style={styles.title}>Log in</Text>
         <Text style={styles.subtitle}>
           Please confirm your country code and enter the number associated with
           your account.
         </Text>
 
-        <View style={[styles.inputContainer, Platform.OS === "android" ? {paddingVertical : 8} : "null"]}>
+        <View
+          style={[
+            styles.inputContainer,
+            Platform.OS === "android" ? { paddingVertical: 8 } : null,
+          ]}
+        >
           <CountryPicker
             countryCode={countryCode}
             withFlag
@@ -67,9 +94,9 @@ export default function LoginScreen({ navigation }) {
           <Switch value={syncContacts} onValueChange={setSyncContacts} />
         </View>
 
-        <CustomButton onPressName={"verify"} navigation={navigation}>
+        <TouchableOpacity style={[styles.ButtonStyle]} onPress={handleLogin}>
           <Text style={styles.signInButtonText}>Continue</Text>
-        </CustomButton>
+        </TouchableOpacity>
 
         <Text style={styles.signUpText}>
           Don’t have an account?{" "}
@@ -91,8 +118,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
   },
-
-  
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -113,21 +138,20 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#ccc",
     marginBottom: 5,
-
   },
   inputContainer_2: {
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
-    marginBottom:20
+    marginBottom: 20,
   },
   countryPicker: {
-    textAlign:"center",
+    textAlign: "center",
     marginRight: 10,
   },
-  textCode:{
-    width:50,
+  textCode: {
+    width: 50,
   },
   phoneInput: {
     flex: 1,
@@ -152,5 +176,14 @@ const styles = StyleSheet.create({
   signUpLink: {
     color: "#4CAF50",
     fontWeight: "bold",
+  },
+  ButtonStyle: {
+    backgroundColor: "#0D986A",
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 5,
+    marginBottom: 20,
+    width: "100%",
+    alignItems: "center",
   },
 });

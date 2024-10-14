@@ -73,8 +73,8 @@ const ScanCamera = ({ navigation, route }) => {
       console.log("type ", cameraType);
 
       navigation.navigate("PlantReport", {
-        image: photo.uri,
-        type: cameraType,
+        imageUri: photo.uri,
+        cameraType: cameraType,
       }); // Navigate with the image
     }
   };
@@ -89,7 +89,10 @@ const ScanCamera = ({ navigation, route }) => {
 
     if (!result.canceled && result?.assets && result?.assets[0]) {
       setSelectedImage(result?.assets[0]?.uri); // Set image URI to display
-      navigation.navigate("PlantReport", { image: result?.assets[0]?.uri });
+      navigation.navigate("PlantReport", {
+        imageUri: result?.assets[0]?.uri,
+        cameraType: cameraType,
+      });
     }
   };
 

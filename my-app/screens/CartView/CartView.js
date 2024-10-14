@@ -44,6 +44,7 @@ import CollectionListBottomSheet from "../../components/CollectionListBottomShee
 import DeliveryListBottomSheet from "../../components/DeliveryListBottomSheet/DeliveryListBottomSheet";
 import CouponListBottomSheet from "../../components/CouponListBottomSheet/CouponListBottomSheet";
 import { getVouchers } from "../../api/voucher";
+import { useCollectionActions } from "../../utils/useCollectionAction";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -54,8 +55,12 @@ export default function CartView({ goback }) {
   const showToast = useCustomToast();
   const cartRedux = useSelector(selectCart);
   const galleryRedux = useSelector(selectGallery);
+  const {
+    handleAddToCollection,
+    handleRemoveToCollection,
+    handleChangeCollections,
+  } = useCollectionActions();
   const [cart, setCart] = useState([]);
-  const [focusPlant, setFocusPlant] = useState({});
   const [deliveryMethod, setDeliveryMethod] = useState([]);
   const [deliveryMethodList, setDeliveryMethodList] = useState([]);
   const [coupon, setCoupon] = useState(null);
@@ -231,101 +236,6 @@ export default function CartView({ goback }) {
     );
   };
 
-  const handleAddToCollection = async (item) => {
-    const response = await addToCollections(item.product?._id);
-    if (response.status === 201) {
-      showToast({
-        title: "Success",
-        message: (
-          <View
-            style={{
-              width: WIDTH * 0.75,
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text>Add to collection successfully</Text>
-            <TouchableOpacity
-              onPress={() => {
-                setChooseCollectionVisible(true);
-                setFocusPlant(item);
-              }}
-            >
-              <Text style={{ color: "#4287f5", fontWeight: "bold" }}>
-                Manager
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ),
-        type: "success",
-        // position: "bottom",
-      });
-      await dispatch(getGaleryThunk()).then((response) => {
-        dispatch(getAllPlantsFromGalleryThunk(response.payload));
-      });
-    } else {
-      showToast({
-        title: "Fail",
-        message: `Add plant to collection fail`,
-        type: "error",
-      });
-    }
-  };
-
-  const handleRemoveToCollection = async (item) => {
-    const collectionId = getCollectionIdFromPlantId(
-      galleryRedux.galleries,
-      item.product?._id
-    );
-
-    const response = await removePlantFromCollections(
-      item.product?._id,
-      collectionId
-    );
-    if (response.status === 200) {
-      showToast({
-        title: "Success",
-        message: "Remove from collection successfully",
-        type: "success",
-        // position: "bottom",
-      });
-      await dispatch(getGaleryThunk()).then((response) => {
-        dispatch(getAllPlantsFromGalleryThunk(response.payload));
-      });
-    } else {
-      showToast({
-        title: "Fail",
-        message: `Remove plant from collection fail`,
-        type: "error",
-      });
-    }
-  };
-
-  const handleChangeCollections = async (collection) => {
-    const response = await changeCollections(
-      focusPlant.product?._id,
-      collection.collection_name
-    );
-    if (response.status === 201) {
-      showToast({
-        title: "Success",
-        message: `Change to collection ${collection?.collection_name} successfully`,
-        type: "success",
-        // position: "bottom",
-      });
-      await dispatch(getGaleryThunk()).then((response) => {
-        dispatch(getAllPlantsFromGalleryThunk(response.payload));
-      });
-    } else {
-      showToast({
-        title: "Fail",
-        message: `Change collection fail`,
-        type: "error",
-      });
-    }
-  };
-
   const handleChangeDeliveryMethod = (item) => {
     setDeliveryMethod(item);
   };
@@ -335,7 +245,7 @@ export default function CartView({ goback }) {
   };
 
   const renderCardBooking = (item, key) => {
-    item.bookmark = plantIdListinGalery.includes(item.product?._id);
+    item.product.bookmark = plantIdListinGalery.includes(item.product?._id);
 
     return (
       <TouchableOpacity
@@ -350,17 +260,13 @@ export default function CartView({ goback }) {
         )}
         <PlantBookingCard
           plant={item?.product}
-          hanldeIncrease={() =>
-            hanldeChangeAmount(item?.product, item.quantity + 1)
-          }
-          hanldeDecrease={() =>
-            hanldeChangeAmount(item?.product, item.quantity - 1)
-          }
-          handleDelete={() => handleDeteteCartItem(item?.product)}
+          hanldeIncrease={() => hanldeChangeAmount(item, item.quantity + 1)}
+          hanldeDecrease={() => hanldeChangeAmount(item, item.quantity - 1)}
+          handleDelete={() => handleDeteteCartItem(item)}
           handleAddToCollection={() =>
             item?.product.bookmark
               ? handleRemoveToCollection(item?.product)
-              : handleAddToCollection(item?.product)
+              : handleAddToCollection(item?.product, setChooseCollectionVisible)
           }
           onPress={() => handleChangeSelected(item?.product)}
         />
@@ -510,7 +416,7 @@ export default function CartView({ goback }) {
           end={{ x: 0, y: 0 }} // End at the left
           style={{
             ...styles.bottomCartSheet,
-            bottom: Platform.OS === "android" ? "0%" : "6%",
+            bottom: Platform.OS === "android" ? "8%" : "6%",
           }}
         >
           <TouchableOpacity

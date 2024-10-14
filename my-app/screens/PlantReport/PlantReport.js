@@ -13,22 +13,19 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import IdentifyBottomSheet from "../../components/IdentifyBottomSheet/IdentifyBottomSheet";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { classifyImage, detectAndSegment } from "../../api/scanService";
 import { plantType } from "../../constant/plantType";
 import { successfulStatus } from "../../utils/utils";
 import { getPlantByName } from "../../api/plant";
-import {
-  getAllPlantsFromGalleryThunk,
-  getGaleryThunk,
-} from "../../redux/thunk/galleryThunk";
-import { addToCollections } from "../../api/collection";
+import * as FileSystem from "expo-image-picker";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
-const PlantReport = ({ navigation, route }) => {
-  const [selectedImage, setSelectedImage] = useState(route?.params?.image);
+const PlantReport = ({ route }) => {
+  const navigation = useNavigation();
+  const [selectedImage, setSelectedImage] = useState(route?.params?.imageUri);
   const [responseImage, setResponseImage] = useState(null);
   const [searchedPlant, setSearchedPlant] = useState(null);
   const [identifyReportVisible, setIdentifyReportVisible] = useState(false);
@@ -40,38 +37,35 @@ const PlantReport = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    setSelectedImage(route?.params?.image);
-    handleImageUpload();
-  }, [route?.params?.image]);
+    setSelectedImage(route?.params?.imageUri);
+  }, [route?.params]);
 
   useEffect(() => {
-    handleImageUpload();
+    if (selectedImage) {
+      handleImageUpload();
+    }
   }, [selectedImage]);
 
   useEffect(() => {
-    loadSearchPlant();
+    if (responseImage) {
+      loadSearchPlant();
+    }
   }, [responseImage]);
 
-  const type = useMemo(() => {
-    return route.params.type;
-  }, [route.params]);
-
   useEffect(() => {
-    route?.params?.type === "identify" &&
-      searchedPlant &&
-      setIdentifyReportVisible(true);
+    type === "identify" && searchedPlant && setIdentifyReportVisible(true);
   }, [searchedPlant]);
 
-  // route?.params?.type
+  // type
+
+  const type = useMemo(() => {
+    return route?.params?.cameraType;
+  }, [route?.params]);
 
   const loadSearchPlant = async () => {
     const searchPlant = plantType.find(
       (item) => item.vn === responseImage.class_name
     );
-    if (!searchPlant) {
-      setUndefinedModal(true);
-      return;
-    }
     const response = await getPlantByName(searchPlant.plantName);
     if (successfulStatus(response.status)) {
       setSearchedPlant(response?.data[0]);
@@ -80,17 +74,26 @@ const PlantReport = ({ navigation, route }) => {
   };
 
   const handleImageUpload = async () => {
-    // Classify the selected
     try {
+      if (!selectedImage) return;
+
+      const fileInfo = await FileSystem.getInfoAsync(selectedImage.uri);
+      if (!fileInfo.exists) {
+        console.error("File not found at path:", selectedImage.uri);
+        return;
+      }
+      // Call the classifyImage function
       const classificationResult = await classifyImage(selectedImage);
-      // const classificationResult = await detectAndSegment(selectedImage);
-      console.log(classificationResult);
-      setResponseImage(classificationResult);
-      // Alert.alert('Classification Result', JSON.stringify(classificationResult, null, 2));
+
+      // Handle classification result
+      if (classificationResult?.class_id === -1) {
+        setUndefinedModal(true);
+        return;
+      } else {
+        setResponseImage(classificationResult);
+      }
     } catch (error) {
-      // Alert.alert('Error', 'Failed to classify image');
       console.error("Classification Error:", error, error?.response);
-      console.error(error);
     }
   };
 
@@ -118,15 +121,15 @@ const PlantReport = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
         <View style={styles.containerBody}>
-          {route?.params?.type === "scan" && (
+          {type === "scan" && !undefinedModal && (
             <TouchableOpacity
               style={styles.viewDetailButton}
               onPress={() => {
                 navigation.navigate("PlantGuide", {
                   plant: {
                     ...searchedPlant,
-                    name: searchedPlant.name,
-                    img: searchedPlant.img_url[0],
+                    name: searchedPlant?.name,
+                    img: searchedPlant?.img_url[0],
                     uri: true,
                   },
                 });
@@ -145,9 +148,9 @@ const PlantReport = ({ navigation, route }) => {
         }}
       />
       <Modal visible={undefinedModal} animationType="fade" transparent={true}>
-        <TouchableOpacity
+        <View
           style={styles.layout}
-          onPress={() => setUndefinedModal(false)}
+          // onPress={() => setUndefinedModal(false)}
         />
         <View style={styles.modalContainer}>
           <Text style={styles.modalContainerTitle}>
@@ -217,6 +220,14 @@ const styles = StyleSheet.create({
   },
 
   //modalContainer
+  layout: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.1)",
+  },
   modalContainer: {
     position: "absolute",
     top: HEIGHT * 0.4,

@@ -103,6 +103,7 @@ export default function Homepage() {
         <Image
           source={{ uri: item?.img_url[0] || "" }}
           style={styles.savedPlantCardImage}
+          resizeMode="cover"
         />
       </TouchableOpacity>
     );

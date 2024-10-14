@@ -18,37 +18,6 @@ const HEIGHT = Dimensions.get("window").height;
 
 const savedPlantTypes = ["Indoor", "Pet friendly", "Papaveraceae"];
 
-const savedPlantNeeded = [
-  {
-    name: "Height",
-    value: "Small",
-    icon: require("../../assets/savedPlant/Ruler.png"),
-    backgroundColor: "#EEF7E8",
-    color: "#4B8364",
-  },
-  {
-    name: "Water",
-    value: "333ml",
-    icon: require("../../assets/savedPlant/Vector.png"),
-    backgroundColor: "#E6EAFA",
-    color: "#7C95E4",
-  },
-  {
-    name: "Light",
-    value: "Normal",
-    icon: require("../../assets/savedPlant/Sun.png"),
-    backgroundColor: "#FCF1E3",
-    color: "#E6B44C",
-  },
-  {
-    name: "Humidity",
-    value: "56%",
-    icon: require("../../assets/savedPlant/Temprature.png"),
-    backgroundColor: "#F8E8F8",
-    color: "#C390E6",
-  },
-];
-
 const savedPlantCardDemo = [
   {
     img: require("../../assets/homeImg/plantImage1.png"),
@@ -76,6 +45,37 @@ export default function SavedPlant({ route }) {
     );
   };
 
+  const savedPlantNeeded = [
+    {
+      name: "Height",
+      value: savedPlant.height,
+      icon: require("../../assets/savedPlant/Ruler.png"),
+      backgroundColor: "#EEF7E8",
+      color: "#4B8364",
+    },
+    {
+      name: "Water",
+      value: savedPlant.water,
+      icon: require("../../assets/savedPlant/Vector.png"),
+      backgroundColor: "#E6EAFA",
+      color: "#7C95E4",
+    },
+    {
+      name: "Light",
+      value: savedPlant.light,
+      icon: require("../../assets/savedPlant/Sun.png"),
+      backgroundColor: "#FCF1E3",
+      color: "#E6B44C",
+    },
+    {
+      name: "Humidity",
+      value: savedPlant.humidity,
+      icon: require("../../assets/savedPlant/Temprature.png"),
+      backgroundColor: "#F8E8F8",
+      color: "#C390E6",
+    },
+  ];
+
   const renderSavedPlantCard = (item, key) => {
     return (
       <TouchableOpacity
@@ -93,7 +93,7 @@ export default function SavedPlant({ route }) {
       <View
         style={{
           ...styles.plantNeedCard,
-          paddingLeft: key % 2 === 0 ? 0 : "15%",
+          paddingLeft: key % 2 === 0 ? 0 : "5%",
         }}
         key={key}
       >
@@ -144,7 +144,10 @@ export default function SavedPlant({ route }) {
         <Text style={styles.plantTitleFullName}>{savedPlant.sub_name}</Text>
       </View>
       <View style={styles.plantType}>
-        {savedPlantTypes.map((item, key) => renderPlantType(item, item + key))}
+        {savedPlant?.uses
+          ?.split(", ")
+          ?.map((item) => item.trim())
+          .map((item, key) => renderPlantType(item, item + key))}
       </View>
       <View style={styles.savedPlantbody}>
         <View style={styles.savedPlantDescription}>
@@ -156,11 +159,7 @@ export default function SavedPlant({ route }) {
             style={styles.descriptionDetail}
             numberOfLines={descriptionReadmore ? 0 : 5}
           >
-            Ginkgo biloba first appeared over 290 million years ago, and fossils
-            very similar to the living species, back to the Middle Jurassic
-            epoch approximately 170 million years ago. The tree was cultivated
-            early in human history and remains commonly planted, and is widely
-            regarded as a living fossil....
+            {savedPlant.describe}
           </Text>
           <TouchableOpacity>
             <Text
@@ -336,6 +335,7 @@ const styles = StyleSheet.create({
   plantNeedValue: {
     fontSize: 18,
     fontWeight: "medium",
+    width: "60%",
   },
   savedPlantImage: {
     fontSize: 20,

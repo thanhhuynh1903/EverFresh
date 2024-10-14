@@ -28,7 +28,13 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.konosuba2324.myapp",
-      "permissions": ["CAMERA"]
+      "permissions": [
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -43,6 +49,11 @@
           "recordAudioAndroid": true
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7fb5edb4-9695-4c15-a7fd-2bcd6eacbbc4"
+      }
+    }
   }
 }

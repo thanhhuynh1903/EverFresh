@@ -42,7 +42,7 @@ export default function Galery() {
         <Image
           style={styles.image}
           source={{ uri: item.img_url[0] || "" }}
-          resizeMode="contain"
+          resizeMode="cover"
         />
       </TouchableOpacity>
     );
@@ -109,6 +109,10 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   imageContainer: {
+    width: WIDTH * 0.3,
+    height: WIDTH * 0.3,
+    backgroundColor: "white",
+
     shadowColor: "#000",
     shadowOffset: {
       width: 5,
@@ -120,7 +124,8 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   image: {
-    height: HEIGHT * 0.15,
+    width: "100%",
+    height: "100%",
     borderRadius: 12,
     aspectRatio: 1,
   },

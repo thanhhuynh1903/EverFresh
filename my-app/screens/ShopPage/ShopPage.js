@@ -18,15 +18,19 @@ import HomeHeader from "../../components/HomeHeader";
 import MenuModal from "../../components/Modal/MenuModal/MenuModal";
 import {
   formatPrice,
+  getPlantIdListinGalery,
   normalizeString,
   successfulStatus,
 } from "../../utils/utils.js";
 import { getPlanters, getPlants, getSeeds } from "../../api/plant.js";
 import SpinnerLoading from "../../components/SpinnerLoading/SpinnerLoading.js";
 import useCustomToast from "../../components/ToastNotification/ToastNotification.js";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getCartItemsThunk } from "../../redux/thunk/cartThunk.js";
 import { addToCart } from "../../api/cart.js";
+import CollectionListBottomSheet from "../../components/CollectionListBottomSheet/CollectionListBottomSheet.jsx";
+import { useCollectionActions } from "../../utils/useCollectionAction.js";
+import { selectGallery } from "../../redux/selector/selector.js";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -35,6 +39,12 @@ export default function ShopPage() {
   const navigation = useNavigation();
   const showToast = useCustomToast();
   const dispatch = useDispatch();
+  const galleryRedux = useSelector(selectGallery);
+  const {
+    handleAddToCollection,
+    handleRemoveToCollection,
+    handleChangeCollections,
+  } = useCollectionActions();
   const [tabIndex, setTabIndex] = useState(0);
   const [menuVisible, setMenuVisible] = useState(false);
   const [plantList, setPlantList] = useState([]);
@@ -42,6 +52,8 @@ export default function ShopPage() {
   const [seedList, setSeedList] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const [chooseCollectionVisible, setChooseCollectionVisible] = useState(false);
 
   const displayList = useMemo(() => {
     switch (tabIndex) {
@@ -64,6 +76,10 @@ export default function ShopPage() {
       return normalizedName.includes(normalizedSearchValue); // Check if item name contains search value
     });
   }, [searchValue, displayList]);
+
+  const plantIdListinGalery = useMemo(() => {
+    return getPlantIdListinGalery(galleryRedux.galleries);
+  }, [galleryRedux]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -144,10 +160,13 @@ export default function ShopPage() {
 
   const renderPlantCard = (item, key) => {
     if (!item) return;
+    item.favorite = plantIdListinGalery.includes(item?._id);
     return (
       <TouchableOpacity
         style={styles.plantCard}
-        onPress={() => navigation.navigate("PlantDetail", { plant: item })}
+        onPress={() => {
+          navigation.navigate("PlantDetail", { plant: item });
+        }}
         key={key}
       >
         <ImageBackground
@@ -174,12 +193,26 @@ export default function ShopPage() {
                 {formatPrice(item.price)} VNĐ
               </Text>
               <View style={styles.plantCardFeature}>
-                <TouchableOpacity>
-                  <Image
-                    source={require("../../assets/shopping/heartIcon.png")}
-                    resizeMode="cover"
-                    style={styles.plantCardFeatureIcon}
-                  />
+                <TouchableOpacity
+                  onPress={() => {
+                    item.favorite
+                      ? handleRemoveToCollection(item)
+                      : handleAddToCollection(item, setChooseCollectionVisible);
+                  }}
+                >
+                  {item.favorite ? (
+                    <Image
+                      source={require("../../assets/shopping/heartIcon.png")}
+                      resizeMode="cover"
+                      style={styles.plantCardFeatureIcon}
+                    />
+                  ) : (
+                    <Image
+                      source={require("../../assets/shopping/emptyHeartIcon.png")}
+                      resizeMode="cover"
+                      style={styles.plantCardFeatureIcon}
+                    />
+                  )}
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
@@ -201,6 +234,92 @@ export default function ShopPage() {
                   ? { uri: item?.img_url[0] || "" }
                   : require("../../assets/cart/plant1.png")
               }
+              resizeMode="cover"
+              style={styles.plantImage}
+            />
+          </View>
+        </ImageBackground>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderPlanterCard = (item, key) => {
+    if (!item) return;
+    item.favorite = plantIdListinGalery.includes(item?._id);
+    return (
+      <TouchableOpacity
+        style={styles.plantCard}
+        onPress={() => {
+          navigation.navigate("PlanterDetail", { plant: item });
+        }}
+        key={key}
+      >
+        <ImageBackground
+          source={
+            item.background ||
+            require("../../assets/shopping/Rectangle9CE5CB.png")
+          }
+          style={styles.plantCardBackground}
+          resizeMode="contain"
+        >
+          <View style={styles.plantCardInfor}>
+            <View style={styles.plantCardLabelContainer}>
+              <Text style={styles.plantCardLabel}>{item.uses}</Text>
+              <Image
+                source={require("../../assets/shopping/pawIcon.png")}
+                style={styles.plantCardLabelIcon}
+              />
+            </View>
+            <Text numberOfLines={1} style={styles.plantCardName}>
+              {item.name}
+            </Text>
+            <View style={styles.plantCardBottom}>
+              <Text style={styles.plantCardPrice}>
+                {formatPrice(item.price)} VNĐ
+              </Text>
+              <View style={styles.plantCardFeature}>
+                <TouchableOpacity
+                  onPress={() => {
+                    item.favorite
+                      ? handleRemoveToCollection(item)
+                      : handleAddToCollection(item, setChooseCollectionVisible);
+                  }}
+                >
+                  {item.favorite ? (
+                    <Image
+                      source={require("../../assets/shopping/heartIcon.png")}
+                      resizeMode="cover"
+                      style={styles.plantCardFeatureIcon}
+                    />
+                  ) : (
+                    <Image
+                      source={require("../../assets/shopping/emptyHeartIcon.png")}
+                      resizeMode="cover"
+                      style={styles.plantCardFeatureIcon}
+                    />
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleAddToCart(item);
+                  }}
+                >
+                  <Image
+                    source={require("../../assets/shopping/shopIcon.png")}
+                    style={styles.plantCardFeatureIcon}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+          <View style={styles.plantImageContainer}>
+            <Image
+              source={
+                item?.img_object
+                  ? { uri: item?.img_object[0]?.img_url || "" }
+                  : require("../../assets/cart/plant1.png")
+              }
+              resizeMode="cover"
               style={styles.plantImage}
             />
           </View>
@@ -253,8 +372,12 @@ export default function ShopPage() {
         </View>
 
         <View style={styles.plantListDefault}>
-          {renderPlantCard(filterPlantList[0], 0)}
-          {renderPlantCard(filterPlantList[1], 1)}
+          {tabIndex === 1
+            ? (renderPlanterCard(filterPlantList[0], 0),
+              renderPlanterCard(filterPlantList[1], 1))
+            : (renderPlantCard(filterPlantList[0], 0),
+              renderPlantCard(filterPlantList[1], 1))}
+
           <ImageBackground
             source={require("../../assets/shopping/inviteFriBackround.png")}
             style={styles.inviteFriContainer}
@@ -272,8 +395,12 @@ export default function ShopPage() {
               </TouchableOpacity>
             </View>
           </ImageBackground>
-          {renderPlantCard(filterPlantList[2], 2)}
-          {renderPlantCard(filterPlantList[3], 3)}
+          {tabIndex === 1
+            ? (renderPlanterCard(filterPlantList[2], 2),
+              renderPlanterCard(filterPlantList[3], 3))
+            : (renderPlantCard(filterPlantList[2], 2),
+              renderPlantCard(filterPlantList[3], 3))}
+
           <View style={styles.videoContainer}>
             <Image
               source={require("../../assets/shopping/video.png")}
@@ -290,14 +417,22 @@ export default function ShopPage() {
               </TouchableOpacity>
             </View>
           </View>
-          {renderPlantCard(filterPlantList[4], 4)}
-          {renderPlantCard(filterPlantList[5], 5)}
+          {tabIndex === 1
+            ? (renderPlanterCard(filterPlantList[4], 4),
+              renderPlanterCard(filterPlantList[5], 5))
+            : (renderPlantCard(filterPlantList[4], 4),
+              renderPlantCard(filterPlantList[5], 5))}
         </View>
       </ScrollView>
       {loading && <SpinnerLoading />}
       <MenuModal
         visible={menuVisible}
         closeModal={() => setMenuVisible(false)}
+      />
+      <CollectionListBottomSheet
+        visible={chooseCollectionVisible}
+        onClose={() => setChooseCollectionVisible(false)}
+        chooseCollection={(item) => handleChangeCollections(item)}
       />
     </>
   );
@@ -427,12 +562,16 @@ const styles = StyleSheet.create({
     width: "50%",
     height: "100%",
     position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
     right: "-20%",
   },
   plantImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain",
+    position: "absolute",
+    width: "70%",
+    height: "60%",
+    bottom: 0,
+    borderRadius: 12,
   },
   // inviteFriContainer
   inviteFriContainer: {

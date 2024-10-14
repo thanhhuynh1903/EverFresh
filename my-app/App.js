@@ -8,6 +8,7 @@ import { ToastProvider } from "react-native-toast-notifications";
 import SafeAreaWrapper from "./components/SafeAreaWrapper";
 import { StripeProvider } from "@stripe/stripe-react-native";
 import NotificationSocket from "./socket/notificateSocket/NotificationSocket";
+import firebase from "./firebaseConfig";
 
 export default function App() {
   return (

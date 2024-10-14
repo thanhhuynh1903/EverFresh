@@ -22,6 +22,7 @@ import Galery from "../screens/Galery/Galery";
 import Personal from "../screens/Personal/Personal";
 import Timer from "../screens/Timer/Timer";
 import EditProfile from "../screens/EditProfile/EditProfile";
+import PlanterDetail from "../screens/PlanterDetail/PlantDetail";
 export const publicRoutes = [
   {
     name: "Welcome",
@@ -118,5 +119,9 @@ export const publicRoutes = [
   {
     name: "EditProfile",
     component: EditProfile,
+  },
+  {
+    name: "PlanterDetail",
+    component: PlanterDetail,
   },
 ];

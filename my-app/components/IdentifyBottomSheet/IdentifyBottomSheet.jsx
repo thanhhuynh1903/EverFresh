@@ -25,6 +25,8 @@ import useCustomToast from "../ToastNotification/ToastNotification";
 import { selectGallery } from "../../redux/selector/selector";
 import { useDispatch, useSelector } from "react-redux";
 import { getCollectionIdFromPlantId } from "../../utils/utils";
+import { useCollectionActions } from "../../utils/useCollectionAction";
+import CollectionListBottomSheet from "../CollectionListBottomSheet/CollectionListBottomSheet";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -77,6 +79,13 @@ export default function IdentifyBottomSheet({
   const snapPoints = useMemo(() => ["25%", "50%", "90%"], []);
   const bottomSheetRef = useRef(null);
   const navigation = useNavigation();
+  const [chooseCollectionVisible, setChooseCollectionVisible] = useState(false);
+
+  const {
+    handleAddToCollection,
+    handleRemoveToCollection,
+    handleChangeCollections,
+  } = useCollectionActions();
 
   useEffect(() => {
     if (visible) {
@@ -99,76 +108,6 @@ export default function IdentifyBottomSheet({
     bottomSheetRef.current?.close();
     setBottomSheetVisible(false);
     if (onClose) onClose();
-  };
-
-  const handleAddToCollection = async () => {
-    const response = await addToCollections(plantDetail?._id);
-    if (response.status === 201) {
-      showToast({
-        title: "Success",
-        message: "Add to collection successfully",
-        // <View
-        //   style={{
-        //     width: WIDTH * 0.75,
-        //     flex: 1,
-        //     flexDirection: "row",
-        //     justifyContent: "space-between",
-        //   }}
-        // >
-        //   <Text>Add to collection successfully</Text>
-        //   <TouchableOpacity
-        //     onPress={() => {
-        //       setChooseCollectionVisible(true);
-        //       setFocusPlant(item);
-        //     }}
-        //   >
-        //     <Text style={{ color: "#4287f5", fontWeight: "bold" }}>
-        //       Manager
-        //     </Text>
-        //   </TouchableOpacity>
-        // </View>
-        type: "success",
-        // position: "bottom",
-      });
-      await dispatch(getGaleryThunk()).then((response) => {
-        dispatch(getAllPlantsFromGalleryThunk(response.payload));
-      });
-    } else {
-      showToast({
-        title: "Fail",
-        message: `Add plant to collection fail`,
-        type: "error",
-      });
-    }
-  };
-
-  const handleRemoveToCollection = async () => {
-    const collectionId = getCollectionIdFromPlantId(
-      galleryRedux.galleries,
-      plantDetail?._id
-    );
-
-    const response = await removePlantFromCollections(
-      plantDetail._id,
-      collectionId
-    );
-    if (response.status === 200) {
-      showToast({
-        title: "Success",
-        message: "Remove from collection successfully",
-        type: "success",
-        // position: "bottom",
-      });
-      await dispatch(getGaleryThunk()).then((response) => {
-        dispatch(getAllPlantsFromGalleryThunk(response.payload));
-      });
-    } else {
-      showToast({
-        title: "Fail",
-        message: `Remove plant from collection fail`,
-        type: "error",
-      });
-    }
   };
 
   const renderPlantType = (item, key) => {
@@ -306,13 +245,16 @@ export default function IdentifyBottomSheet({
                 ...styles.addButton,
                 justifyContent: "center",
               }}
-              onPress={
+              onPress={() => {
                 galleryRedux.plantList?.find(
                   (item) => item._id === plantDetail?._id
                 )
-                  ? handleRemoveToCollection
-                  : handleAddToCollection
-              }
+                  ? handleRemoveToCollection(plantDetail)
+                  : handleAddToCollection(
+                      plantDetail,
+                      setChooseCollectionVisible
+                    );
+              }}
             >
               <Icon name="bookmark-outline" size={30} color="white" />
               <Text style={styles.addButtonText}>
@@ -326,6 +268,11 @@ export default function IdentifyBottomSheet({
           </View>
         </BottomSheet>
       </TouchableWithoutFeedback>
+      <CollectionListBottomSheet
+        visible={chooseCollectionVisible}
+        onClose={() => setChooseCollectionVisible(false)}
+        chooseCollection={(item) => handleChangeCollections(item)}
+      />
     </>
   );
 }

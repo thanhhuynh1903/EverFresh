@@ -32,7 +32,7 @@ import { useCollectionActions } from "../../utils/useCollectionAction";
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
-export default function PlantDetail({ route }) {
+export default function PlanterDetail({ route }) {
   const navigation = useNavigation();
   const cartRedux = useSelector(selectCart);
   const galleryRedux = useSelector(selectGallery);
@@ -68,17 +68,17 @@ export default function PlantDetail({ route }) {
     return [
       {
         img: require("../../assets/plant details/drop.png"),
-        value: plant.water || "250ml",
+        value: "250ml",
         name: "Water",
       },
       {
         img: require("../../assets/plant details/sun.png"),
-        value: plant.light || "35-40%",
+        value: "35-40%",
         name: "Light",
       },
       {
         img: require("../../assets/plant details/fertilizer.png"),
-        value: plant.fertilizer || "250gm",
+        value: "250gm",
         name: "Fertilizer",
       },
     ];
@@ -119,11 +119,11 @@ export default function PlantDetail({ route }) {
         <Text style={styles.tooltipPlantName}>Grant Earthenware bowl</Text>
         <View style={styles.tooltipPlantInfo}>
           <Text style={styles.tooltipPlantInfoTitle}>Size</Text>
-          <Text style={styles.tooltipPlantInfoValue}>{plant.size}</Text>
+          <Text style={styles.tooltipPlantInfoValue}>4”</Text>
         </View>
         <View style={styles.tooltipPlantInfo}>
           <Text style={styles.tooltipPlantInfoTitle}>Drainage</Text>
-          <Text style={styles.tooltipPlantInfoValue}>{plant.moisture}</Text>
+          <Text style={styles.tooltipPlantInfoValue}>no hole</Text>
         </View>
         <View style={styles.tooltipPlantInfo}>
           <Text style={styles.tooltipPlantInfoTitle}>MATERIAL</Text>
@@ -149,12 +149,7 @@ export default function PlantDetail({ route }) {
           style={styles.plantOverviewItemImage}
         />
         <View style={styles.plantOverviewItemDetail}>
-          <Text
-            style={{ ...styles.plantOverviewItemDetailValue, width: "60%" }}
-            numberOfLines={1}
-          >
-            {item.value}
-          </Text>
+          <Text style={styles.plantOverviewItemDetailValue}>{item.value}</Text>
           <Text style={styles.plantOverviewItemDetailName}>{item.name}</Text>
         </View>
       </View>
@@ -264,10 +259,7 @@ export default function PlantDetail({ route }) {
                   {plant.uses || "Air Purifier"}
                 </Text>
                 <Image
-                  source={
-                    plant.img_url[0] ||
-                    require("../../assets/plant details/pawIcon.png")
-                  }
+                  source={require("../../assets/plant details/pawIcon.png")}
                   style={styles.plantTypeLabelIcon}
                 />
               </View>
@@ -354,8 +346,8 @@ export default function PlantDetail({ route }) {
                 >
                   <Image
                     source={
-                      plant?.img_url && plant?.img_url[0]
-                        ? { uri: plant?.img_url[0] || "" }
+                      plant?.img_object && plant?.img_object[0]
+                        ? { uri: plant?.img_object[0]?.img_url || "" }
                         : require("../../assets/cart/plant1.png")
                     }
                     style={styles.headerPlantImage}
@@ -394,7 +386,7 @@ export default function PlantDetail({ route }) {
                   )}
                 </View>
               </View>
-              {/* <View
+              <View
                 style={[
                   styles.changeColorContainer,
                   colorChangerVisible && styles.changeColorVisible,
@@ -405,7 +397,7 @@ export default function PlantDetail({ route }) {
                 ) : (
                   <ChangeColorWheel setCustomPlant={setCustomPlant} />
                 )}
-              </View> */}
+              </View>
             </View>
           </View>
         </View>
@@ -420,7 +412,10 @@ export default function PlantDetail({ route }) {
         </View>
         <View style={styles.plantOverview}>
           <Text style={styles.plantOverviewTitle}>Plant Bio</Text>
-          <Text style={styles.plantPlantBioDes}>{plant?.describe}</Text>
+          <Text style={styles.plantPlantBioDes}>
+            No green thumb required to keep our artificial watermelon peperomia
+            plant looking lively and lush anywhere you place it.
+          </Text>
         </View>
 
         <ScrollView
