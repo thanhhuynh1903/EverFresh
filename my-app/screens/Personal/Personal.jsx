@@ -24,6 +24,7 @@ import Products from "./tabViews/products";
 import Reviews from "./tabViews/reviews";
 import { successfulStatus } from "../../utils/utils";
 import { paymentStripeUprank } from "../../api/payment";
+import LogoCorner from "../../components/logo-corner";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -163,7 +164,7 @@ export default function Personal() {
           {userRedux?.user?.rank !== "Premium" && (
             <View
               style={{
-                ...styles.flexRow,
+                ...styles.flexCol,
                 justifyContent: "space-between",
                 padding: 10,
                 paddingVertical: 10,
@@ -183,16 +184,18 @@ export default function Personal() {
                 elevation: 5,
               }}
             >
-              <Text style={{ fontWeight: "bold" }}>Experience exciting features only available at Everfresh</Text>
+              <LogoCorner />
+              <Text style={{ fontWeight: "bold", textAlign: "center" }}>Experience exciting features only available at Everfresh</Text>
               <TouchableOpacity
                 style={{
-                  padding: 15,
+                  padding: 10,
                   backgroundColor: "#009E71",
                   borderRadius: 4,
+                  marginTop: 5
                 }}
                 onPress={paymentPremium}
               >
-                <Text style={{ color: "white" }}>Purchasing Now!</Text>
+                <Text style={{ color: "white", fontSize: 15 }}>Purchasing Now!</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -311,4 +314,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  flexCol: {
+    flexDirection: "col",
+    alignItems: "center",
+  }
 });
