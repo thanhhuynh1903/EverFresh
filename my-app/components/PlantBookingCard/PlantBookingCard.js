@@ -103,7 +103,9 @@ export default function PlantBookingCard({
         </View>
         {type === "Plant" && (
           <View style={styles.planter}>
-            <Text>+{item?.quantity} planter (accompanying gifts)</Text>
+            <Text style={styles.textPlanter}>
+              +{item?.quantity} planter (accompanying gifts)
+            </Text>
             <Image
               source={{
                 uri: "https://cayxinh.vn/wp-content/uploads/2017/12/chau-gom-dat-nung-nau-2.jpg",
@@ -174,6 +176,9 @@ const styles = StyleSheet.create({
   planter: {
     height: HEIGHT * 0.08,
     flexDirection: "row",
+  },
+  textPlanter: {
+    fontSize: 12,
   },
   planterImage: {
     height: WIDTH * 0.08,

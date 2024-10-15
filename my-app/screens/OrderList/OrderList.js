@@ -43,10 +43,11 @@ export default function OrderList() {
   };
 
   const renderOrderItem = (item, key) => {
-    let totalPrice = 0;
-    item?.list_cart_item_id?.map(
-      (item) => (totalPrice += item?.item_total_price)
-    );
+    let totalPrice = item?.total_price;
+    
+    // item?.list_cart_item_id?.map(
+    //   (item) => (totalPrice += item?.item_total_price)
+    // );
 
     return (
       <TouchableOpacity

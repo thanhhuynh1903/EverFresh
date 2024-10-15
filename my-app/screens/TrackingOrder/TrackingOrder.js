@@ -44,7 +44,6 @@ export default function TrackingOrder({ route }) {
   const navigation = useNavigation();
 
   const [orderDetail, setOrderDetail] = useState(route.params.orderDetail);
-
   const orderStatusList = useMemo(() => {
     return [
       {
@@ -96,11 +95,11 @@ export default function TrackingOrder({ route }) {
         <View style={styles.imageContainer}>
           <Image
             source={
-              // orderDetail?.list_cart_item_id[0]?.img_url[0]
-              //   ? {
-              //       uri: orderDetail?.list_cart_item_id[0]?.img_url[0] || "",
-              //     }
-              //   :
+              item?.img_url[0]
+                ? {
+                    uri: item?.img_url[0] || "",
+                  }
+                :
               require("../../assets/cart/plant1.png")
             }
             resizeMode="stretch"
@@ -135,7 +134,9 @@ export default function TrackingOrder({ route }) {
           </View>
           {type === "Plant" && (
             <View style={styles.planter}>
-              <Text>+{item?.quantity} planter (accompanying gifts)</Text>
+              <Text style={styles.textPlanter}>
+                +{item?.quantity} planter (accompanying gifts)
+              </Text>
               <Image
                 source={{
                   uri: "https://cayxinh.vn/wp-content/uploads/2017/12/chau-gom-dat-nung-nau-2.jpg",
@@ -272,7 +273,16 @@ export default function TrackingOrder({ route }) {
               </Text>
               <Text style={{ ...styles.orderInfoTabText, color: "#475467" }}>
                 {formatPrice(
-                  orderDetail.total_price - orderDetail.delivery_method?.price
+                  orderDetail?.total_price -
+                    orderDetail?.delivery_method?.price +
+                    (orderDetail?.voucher_id
+                      ? orderDetail?.voucher_id?.is_percent
+                        ? ((orderDetail?.total_price -
+                            orderDetail?.delivery_method?.price) *
+                            orderDetail?.voucher_id?.voucher_discount) /
+                          100
+                        : orderDetail?.voucher_id?.voucher_discount
+                      : 0)
                 )}{" "}
                 VNĐ
               </Text>
@@ -295,8 +305,7 @@ export default function TrackingOrder({ route }) {
                           orderDetail.delivery_method?.price) *
                           orderDetail.voucher_id.voucher_discount) /
                         100
-                      : orderDetail.total_price -
-                        orderDetail.voucher_id.voucher_discount)) ||
+                      : orderDetail.voucher_id.voucher_discount)) ||
                     0
                 )}{" "}
                 VNĐ
@@ -512,6 +521,9 @@ const styles = StyleSheet.create({
   planter: {
     height: HEIGHT * 0.08,
     flexDirection: "row",
+  },
+  textPlanter: {
+    fontSize: 12,
   },
   planterImage: {
     height: WIDTH * 0.08,

@@ -290,7 +290,8 @@ export default function CartView({ goback }) {
           marginBottom: Platform.OS === "android" ? 0 : "15%",
         }}
       >
-        <View style={styles.cartHeader}>
+        {/* tạm thời ẩn đi */}
+        {/* <View style={styles.cartHeader}>
           <Text style={styles.cartAmount}>
             {cartRedux.cartList[0]?.list_cart_item_id.length} items
           </Text>
@@ -311,7 +312,7 @@ export default function CartView({ goback }) {
             />
             <Text style={styles.cartHeaderText}>Delete Selected</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View>
           {!loading && cart.map((item, key) => renderCardBooking(item, key))}
         </View>

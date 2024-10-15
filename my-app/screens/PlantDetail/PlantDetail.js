@@ -621,7 +621,7 @@ const styles = StyleSheet.create({
   },
   headerPlantInfo: {
     transform: [{ translateY: 40 }],
-    marginTop: 24,
+    marginTop: 12,
     zIndex: 10,
   },
   headerPlantPriceTitle: {
