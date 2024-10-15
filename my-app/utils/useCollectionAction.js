@@ -30,6 +30,7 @@ export const useCollectionActions = () => {
 
   const handleAddToCollection = async (item, setChooseCollectionVisible) => {
     const response = await addToCollections(item?._id);
+    console.log(item?._id);
 
     if (response.status === 201) {
       showToast({
@@ -60,6 +61,9 @@ export const useCollectionActions = () => {
       });
       await refreshGallery();
     } else {
+      console.log(response?.response?.data);
+      console.log(galleryRedux);
+
       showToast({
         title: "Fail",
         message: `Add plant to collection failed`,

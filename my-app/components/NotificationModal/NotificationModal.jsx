@@ -126,10 +126,10 @@ export default function NotificationModal({ visible, onCancle }) {
           <Text
             style={{ ...styles.notificainCardInfoTitle, fontWeight: "normal" }}
           >
-            Create: {formatDateMonthYear(item.updatedAt)}
+            Create: {formatDateMonthYear(item.createdAt)}
           </Text>
           <Text style={styles.notificainCardInfoTitle}>
-            Time: {formatTime(item.updatedAt)}
+            Time: {formatTime(item.createdAt)}
           </Text>
         </View>
         <View style={styles.deleteContainer}>

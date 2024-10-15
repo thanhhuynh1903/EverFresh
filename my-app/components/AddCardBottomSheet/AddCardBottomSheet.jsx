@@ -12,6 +12,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { createPaymentMethod } from "../../api/linkedInformation";
 import { successfulStatus } from "../../utils/utils";
+import useCustomToast from "../ToastNotification/ToastNotification";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -21,6 +22,7 @@ export default function AddCardBottomSheet({ visible, onSubmit, onClose }) {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
+  const showToast = useCustomToast();
 
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const snapPoints = useMemo(() => ["25%", "50%", "75%"], []);
@@ -48,7 +50,7 @@ export default function AddCardBottomSheet({ visible, onSubmit, onClose }) {
   const handleSubmit = async () => {
     const newCard = {
       author: name,
-      card_number: cardNumber,
+      card_number: Number(cardNumber.replace(/\s+/g, "")),
       expiration_date: expiryDate,
       cvv: cvv,
     };
@@ -57,10 +59,42 @@ export default function AddCardBottomSheet({ visible, onSubmit, onClose }) {
 
     if (successfulStatus(response.status)) {
       onSubmit(response?.data);
+      showToast({
+        title: "Success",
+        message: "Add to cart successfully",
+        type: "success",
+      });
       closeBottomSheet();
     } else {
+      showToast({
+        title: "Add card fail",
+        message: response?.response?.data,
+        type: "error",
+      });
+
       console.log(response?.response?.data);
     }
+  };
+
+  const formatCardNumber = (number) => {
+    return number
+      .replace(/\s?/g, "")
+      .replace(/(\d{4})/g, "$1 ")
+      .trim();
+  };
+
+  const handleExpiryDateChange = (text) => {
+    // Remove any non-digit characters
+    const cleaned = text.replace(/\D/g, "");
+
+    let formatted = cleaned;
+    if (cleaned.length >= 3) {
+      // Insert a "/" after the first two digits (MM)
+      formatted = cleaned.slice(0, 2) + "/" + cleaned.slice(2);
+    }
+
+    // Limit the length to 5 characters (MM/YY)
+    setExpiryDate(formatted.slice(0, 5));
   };
 
   return (
@@ -103,7 +137,8 @@ export default function AddCardBottomSheet({ visible, onSubmit, onClose }) {
               style={styles.input}
               placeholder="1234 4567 7890 1234"
               keyboardType="numeric"
-              value={cardNumber}
+              maxLength={19}
+              value={formatCardNumber(cardNumber)}
               onChangeText={setCardNumber}
             />
 
@@ -115,7 +150,7 @@ export default function AddCardBottomSheet({ visible, onSubmit, onClose }) {
                   placeholder="02/24"
                   keyboardType="numeric"
                   value={expiryDate}
-                  onChangeText={setExpiryDate}
+                  onChangeText={handleExpiryDateChange}
                 />
               </View>
               <View style={styles.col}>
@@ -126,6 +161,7 @@ export default function AddCardBottomSheet({ visible, onSubmit, onClose }) {
                   keyboardType="numeric"
                   secureTextEntry
                   value={cvv}
+                  maxLength={3}
                   onChangeText={setCvv}
                 />
               </View>

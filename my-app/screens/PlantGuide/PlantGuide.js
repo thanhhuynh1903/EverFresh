@@ -10,7 +10,7 @@ import {
   Button,
   TextInput,
 } from "react-native";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 const WIDTH = Dimensions.get("window").width;
@@ -94,6 +94,10 @@ export default function PlantGuide({ route }) {
 
   const navigation = useNavigation();
 
+  useEffect(() => {
+    setPlant(route.params.plant);
+  }, [route.params.plant]);
+
   const renderInfoCard = (item, key) => {
     return (
       <View style={styles.plantInforCard} key={key}>
@@ -137,13 +141,13 @@ export default function PlantGuide({ route }) {
       <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
         <View style={styles.plantDetail}>
           <Text style={styles.plantDetailTitle}>
-            {plant.name || "‘Banana Boat’ daylily"}
+            {plant?.name || "‘Banana Boat’ daylily"}
           </Text>
           <Text style={styles.plantDetailName}>Hemerocallis ‘Banana Boat’</Text>
           <Text style={styles.plantDetailClass}>hem-er-oh-KAL-iss</Text>
           <Image
             source={
-              plant.uri
+              plant?.uri && plant.img_url
                 ? { uri: plant.img_url[0] }
                 : require("../../assets/utilsImage/plantGuideImage.png")
             }
