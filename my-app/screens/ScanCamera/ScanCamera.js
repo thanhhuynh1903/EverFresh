@@ -10,8 +10,7 @@ import {
   Platform,
   LogBox,
 } from "react-native";
-import { Camera, CameraView, useCameraPermissions } from "expo-camera"; // Use Camera instead of CameraView
-// import * as Permissions from "expo-permissions";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -19,7 +18,7 @@ const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
 const ScanCamera = ({ navigation, route }) => {
-  const [facing, setFacing] = useState("by");
+  const [facing, setFacing] = useState("back");
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraType, setCameraType] = useState(route?.params?.type || "scan");
   const [selectedImage, setSelectedImage] = useState(null);
@@ -30,25 +29,19 @@ const ScanCamera = ({ navigation, route }) => {
     return () => LogBox.ignoreAllLogs(false); // Re-enable logs when the component unmounts
   }, []);
 
-  // useEffect(() => {
-  //   // Request permissions when the component mounts
-  //   requestPermissions();
-  // }, []);
-
-  // const requestPermissions = async () => {
-  //   const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-  //   if (status !== "granted") {
-  //     console.log("Permission to access camera roll denied");
-  //   }
-  // };
-
   useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
-        const { status } =
+        // Request camera and media library permissions
+        const { status: cameraStatus } =
+          await Camera.requestCameraPermissionsAsync();
+        const { status: libraryStatus } =
           await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-          alert("Sorry, we need camera roll permissions to make this work!");
+
+        if (cameraStatus !== "granted" || libraryStatus !== "granted") {
+          alert(
+            "Sorry, we need camera and media library permissions to make this work!"
+          );
         }
       }
     })();
@@ -70,7 +63,7 @@ const ScanCamera = ({ navigation, route }) => {
         <Text style={styles.message}>
           We need your permission to show the camera
         </Text>
-        <Button onPress={requestPermission} title="grant permission" />
+        <Button onPress={requestPermission} title="Grant Permission" />
       </View>
     );
   }
@@ -83,8 +76,6 @@ const ScanCamera = ({ navigation, route }) => {
     if (cameraRef.current) {
       const photo = await cameraRef.current.takePictureAsync();
       setSelectedImage(photo.uri); // Optionally display the captured image
-      console.log("type ", cameraType);
-
       navigation.navigate("PlantReport", {
         imageUri: photo.uri,
         cameraType: cameraType,
@@ -95,7 +86,6 @@ const ScanCamera = ({ navigation, route }) => {
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      // allowsEditing: true,
       aspect: [3, 12],
       quality: 1,
     });
@@ -117,9 +107,6 @@ const ScanCamera = ({ navigation, route }) => {
         facing={facing}
         // flash={"auto"}
       >
-        {/* {selectedImage && (
-          <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
-        )} */}
         <View style={styles.buttonContainer}>
           <View style={styles.containerHeader}>
             <Text style={styles.containerHeaderTitle}>
