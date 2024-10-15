@@ -19,6 +19,8 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { setSaveAreaColor } from "../../../redux/reducers/saveAreaReducer";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -56,6 +58,7 @@ export default function MenuModal({ visible, closeModal }) {
   const [fontsLoaded] = useFonts({
     Philosopher_400Regular,
   });
+  const dispatch = useDispatch();
 
   // Prevent splash screen auto-hide until fonts are loaded
   useEffect(() => {
@@ -66,6 +69,15 @@ export default function MenuModal({ visible, closeModal }) {
     }
     prepare();
   }, [fontsLoaded]);
+
+  // useEffect(() => {
+  //   if (visible) {
+  //     dispatch(setSaveAreaColor("#0B845C"));
+  //     console.log("change color");
+  //   } else {
+  //     dispatch(setSaveAreaColor("white"));
+  //   }
+  // }, [visible]);
 
   if (!fontsLoaded) {
     return null; // Return null until fonts are loaded

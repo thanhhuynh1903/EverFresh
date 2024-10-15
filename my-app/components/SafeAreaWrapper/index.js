@@ -10,15 +10,20 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
+import { selectSaveArea } from "../../redux/selector/selector";
 
 const HEIGHT = Dimensions.get("window").height;
 
 const SafeAreaWrapper = ({ children }) => {
   // const insets = useSafeAreaInsets();
+  // const saveAreaColor = useSelector(selectSaveArea);
+  // saveAreaColor.color
   return (
     <>
       <StatusBar
         barStyle={Platform.OS === "ios" ? "dark-content" : "light-content"}
+        // backgroundColor={saveAreaColor.color}
       />
       {Platform.OS === "android" ? (
         <View style={styles.AndroidSafeArea}>{children}</View>
