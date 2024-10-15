@@ -40,6 +40,21 @@ const momoMethod = {
   imageUrl: require("../../assets/utilsImage/card-1.png"),
 };
 
+const defaultPaymentType = [
+  {
+    _id: "1",
+    title: "Item 1",
+    type: "MOMO",
+    imageUrl: require("../../assets/utilsImage/card-1.png"),
+  },
+  {
+    _id: "2",
+    title: "Item 2",
+    type: "STRIPE",
+    imageUrl: require("../../assets/visaCard.png"),
+  },
+];
+
 export default function Payment({ route }) {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -106,6 +121,8 @@ export default function Payment({ route }) {
 
   const checkPaymentSuccess = async () => {
     const response = await getNewestOrder();
+    console.log("get newst");
+
     if (successfulStatus(response.status)) {
       if (response.data.is_new) {
         clearInterval(intervalId);
@@ -113,7 +130,10 @@ export default function Payment({ route }) {
       }
     }
   };
-  intervalId = setInterval(checkPaymentSuccess, 3000);
+
+  useEffect(() => {
+    intervalId = setInterval(checkPaymentSuccess, 3000);
+  }, []);
   // stripe
 
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
@@ -204,11 +224,12 @@ export default function Payment({ route }) {
   };
 
   const handlePaymentStripe = async () => {
+    const currentCard = paymentMethodList[currentIndex];
     const data = {
       delivery_method_id: deliveryMethod._id,
       delivery_information_id: deliveryInformation._id,
       cart_id: route.params.currentCart._id,
-      linked_information_id: "66ffcf324bff98afff2cb039",
+      linked_information_id: currentCard._id,
     };
     if (route.params.voucher) {
       data.voucher_id = route.params.voucher._id;
@@ -343,9 +364,9 @@ export default function Payment({ route }) {
           keyExtractor={(item) => item._id}
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={(event) => {
-            const newIndex = Math.floor(
-              event.nativeEvent.contentOffset.x / WIDTH
-            );
+            const contentOffsetX = event.nativeEvent.contentOffset.x;
+            const newIndex = Math.round(contentOffsetX / WIDTH); // Round instead of Math.floor
+
             setCurrentIndex(newIndex);
           }}
         />

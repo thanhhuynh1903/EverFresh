@@ -91,7 +91,11 @@ export default function Checkout({ route }) {
       <ScrollView style={styles.contentContainer}>
         <View style={styles.plantList}>
           {cart.map((item, key) => (
-            <PlantBookingCard plant={item.product} key={key} />
+            <PlantBookingCard
+              plant={item.product}
+              key={key}
+              type={item?.product_type}
+            />
           ))}
         </View>
         <View style={styles.totalPrice}>

@@ -16,7 +16,6 @@ const useNotificationSocket = () => {
     const socket = io(url, {
       transports: ["websocket"], // Force WebSocket transport
     });
-    console.log("get in");
 
     socket.on("connect", () => {
       console.log("Socket connected to server");

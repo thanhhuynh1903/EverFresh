@@ -17,6 +17,7 @@ const HEIGHT = Dimensions.get("window").height;
 
 export default function PlantBookingCard({
   plant,
+  type,
   onPress,
   hanldeIncrease,
   hanldeDecrease,
@@ -30,17 +31,31 @@ export default function PlantBookingCard({
   }, [plant]);
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress && onPress}>
+    <TouchableOpacity
+      style={{
+        ...styles.container,
+        marginBottom: type === "Plant" ? HEIGHT * 0.08 : 0,
+      }}
+      onPress={onPress && onPress}
+    >
       <Image
         source={
-          item?.img_url && item?.img_url[0]
-            ? { uri: item?.img_url[0] || "" }
+          type === "Plant"
+            ? item?.img_url && item?.img_url[0]
+              ? { uri: item?.img_url[0] || "" }
+              : require("../../assets/cart/plant1.png")
+            : item?.img_object && item?.img_object[0]
+            ? { uri: item?.img_object[0].img_url || "" }
             : require("../../assets/cart/plant1.png")
         }
         resizeMode="stretch"
         style={styles.image}
       />
-      <View style={styles.center}>
+      <View
+        style={{
+          ...styles.center,
+        }}
+      >
         <View style={styles.centerFuncional}>
           <Text style={styles.centerTitle}>{item?.name}</Text>
           <TouchableOpacity
@@ -86,6 +101,18 @@ export default function PlantBookingCard({
             {formatPrice((item?.price || 1) * (item?.quantity || 1))} VNĐ
           </Text>
         </View>
+        {type === "Plant" && (
+          <View style={styles.planter}>
+            <Text>+{item?.quantity} planter (accompanying gifts)</Text>
+            <Image
+              source={{
+                uri: "https://cayxinh.vn/wp-content/uploads/2017/12/chau-gom-dat-nung-nau-2.jpg",
+              }}
+              style={styles.planterImage}
+              resizeMode="stretch"
+            />
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -106,6 +133,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   center: {
+    position: "relative",
     width: "70%",
     flexDirection: "row",
     flexWrap: "wrap",
@@ -142,6 +170,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "medium",
     color: "#002140",
+  },
+  planter: {
+    height: HEIGHT * 0.08,
+    flexDirection: "row",
+  },
+  planterImage: {
+    height: WIDTH * 0.08,
+    width: WIDTH * 0.08,
+    marginLeft: 8,
   },
 
   flexRow: {

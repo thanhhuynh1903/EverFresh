@@ -11,6 +11,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useSelector } from "react-redux";
 import { selectGallery } from "../../redux/selector/selector";
+import AddNewCollection from "./AddNewCollection";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -21,6 +22,7 @@ export default function CollectionListBottomSheet({
   onClose,
 }) {
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const snapPoints = useMemo(() => ["25%", "50%", "75%"], []);
   const bottomSheetRef = useRef(null);
   const galleryRedux = useSelector(selectGallery);
@@ -49,6 +51,11 @@ export default function CollectionListBottomSheet({
       chooseCollection(item);
       closeBottomSheet();
     }
+  };
+
+  const createColection = (name) => {
+    setModalVisible(false);
+    handleChooseCollection({ collection_name: name });
   };
 
   const renderCollectionCard = (item, key) => {
@@ -100,11 +107,42 @@ export default function CollectionListBottomSheet({
           </TouchableOpacity>
           <Text style={styles.title}>Add to collection</Text>
           <View style={styles.collectionList}>
+            <TouchableOpacity
+              style={{
+                ...styles.collectionCard,
+                borderWidth: 1,
+                borderRadius: 12,
+                margin: 10,
+                padding: 12,
+                width: WIDTH - 60,
+                height: HEIGHT * 0.08,
+              }}
+              onPress={() => setModalVisible(true)}
+            >
+              <View
+                style={{
+                  ...styles.collectionCardInfor,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    ...styles.collectionName,
+                    transform: [{ translateY: 8 }],
+                  }}
+                >
+                  Add new collection +
+                </Text>
+                <Text></Text>
+              </View>
+            </TouchableOpacity>
             {galleryRedux?.galleries?.list_collection_id?.map((item, key) =>
               renderCollectionCard(item, key)
             )}
           </View>
         </View>
+        <AddNewCollection visible={modalVisible} onSubmit={createColection} />
       </BottomSheet>
     </>
   );
@@ -172,6 +210,7 @@ const styles = StyleSheet.create({
   collectionCardInfor: {
     height: "100%",
     justifyContent: "space-around",
+    backgroundColor: "white",
   },
   collectionName: {
     fontWeight: "bold",

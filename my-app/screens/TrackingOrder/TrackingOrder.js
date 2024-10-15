@@ -81,14 +81,18 @@ export default function TrackingOrder({ route }) {
     setOrderDetail(route.params.orderDetail);
   }, [route.params.orderDetail]);
 
-  const renderBookingCard = (item, key) => {
+  const renderBookingCard = (item, key, type) => {
     return (
       <TouchableOpacity
-        style={styles.bookingCardContainer}
+        style={{
+          ...styles.bookingCardContainer,
+          marginBottom: type === "Plant" ? HEIGHT * 0.08 : 0,
+        }}
         activeOpacity={1}
         onPress={item?.onPress && item?.onPress}
         key={key}
       >
+        {console.log(item)}
         <View style={styles.imageContainer}>
           <Image
             source={
@@ -129,6 +133,18 @@ export default function TrackingOrder({ route }) {
               Oty: {item?.quantity}
             </Text>
           </View>
+          {type === "Plant" && (
+            <View style={styles.planter}>
+              <Text>+{item?.quantity} planter (accompanying gifts)</Text>
+              <Image
+                source={{
+                  uri: "https://cayxinh.vn/wp-content/uploads/2017/12/chau-gom-dat-nung-nau-2.jpg",
+                }}
+                style={styles.planterImage}
+                resizeMode="stretch"
+              />
+            </View>
+          )}
         </View>
       </TouchableOpacity>
     );
@@ -163,7 +179,7 @@ export default function TrackingOrder({ route }) {
         </View>
         <View style={styles.dashLine} />
         {orderDetail?.list_cart_item_id?.map((item, key) =>
-          renderBookingCard(item.product, key)
+          renderBookingCard(item.product, key, item.product_type)
         )}
         <View style={styles.dashLine} />
         <View style={styles.orderInfo}>
@@ -492,6 +508,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "semibold",
     color: "#1D2939",
+  },
+  planter: {
+    height: HEIGHT * 0.08,
+    flexDirection: "row",
+  },
+  planterImage: {
+    height: WIDTH * 0.08,
+    width: WIDTH * 0.08,
+    marginLeft: 8,
   },
 
   orderInfo: {

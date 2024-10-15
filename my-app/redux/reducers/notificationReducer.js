@@ -10,7 +10,7 @@ const notificateSlice = createSlice({
   initialState: initState,
   reducers: {
     setNotificateList: (state, action) => {
-      state.notificateList = action.payload;
+      state.notificateList = action.payload.reverse();
     },
   },
   extraReducers: (builder) => {
@@ -20,7 +20,7 @@ const notificateSlice = createSlice({
       })
       .addCase(getNotificationThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.notificateList = action.payload || [];
+        state.notificateList = action.payload?.reverse() || [];
       })
       .addCase(getNotificationThunk.rejected, (state, action) => {
         state.loading = false;

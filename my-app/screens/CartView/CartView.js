@@ -260,6 +260,7 @@ export default function CartView({ goback }) {
         )}
         <PlantBookingCard
           plant={item?.product}
+          type={item?.product_type}
           hanldeIncrease={() => hanldeChangeAmount(item, item.quantity + 1)}
           hanldeDecrease={() => hanldeChangeAmount(item, item.quantity - 1)}
           handleDelete={() => handleDeteteCartItem(item)}

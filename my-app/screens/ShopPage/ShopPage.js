@@ -117,7 +117,8 @@ export default function ShopPage() {
   const handleAddToCart = async (item) => {
     const data = {
       product_id: item._id,
-      product_type: "Plant",
+      product_type:
+        tabIndex === 0 ? "Plant" : tabIndex === 1 ? "Planter" : "Seed",
       custom_color: "#FFD2B6",
       quantity: 1,
     };
@@ -179,7 +180,9 @@ export default function ShopPage() {
         >
           <View style={styles.plantCardInfor}>
             <View style={styles.plantCardLabelContainer}>
-              <Text style={styles.plantCardLabel}>{item.uses}</Text>
+              <Text style={styles.plantCardLabel} numberOfLines={1}>
+                {item.uses}
+              </Text>
               <Image
                 source={require("../../assets/shopping/pawIcon.png")}
                 style={styles.plantCardLabelIcon}

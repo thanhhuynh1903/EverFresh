@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { createPaymentMethod } from "../../api/linkedInformation";
+import { successfulStatus } from "../../utils/utils";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -56,6 +58,8 @@ export default function AddCardBottomSheet({ visible, onSubmit, onClose }) {
     if (successfulStatus(response.status)) {
       onSubmit(response?.data);
       closeBottomSheet();
+    } else {
+      console.log(response?.response?.data);
     }
   };
 

@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "My App",
-    "slug": "my-app",
+    "name": "EverFresh",
+    "slug": "ever-fresh",
     "platforms": ["ios", "android", "web"],
     "jsEngine": "hermes",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/appIcon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/appIcon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -24,10 +24,10 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/appIcon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.konosuba2324.myapp",
+      "package": "com.konosuba2324.everfresh",
       "permissions": [
         "CAMERA",
         "android.permission.CAMERA",
@@ -53,7 +53,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "7fb5edb4-9695-4c15-a7fd-2bcd6eacbbc4"
+        "projectId": "4678b207-c9d7-4280-a518-e802ca7a4cc4"
       }
     }
   }
