@@ -2,7 +2,11 @@
   "expo": {
     "name": "EverFresh",
     "slug": "ever-fresh",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "jsEngine": "hermes",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,19 +19,22 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to scan plants."
-      }
+      },
+      "bundleIdentifier": "ever-fresh"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/appIcon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.konosuba2324.everfresh",
+      "package": "com.andnm_1508.everfresh",
       "permissions": [
         "CAMERA",
         "android.permission.CAMERA",
@@ -53,7 +60,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "4678b207-c9d7-4280-a518-e802ca7a4cc4"
+        "projectId": "af603cee-c1a0-4e47-aa9a-aca9bf193917"
       }
     }
   }
