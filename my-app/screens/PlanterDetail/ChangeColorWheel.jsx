@@ -11,7 +11,12 @@ import ColorBar from "./ColorBar";
 
 const WIDTH = Dimensions.get("window").width;
 
-export default function ChangeColorWheel({ setCustomPlant }) {
+export default function ChangeColorWheel({
+  defaultPlanterList,
+  defaultColor,
+  choosedPlanterIndex,
+  setChoosedPlanterIndex,
+}) {
   const [planterList, setPlanterList] = useState([
     { image: require("../../assets/plant details/pot6.png") },
     { image: require("../../assets/plant details/pot5.png") },
@@ -156,7 +161,11 @@ export default function ChangeColorWheel({ setCustomPlant }) {
       }}
     >
       {planterList.map((item, index) => renderPot(item, index))}
-      <ColorBar setCustomPlant={setCustomPlant} />
+      <ColorBar
+        defaultColorList={defaultPlanterList}
+        defaultColor={defaultColor}
+        setDefaultColorIndex={setChoosedPlanterIndex}
+      />
     </View>
   );
 }

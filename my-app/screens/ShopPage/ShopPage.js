@@ -10,7 +10,7 @@ import {
   ImageBackground,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
@@ -81,13 +81,15 @@ export default function ShopPage() {
     return getPlantIdListinGalery(galleryRedux.galleries);
   }, [galleryRedux]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      loadPlantList();
-      loadPlanterList();
-      loadSeedList();
-    }, [])
-  );
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    loadPlantList();
+    loadPlanterList();
+    loadSeedList();
+  };
 
   const loadPlantList = async () => {
     setLoading(true);
@@ -331,6 +333,85 @@ export default function ShopPage() {
     );
   };
 
+  const renderItemList = (item, key) => {
+    let additionalComponent = <></>;
+
+    if (key == 1) {
+      additionalComponent = (
+        <ImageBackground
+          source={require("../../assets/shopping/inviteFriBackround.png")}
+          style={styles.inviteFriContainer}
+          resizeMode="contain"
+          key={`invite-${key}`} // Adding key for this component
+        >
+          <Text style={styles.inviteFriTitle}>
+            Invite a Friend and earn Everfresh rewards
+          </Text>
+          <View style={styles.redeemLink}>
+            <Text style={styles.redeemLinkText}>
+              Redeem them to get instant discounts
+            </Text>
+            <TouchableOpacity style={styles.redeemLinkButton}>
+              <Text style={styles.redeemLinkButtonText}>Invite</Text>
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
+      );
+    }
+
+    if (key == 3) {
+      additionalComponent = (
+        <View style={styles.videoContainer} key={`video-${key}`}>
+          <Image
+            source={require("../../assets/shopping/video.png")}
+            style={styles.videoImage}
+          />
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.videoText} numberOfLines={3}>
+              Caring for plants should be fun. That’s why we offer 1-on-1
+              virtual consultations from the comfort of your home or office.
+            </Text>
+            <TouchableOpacity style={styles.videoLearnMore}>
+              <View style={styles.videoDash} />
+              <Text style={styles.videoLearnMoreText}>Learn More</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    }
+
+    switch (tabIndex) {
+      case 0:
+        return (
+          <React.Fragment key={`plant-${key}`}>
+            {renderPlantCard(item, key)}
+            {additionalComponent}
+          </React.Fragment>
+        );
+      case 1:
+        return (
+          <React.Fragment key={`planter-${key}`}>
+            {renderPlanterCard(item, key)}
+            {additionalComponent}
+          </React.Fragment>
+        );
+      case 2:
+        return (
+          <React.Fragment key={`plant-${key}`}>
+            {renderPlantCard(item, key)}
+            {additionalComponent}
+          </React.Fragment>
+        );
+      default:
+        return (
+          <React.Fragment key={`default-${key}`}>
+            {renderPlantCard(item, key)}
+            {additionalComponent}
+          </React.Fragment>
+        );
+    }
+  };
+
   const tabList = [
     { label: "Plant" },
     { label: "Planter" },
@@ -375,56 +456,7 @@ export default function ShopPage() {
         </View>
 
         <View style={styles.plantListDefault}>
-          {tabIndex === 1
-            ? (renderPlanterCard(filterPlantList[0], 0),
-              renderPlanterCard(filterPlantList[1], 1))
-            : (renderPlantCard(filterPlantList[0], 0),
-              renderPlantCard(filterPlantList[1], 1))}
-
-          <ImageBackground
-            source={require("../../assets/shopping/inviteFriBackround.png")}
-            style={styles.inviteFriContainer}
-            resizeMode="contain"
-          >
-            <Text style={styles.inviteFriTitle}>
-              Invite a Friend and earn Everfresh rewards
-            </Text>
-            <View style={styles.redeemLink}>
-              <Text style={styles.redeemLinkText}>
-                Redeem them to get instant discounts
-              </Text>
-              <TouchableOpacity style={styles.redeemLinkButton}>
-                <Text style={styles.redeemLinkButtonText}>Invite</Text>
-              </TouchableOpacity>
-            </View>
-          </ImageBackground>
-          {tabIndex === 1
-            ? (renderPlanterCard(filterPlantList[2], 2),
-              renderPlanterCard(filterPlantList[3], 3))
-            : (renderPlantCard(filterPlantList[2], 2),
-              renderPlantCard(filterPlantList[3], 3))}
-
-          <View style={styles.videoContainer}>
-            <Image
-              source={require("../../assets/shopping/video.png")}
-              style={styles.videoImage}
-            />
-            <View style={styles.descriptionContainer}>
-              <Text style={styles.videoText} numberOfLines={3}>
-                Caring for plants should be fun. That’s why we offer 1-on-1
-                virtual consultations from the comfort of your home or office.
-              </Text>
-              <TouchableOpacity style={styles.videoLearnMore}>
-                <View style={styles.videoDash} />
-                <Text style={styles.videoLearnMoreText}>Learn More</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          {tabIndex === 1
-            ? (renderPlanterCard(filterPlantList[4], 4),
-              renderPlanterCard(filterPlantList[5], 5))
-            : (renderPlantCard(filterPlantList[4], 4),
-              renderPlantCard(filterPlantList[5], 5))}
+          {filterPlantList?.map((item, index) => renderItemList(item, index))}
         </View>
       </ScrollView>
       {loading && <SpinnerLoading />}

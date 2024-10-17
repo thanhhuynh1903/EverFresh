@@ -50,11 +50,7 @@ export default function PlanterDetail({ route }) {
     cartViewVisible: false,
   });
   const [chooseCollectionVisible, setChooseCollectionVisible] = useState(false);
-
-  const [customPlant, setCustomPlant] = useState({
-    planter: "",
-    planterColor: "#FFD2B6",
-  });
+  const [choosedPlanterIndex, setChoosedPlanterIndex] = useState(0);
 
   useEffect(() => {
     setPlant({
@@ -213,7 +209,11 @@ export default function PlanterDetail({ route }) {
           setColorChangerVisible(true);
         }}
       >
-        <Image source={require("../../assets/utilsImage/Union.png")} />
+        <Image
+          style={{ width: "100%", height: "100%" }}
+          resizeMode="cover"
+          source={require("../../assets/utilsImage/Union.png")}
+        />
       </TouchableOpacity>
     );
   };
@@ -346,23 +346,18 @@ export default function PlanterDetail({ route }) {
                 >
                   <Image
                     source={
-                      plant?.img_object && plant?.img_object[0]
-                        ? { uri: plant?.img_object[0]?.img_url || "" }
+                      plant?.img_object &&
+                      plant?.img_object[choosedPlanterIndex]
+                        ? {
+                            uri:
+                              plant?.img_object[choosedPlanterIndex]?.img_url ||
+                              "",
+                          }
                         : require("../../assets/cart/plant1.png")
                     }
+                    resizeMode="cover"
                     style={styles.headerPlantImage}
                   />
-                  {colorChangerVisible && (
-                    <View
-                      style={{
-                        position: "absolute",
-                        width: "50%",
-                        height: "30%",
-                        bottom: "22%",
-                        backgroundColor: customPlant.planterColor,
-                      }}
-                    ></View>
-                  )}
                   {!colorChangerVisible && (
                     <View style={styles.headerPlantDetailTooltip}>
                       <View
@@ -395,7 +390,12 @@ export default function PlanterDetail({ route }) {
                 {!colorChangerVisible ? (
                   renderChangeColor()
                 ) : (
-                  <ChangeColorWheel setCustomPlant={setCustomPlant} />
+                  <ChangeColorWheel
+                    defaultPlanterList={plant?.img_object}
+                    defaultColor={plant?.default_color}
+                    choosedPlanterIndex={choosedPlanterIndex}
+                    setChoosedPlanterIndex={setChoosedPlanterIndex}
+                  />
                 )}
               </View>
             </View>
@@ -589,7 +589,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     bottom: 0,
-    // right
+    top: "20%",
+    zIndex: 999,
   },
 
   // changingWheel
