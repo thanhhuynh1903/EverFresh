@@ -12,43 +12,33 @@ import {
 import CountryPicker from "react-native-country-picker-modal";
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
 import Header from "../../components/header";
-import { auth } from "../../firebaseConfig"; // Adjust the path to your firebaseConfig file
-import { PhoneAuthProvider } from "firebase/auth"; // Import PhoneAuthProvider from Firebase Auth
 
-export default function LoginScreen({ navigation }) {
-  const [countryCode, setCountryCode] = useState("VN");
-  const [country, setCountry] = useState(null);
+import { useNavigation } from "@react-navigation/native";
+import auth from "@react-native-firebase/auth";
+
+export default function LoginScreen() {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [syncContacts, setSyncContacts] = useState(false);
-  const [callingCode, setCallingCode] = useState("+84");
-  const [countryName, setCountryName] = useState("Vietnam");
-  const [verificationId, setVerificationId] = useState(null);
+  const [code, setCode] = useState("");
+  const [confirm, setConfirm] = useState(null);
+  const navigation = useNavigation();
 
-  const onSelect = (country) => {
-    setCountryCode(country.cca2);
-    setCountry(country);
-    setCountryName(country.name);
-    setCallingCode(country.callingCode[0]);
+  const signInWithPhoneNumber = async () => {
+    try {
+      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+      setConfirm(confirmation);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleLogin = async () => {
-    const fullPhoneNumber = callingCode + phoneNumber;
+  const confirmCode = async () => {
     try {
-      // Create a new Phone Auth Provider instance
-      const provider = new PhoneAuthProvider(auth);
-      const confirmation = await provider.verifyPhoneNumber({
-        phoneNumber: fullPhoneNumber,
-        // Optionally, set the application verifier for reCAPTCHA here if needed
-      });
-      // Store the verification ID to use later when confirming the code
-      setVerificationId(confirmation.verificationId);
-      // Navigate to code verification screen
-      navigation.navigate("VerifyCode", {
-        verificationId: confirmation.verificationId,
-      });
+      const userCredential = await confirm.confirm(code);
+      const user = userCredential.user;
+
+      console.log(user);
     } catch (error) {
-      console.error("Error during login: ", error);
-      alert("Failed to send verification code. Please try again.");
+      console.log(error);
     }
   };
 
@@ -61,42 +51,72 @@ export default function LoginScreen({ navigation }) {
           Please confirm your country code and enter the number associated with
           your account.
         </Text>
+        {!confirm ? (
+          <>
+            {/* <View
+              style={[
+                styles.inputContainer,
+                Platform.OS === "android" ? { paddingVertical: 8 } : null,
+              ]}
+            >
+              <CountryPicker
+                countryCode={countryCode}
+                withFlag
+                withCallingCode
+                withFilter
+                onSelect={onSelect}
+                containerButtonStyle={styles.countryPicker}
+              />
+              <Text>{countryName}</Text>
+            </View> */}
+            <View style={styles.inputContainer_2}>
+              {/* <Text style={styles.textCode}>({callingCode})</Text> */}
+              <TextInput
+                style={styles.phoneInput}
+                placeholder="0 00 00 00 00"
+                keyboardType="phone-pad"
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+              />
+            </View>
 
-        <View
-          style={[
-            styles.inputContainer,
-            Platform.OS === "android" ? { paddingVertical: 8 } : null,
-          ]}
-        >
-          <CountryPicker
-            countryCode={countryCode}
-            withFlag
-            withCallingCode
-            withFilter
-            onSelect={onSelect}
-            containerButtonStyle={styles.countryPicker}
-          />
-          <Text>{countryName}</Text>
-        </View>
-        <View style={styles.inputContainer_2}>
-          <Text style={styles.textCode}>({callingCode})</Text>
-          <TextInput
-            style={styles.phoneInput}
-            placeholder="0 00 00 00 00"
-            keyboardType="phone-pad"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-          />
-        </View>
-
-        <View style={styles.syncContactsContainer}>
+            {/* <View style={styles.syncContactsContainer}>
           <Text>Sync Contacts</Text>
           <Switch value={syncContacts} onValueChange={setSyncContacts} />
-        </View>
+        </View> */}
 
-        <TouchableOpacity style={[styles.ButtonStyle]} onPress={handleLogin}>
-          <Text style={styles.signInButtonText}>Continue</Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.ButtonStyle]}
+              onPress={signInWithPhoneNumber}
+            >
+              <Text style={styles.signInButtonText}>Continue</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <Text
+              style={{
+                marginBottom: 20,
+                fontSize: 18,
+              }}
+            >
+              Enter code
+            </Text>
+            <TextInput
+              style={styles.phoneInput}
+              placeholder="0 00 00 00 00"
+              keyboardType="number"
+              value={code}
+              onChangeText={setCode}
+            />
+            <TouchableOpacity
+              style={[styles.ButtonStyle]}
+              onPress={confirmCode}
+            >
+              <Text style={styles.signInButtonText}>Confirm</Text>
+            </TouchableOpacity>
+          </>
+        )}
 
         <Text style={styles.signUpText}>
           Don’t have an account?{" "}

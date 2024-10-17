@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "1018818217852",
-    "project_id": "everfresh-a5e2f",
-    "storage_bucket": "everfresh-a5e2f.appspot.com"
+    "project_number": "123763580687",
+    "project_id": "test-everfresh",
+    "storage_bucket": "test-everfresh.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1018818217852:android:3132672675a77d29e0c6f9",
+        "mobilesdk_app_id": "1:123763580687:android:aee50abf4206ab736a287a",
         "android_client_info": {
-          "package_name": "com.companyname.everfresh"
+          "package_name": "com.konosuba2324.everfresh"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCOWW46p75yVHMNJnK1alp6Bhv90Z6iBvA"
+          "current_key": "AIzaSyAYrOhSsKwcWDYa8lz1oDpTZT5yNiHnuD4"
         }
       ],
       "services": {
