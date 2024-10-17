@@ -2,11 +2,7 @@
   "expo": {
     "name": "EverFresh",
     "slug": "ever-fresh",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "jsEngine": "hermes",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,9 +15,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -30,6 +24,7 @@
       "bundleIdentifier": "ever-fresh"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/appIcon.png",
         "backgroundColor": "#ffffff"
@@ -56,7 +51,9 @@
           "microphonePermission": "Allow Ever fresh to access your microphone",
           "recordAudioAndroid": true
         }
-      ]
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth"
     ],
     "extra": {
       "eas": {

@@ -64,3 +64,13 @@ export const getCollectionIdFromPlantId = (galleryData, plantId) => {
 export const successfulStatus = (status) => {
   return status >= 200 && status < 300;
 };
+
+export const formatPhoneNumber = (phoneNumber, callingCode) => {
+  // Remove the leading '0' if present
+  const formattedNumber = phoneNumber.startsWith("0")
+    ? phoneNumber.substring(1)
+    : phoneNumber;
+
+  // Return the formatted phone number with calling code
+  return `${callingCode}${formattedNumber}`;
+};

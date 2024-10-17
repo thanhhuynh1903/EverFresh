@@ -29,8 +29,8 @@ export default function Welcome({ navigation }) {
         </View>
 
         <CustomButton
-          // onPressName={"Signin"}
-          onPressName={"LoginPage"}
+          onPressName={"Signin"}
+          // onPressName={"LoginPage"}
           navigation={navigation}
         >
           <Text style={styles.signInButtonText}>Sign In</Text>
