@@ -1,4 +1,4 @@
-package com.konosuba2324.myapp
+package com.andnm_1508.everfresh
 
 import android.app.Application
 import android.content.res.Configuration

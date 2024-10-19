@@ -24,7 +24,6 @@
       "bundleIdentifier": "ever-fresh"
     },
     "android": {
-      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/appIcon.png",
         "backgroundColor": "#ffffff"
@@ -53,7 +52,8 @@
         }
       ],
       "@react-native-firebase/app",
-      "@react-native-firebase/auth"
+      "@react-native-firebase/auth",
+      "@react-native-google-signin/google-signin"
     ],
     "extra": {
       "eas": {

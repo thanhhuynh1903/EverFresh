@@ -163,12 +163,12 @@ const styles = StyleSheet.create({
     height: HEIGHT,
     width: WIDTH,
     overflow: "visible",
-    marginBottom: 100,
     backgroundColor: "#FFFFFF",
     zIndex: 11,
   },
   contentContainer: {
     paddingHorizontal: 16,
+    marginBottom: 100,
   },
   plantList: {
     width: WIDTH,

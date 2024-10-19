@@ -48,7 +48,7 @@ export default function PlantBookingCard({
             ? { uri: item?.img_object[0].img_url || "" }
             : require("../../assets/cart/plant1.png")
         }
-        resizeMode="stretch"
+        resizeMode="cover"
         style={styles.image}
       />
       <View

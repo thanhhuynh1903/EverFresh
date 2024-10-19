@@ -2,4 +2,5 @@
   <string name="app_name">Ever Fresh</string>
   <string name="expo_splash_screen_resize_mode" translatable="false">contain</string>
   <string name="expo_splash_screen_status_bar_translucent" translatable="false">false</string>
+  <string name="server_client_id">863903622013-s9gk72tgldl79l37c94j12hqtnsa196c.apps.googleusercontent.com</string>
 </resources>

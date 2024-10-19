@@ -53,3 +53,32 @@ export const deleteCartItem = async (id) => {
     return error;
   }
 };
+
+export const getSuggestionPlant = async () => {
+  try {
+    const response = await api.get(`/cart/suggestion-plant`);
+    return response;
+  } catch (error) {
+    console.log("getSuggestionPlant in service/cart error : ", error);
+    return error;
+  }
+};
+
+export const getSuggestionPlanter = async () => {
+  try {
+    const response = await api.get(`/cart/suggestion-planter`);
+    return response;
+  } catch (error) {
+    console.log("getSuggestionPlant in service/cart error : ", error);
+    return error;
+  }
+};
+export const getSuggestionSeed = async () => {
+  try {
+    const response = await api.get(`/cart/suggestion-seed`);
+    return response;
+  } catch (error) {
+    console.log("getSuggestionPlant in service/cart error : ", error);
+    return error;
+  }
+};

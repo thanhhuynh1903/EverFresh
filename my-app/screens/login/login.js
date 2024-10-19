@@ -1,4 +1,3 @@
-
 import {
   View,
   Text,
@@ -24,6 +23,7 @@ import {
 import { getNotificationThunk } from "../../redux/thunk/notificationThunk";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import LogoCorner from "../../components/logo-corner";
+import GAuth from "../../components/GoogleAuth/GAuth";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -154,6 +154,17 @@ export default function LoginPage() {
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
             <Text style={styles.loginButtonText}>Login</Text>
           </TouchableOpacity>
+          <Text style={styles.or}>Or</Text>
+          <View style={styles.otherLogin}>
+            <GAuth handleCheckToken={handleCheckToken} />
+            {/* <TouchableOpacity style={styles.googleIconContainer}>
+              <Image
+                resizeMode="cover"
+                style={styles.googleIcon}
+                source={require("../../assets/utilsImage/google.png")}
+              />
+            </TouchableOpacity> */}
+          </View>
         </View>
       </View>
       {loading && <SpinnerLoading />}
@@ -218,5 +229,22 @@ const styles = StyleSheet.create({
   logo: {
     width: 300,
     height: 200,
+  },
+  or: { textAlign: "center", marginVertical: 12 },
+  otherLogin: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  googleIconContainer: {
+    padding: 12,
+    width: WIDTH * 0.15,
+    height: WIDTH * 0.15,
+    borderRadius: 500,
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.5)",
+  },
+  googleIcon: {
+    width: "100%",
+    height: "100%",
   },
 });

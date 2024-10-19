@@ -8,6 +8,7 @@ import {
   Image,
   TextInput,
   ImageBackground,
+  RefreshControl,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useMemo, useState } from "react";
@@ -51,7 +52,9 @@ export default function ShopPage() {
   const [planterList, setPlanterList] = useState([]);
   const [seedList, setSeedList] = useState([]);
   const [searchValue, setSearchValue] = useState("");
+
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [chooseCollectionVisible, setChooseCollectionVisible] = useState(false);
 
@@ -85,7 +88,13 @@ export default function ShopPage() {
     loadData();
   }, []);
 
-  const loadData = () => {
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  };
+
+  const loadData = async () => {
     loadPlantList();
     loadPlanterList();
     loadSeedList();
@@ -425,7 +434,12 @@ export default function ShopPage() {
         handleMenuToggle={() => setMenuVisible(!menuVisible)}
         backgroundColor={menuVisible && "#0B845C"}
       />
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <Image
           source={require("../../assets/shopping/headerImg.png")}
           style={styles.headerImg}

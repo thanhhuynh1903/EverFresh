@@ -17,16 +17,21 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
 import HomeHeader from "../../components/HomeHeader";
 import MenuModal from "../../components/Modal/MenuModal/MenuModal";
-import { formatPrice, getPlantIdListinGalery } from "../../utils/utils";
+import {
+  formatPrice,
+  getPlantIdListinGalery,
+  successfulStatus,
+} from "../../utils/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import { selectCart, selectGallery } from "../../redux/selector/selector";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "../../api/cart";
+import { addToCart, getSuggestionPlant } from "../../api/cart";
 import useCustomToast from "../../components/ToastNotification/ToastNotification";
 import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
 import ChangeColorWheel from "./ChangeColorWheel";
 import CollectionListBottomSheet from "../../components/CollectionListBottomSheet/CollectionListBottomSheet";
 import { useCollectionActions } from "../../utils/useCollectionAction";
+import PlantSuggestion from "../../components/Suggestion/PlantSuggestion";
 // import { Tooltip, lightColors } from '@rneui/themed';
 
 const WIDTH = Dimensions.get("window").width;
@@ -44,6 +49,7 @@ export default function PlantDetail({ route }) {
     handleChangeCollections,
   } = useCollectionActions();
   const [plant, setPlant] = useState(route.params.plant || {});
+  const [suggestionPlant, setSuggestionPlant] = useState([]);
   const [menuVisible, setMenuVisible] = useState(false);
   const [colorChangerVisible, setColorChangerVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState({
@@ -56,11 +62,24 @@ export default function PlantDetail({ route }) {
     planterColor: "#FFD2B6",
   });
 
+  const scrollViewRef = useRef(null);
+  const cardWidth = Dimensions.get("window").width; // Calculate card width
+
+  const scrollToNext = (index) => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({
+        x: (index + 1) * cardWidth, // Scroll to the right by the width of one card
+        animated: true,
+      });
+    }
+  };
+
   useEffect(() => {
     setPlant({
       ...route.params.plant,
       favorite: plantIdListinGalery.includes(route.params.plant?._id),
     });
+    loadSuggestion();
     setColorChangerVisible(false);
   }, [route.params.plant, galleryRedux.galleries]);
 
@@ -87,6 +106,13 @@ export default function PlantDetail({ route }) {
   const plantIdListinGalery = useMemo(() => {
     return getPlantIdListinGalery(galleryRedux.galleries);
   }, [galleryRedux]);
+
+  const loadSuggestion = async () => {
+    const response = await getSuggestionPlant();
+    if (successfulStatus(response.status)) {
+      setSuggestionPlant(response.data);
+    }
+  };
 
   const handleAddToCart = async (item) => {
     const data = {
@@ -437,6 +463,22 @@ export default function PlantDetail({ route }) {
             {similarPlant.map((item, key) => renderSimilarPlant(item, key))}
           </ScrollView>
         </View>
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.suggestionList}
+          horizontal
+          nestedScrollEnabled={true}
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+        >
+          {suggestionPlant.map((item, key) => (
+            <PlantSuggestion
+              plant={item}
+              key={key}
+              handleNext={() => scrollToNext(key)}
+            />
+          ))}
+        </ScrollView>
         <View style={styles.verifyPlant}>
           <View style={styles.verifyPlantLeft}>
             <Text style={styles.verifyPlantLeftTitle}>That very plant?</Text>
@@ -862,6 +904,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
+
+  suggestionList: {
+    width: WIDTH,
+    marginRight: WIDTH * 0.5,
+    marginVertical: 12,
+  },
+
   // bottomCartSheet
   bottomCartSheet: {
     width: "100%",

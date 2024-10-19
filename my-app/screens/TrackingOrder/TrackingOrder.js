@@ -81,47 +81,74 @@ export default function TrackingOrder({ route }) {
   }, [route.params.orderDetail]);
 
   const renderBookingCard = (item, key, type) => {
+    let customColor = item?.product?.custom_color;
+    let planterIdex = 0;
+    if (customColor) {
+      const customIndex = item?.product?.img_object.findIndex(
+        (e) => e?.color === customColor
+      );
+
+      if (customIndex !== -1) planterIdex = customIndex;
+    }
+
     return (
       <TouchableOpacity
         style={{
           ...styles.bookingCardContainer,
-          marginBottom: type === "Plant" ? HEIGHT * 0.08 : 0,
+          marginBottom: type === "Plant" ? HEIGHT * 0.035 : HEIGHT * 0.035,
         }}
         activeOpacity={1}
-        onPress={item?.onPress && item?.onPress}
         key={key}
       >
-        {console.log(item)}
         <View style={styles.imageContainer}>
           <Image
             source={
-              item?.img_url[0]
+              type === "Planter"
+                ? item?.product?.img_object &&
+                  item?.product?.img_object[planterIdex]
+                  ? {
+                      uri: item?.product?.img_object[planterIdex].img_url || "",
+                    }
+                  : require("../../assets/cart/plant1.png")
+                : item?.product?.img_url && item?.product?.img_url[0]
                 ? {
-                    uri: item?.img_url[0] || "",
+                    uri: item?.product?.img_url[0] || "",
                   }
-                :
-              require("../../assets/cart/plant1.png")
+                : require("../../assets/cart/plant1.png")
             }
-            resizeMode="stretch"
+            resizeMode="cover"
             style={styles.image}
           />
         </View>
 
         <View style={styles.center}>
           <View style={styles.centerFuncional}>
-            <Text style={styles.centerTitle}>{item?.name}</Text>
+            <Text style={styles.centerTitle}>{item?.product?.name}</Text>
             <Text style={styles.centerPrice}>
-              {formatPrice(item?.price || 0)} VNĐ
+              {formatPrice(item?.product?.price || 0)} VNĐ
             </Text>
           </View>
           <View
             style={{ ...styles.centerFuncional, justifyContent: "flex-start" }}
           >
-            <Text style={styles.amount}>{item?.uses}</Text>
+            <Text style={{ ...styles.amount, width: "40%" }} numberOfLines={1}>
+              {type === "Plant"
+                ? item?.product?.uses
+                : item?.product?.special_feature}
+            </Text>
             <View style={styles.split} />
-            <Text style={styles.amount}>{item?.growth_rate}</Text>
+            <Text
+              style={{ ...styles.amount, width: "15%", textAlign: "center" }}
+              numberOfLines={1}
+            >
+              {type === "Plant"
+                ? item?.product?.growth_rate
+                : item?.product?.planter_form}
+            </Text>
             <View style={styles.split} />
-            <Text style={styles.amount}>35 cm</Text>
+            <Text style={styles.amount}>
+              {type === "Plant" ? item?.product?.size : item?.product?.size}
+            </Text>
             <Text
               style={{
                 ...styles.amount,
@@ -180,7 +207,7 @@ export default function TrackingOrder({ route }) {
         </View>
         <View style={styles.dashLine} />
         {orderDetail?.list_cart_item_id?.map((item, key) =>
-          renderBookingCard(item.product, key, item.product_type)
+          renderBookingCard(item, key, item.product_type)
         )}
         <View style={styles.dashLine} />
         <View style={styles.orderInfo}>

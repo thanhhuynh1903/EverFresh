@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.konosuba2324.myapp" xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.andnm_1508.everfresh" xmlns:tools="http://schemas.android.com/tools">
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
@@ -33,7 +33,7 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="com.konosuba2324.myapp"/>
+        <data android:scheme="com.andnm_1508.everfresh"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>

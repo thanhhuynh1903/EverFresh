@@ -31,15 +31,6 @@ import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
 import { deleteCartItem, updateCartItem } from "../../api/cart";
 import useCustomToast from "../../components/ToastNotification/ToastNotification";
 import BottomSheet from "@gorhom/bottom-sheet";
-import {
-  addToCollections,
-  changeCollections,
-  removePlantFromCollections,
-} from "../../api/collection";
-import {
-  getAllPlantsFromGalleryThunk,
-  getGaleryThunk,
-} from "../../redux/thunk/galleryThunk";
 import CollectionListBottomSheet from "../../components/CollectionListBottomSheet/CollectionListBottomSheet";
 import DeliveryListBottomSheet from "../../components/DeliveryListBottomSheet/DeliveryListBottomSheet";
 import CouponListBottomSheet from "../../components/CouponListBottomSheet/CouponListBottomSheet";

@@ -11,22 +11,35 @@ import {
   Animated,
   Easing,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
 import HomeHeader from "../../components/HomeHeader";
 import MenuModal from "../../components/Modal/MenuModal/MenuModal";
-import { formatPrice, getPlantIdListinGalery } from "../../utils/utils";
+import {
+  formatPrice,
+  getPlantIdListinGalery,
+  successfulStatus,
+} from "../../utils/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import { selectCart, selectGallery } from "../../redux/selector/selector";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "../../api/cart";
+import { addToCart, getSuggestionPlanter } from "../../api/cart";
 import useCustomToast from "../../components/ToastNotification/ToastNotification";
 import { getCartItemsThunk } from "../../redux/thunk/cartThunk";
 import ChangeColorWheel from "./ChangeColorWheel";
 import CollectionListBottomSheet from "../../components/CollectionListBottomSheet/CollectionListBottomSheet";
 import { useCollectionActions } from "../../utils/useCollectionAction";
+import AvailableInfomation from "./AvailableInfomation";
+import About from "./About";
+import PlantSuggestion from "../../components/Suggestion/PlantSuggestion";
 // import { Tooltip, lightColors } from '@rneui/themed';
 
 const WIDTH = Dimensions.get("window").width;
@@ -44,41 +57,45 @@ export default function PlanterDetail({ route }) {
     handleChangeCollections,
   } = useCollectionActions();
   const [plant, setPlant] = useState(route.params.plant || {});
+  const [suggestionPlanter, setSuggestionPlanter] = useState([]);
   const [menuVisible, setMenuVisible] = useState(false);
   const [colorChangerVisible, setColorChangerVisible] = useState(false);
-  const [modalVisible, setModalVisible] = useState({
-    cartViewVisible: false,
-  });
   const [chooseCollectionVisible, setChooseCollectionVisible] = useState(false);
   const [choosedPlanterIndex, setChoosedPlanterIndex] = useState(0);
+
+  const scrollViewRef = useRef(null);
+  const cardWidth = Dimensions.get("window").width; // Calculate card width
+
+  const scrollToNext = (index) => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({
+        x: (index + 1) * cardWidth, // Scroll to the right by the width of one card
+        animated: true,
+      });
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      setChooseCollectionVisible(false);
+    }, [])
+  );
 
   useEffect(() => {
     setPlant({
       ...route.params.plant,
       favorite: plantIdListinGalery.includes(route.params.plant?._id),
     });
+    loadSuggestion();
     setColorChangerVisible(false);
   }, [route.params.plant, galleryRedux.galleries]);
 
-  const OverviewItems = useMemo(() => {
-    return [
-      {
-        img: require("../../assets/plant details/drop.png"),
-        value: "250ml",
-        name: "Water",
-      },
-      {
-        img: require("../../assets/plant details/sun.png"),
-        value: "35-40%",
-        name: "Light",
-      },
-      {
-        img: require("../../assets/plant details/fertilizer.png"),
-        value: "250gm",
-        name: "Fertilizer",
-      },
-    ];
-  }, [plant]);
+  const loadSuggestion = async () => {
+    const response = await getSuggestionPlanter();
+    if (successfulStatus(response.status)) {
+      setSuggestionPlanter(response.data);
+    }
+  };
 
   const plantIdListinGalery = useMemo(() => {
     return getPlantIdListinGalery(galleryRedux.galleries);
@@ -87,7 +104,7 @@ export default function PlanterDetail({ route }) {
   const handleAddToCart = async (item) => {
     const data = {
       product_id: item._id,
-      product_type: "Plant",
+      product_type: "Planter",
       custom_color: "#FFD2B6",
       quantity: 1,
     };
@@ -124,29 +141,6 @@ export default function PlanterDetail({ route }) {
         <View style={styles.tooltipPlantInfo}>
           <Text style={styles.tooltipPlantInfoTitle}>MATERIAL</Text>
           <Text style={styles.tooltipPlantInfoValue}>Ceramic</Text>
-        </View>
-      </View>
-    );
-  };
-
-  const renderOverviewItem = (item, key) => {
-    return (
-      <View
-        style={[
-          styles.plantOverviewItem,
-          colorChangerVisible && styles.smallPlantOverviewItem,
-        ]}
-        key={key}
-      >
-        <Image
-          // source={require('../../assets/plant details/drop.png')}
-          source={item.img}
-          resizeMode="stretch"
-          style={styles.plantOverviewItemImage}
-        />
-        <View style={styles.plantOverviewItemDetail}>
-          <Text style={styles.plantOverviewItemDetailValue}>{item.value}</Text>
-          <Text style={styles.plantOverviewItemDetailName}>{item.name}</Text>
         </View>
       </View>
     );
@@ -291,7 +285,7 @@ export default function PlanterDetail({ route }) {
                     <View style={styles.headerPlantInfo}>
                       <Text style={styles.headerPlantPriceTitle}>Size</Text>
                       <Text style={styles.headerPlantPriceText}>
-                        {plant.height || "Unknown"}
+                        {plant.size || "Unknown"}
                       </Text>
                     </View>
                     <View
@@ -401,23 +395,7 @@ export default function PlanterDetail({ route }) {
             </View>
           </View>
         </View>
-        <View
-          style={[
-            styles.plantOverview,
-            colorChangerVisible && styles.smallPlantOverview,
-          ]}
-        >
-          <Text style={styles.plantOverviewTitle}>Overview</Text>
-          {OverviewItems.map((item, key) => renderOverviewItem(item, key))}
-        </View>
-        <View style={styles.plantOverview}>
-          <Text style={styles.plantOverviewTitle}>Plant Bio</Text>
-          <Text style={styles.plantPlantBioDes}>
-            No green thumb required to keep our artificial watermelon peperomia
-            plant looking lively and lush anywhere you place it.
-          </Text>
-        </View>
-
+        {/* Image List */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -426,28 +404,127 @@ export default function PlanterDetail({ route }) {
         >
           {plantImageList.map((item, key) => renderPlantImage(item, key))}
         </ScrollView>
-        <View style={styles.similarPlant}>
-          <Text style={styles.plantOverviewTitle}>Similar Plants</Text>
-          <ScrollView horizontal style={styles.similarPlantList}>
-            {similarPlant.map((item, key) => renderSimilarPlant(item, key))}
-          </ScrollView>
+
+        <View style={styles.divider} />
+        {/* introduction */}
+        <View style={styles.plantOverview}>
+          <Text style={styles.plantOverviewTitle}>Introduction</Text>
+          <Text style={styles.plantPlantBioDes}>{plant?.describe}</Text>
         </View>
-        <View style={styles.verifyPlant}>
-          <View style={styles.verifyPlantLeft}>
-            <Text style={styles.verifyPlantLeftTitle}>That very plant?</Text>
-            <Text style={styles.verifyPlantLeftDes}>
-              Just Scan and the AI will know exactly
-            </Text>
-            <TouchableOpacity style={styles.verifyPlantLeftButton}>
-              <Text style={styles.verifyPlantLeftButtonText}>Scan Now</Text>
-            </TouchableOpacity>
+        <View style={styles.divider} />
+        {/* rating */}
+        <View style={{ ...styles.plantOverview, height: HEIGHT * 0.1 }}>
+          <View style={{ ...styles.flexRow, justifyContent: "space-between" }}>
+            <Text style={styles.plantOverviewTitle}>Rating</Text>
+            <Text style={styles.reviewAmount}>47 Reviews</Text>
           </View>
-          <Image
-            source={require("../../assets/plant details/scanPlant.png")}
-            resizeMode="contain"
-            style={styles.verifyPlantImage}
-          />
+          <View style={styles.starList}>
+            <View style={styles.starItem}>
+              <Icon
+                name="star-outline"
+                size={WIDTH * 0.1}
+                color="#000"
+                style={styles.iconBorder}
+              />
+              {/* Inner Star (filled) */}
+              <Icon
+                name="star"
+                size={WIDTH * 0.1 * 0.9}
+                color="#FFEEA3"
+                style={styles.iconFill}
+              />
+            </View>
+            <View style={styles.starItem}>
+              <Icon
+                name="star-outline"
+                size={WIDTH * 0.1}
+                color="#000"
+                style={styles.iconBorder}
+              />
+              {/* Inner Star (filled) */}
+              <Icon
+                name="star"
+                size={WIDTH * 0.1 * 0.9}
+                color="#FFEEA3"
+                style={styles.iconFill}
+              />
+            </View>
+            <View style={styles.starItem}>
+              <Icon
+                name="star-outline"
+                size={WIDTH * 0.1}
+                color="#000"
+                style={styles.iconBorder}
+              />
+              {/* Inner Star (filled) */}
+              <Icon
+                name="star"
+                size={WIDTH * 0.1 * 0.9}
+                color="#FFEEA3"
+                style={styles.iconFill}
+              />
+            </View>
+            <View style={styles.starItem}>
+              <Icon
+                name="star-outline"
+                size={WIDTH * 0.1}
+                color="#000"
+                style={styles.iconBorder}
+              />
+              {/* Inner Star (filled) */}
+              <Icon
+                name="star"
+                size={WIDTH * 0.1 * 0.9}
+                color="#FFEEA3"
+                style={styles.iconFill}
+              />
+            </View>
+            <View style={styles.starItem}>
+              <Icon
+                name="star-outline"
+                size={WIDTH * 0.1}
+                color="#000"
+                style={styles.iconBorder}
+              />
+              {/* Inner Star (filled) */}
+              <Icon
+                name="star"
+                size={WIDTH * 0.1 * 0.9}
+                color="#FFEEA3"
+                style={styles.iconFill}
+              />
+            </View>
+          </View>
         </View>
+        <View style={styles.divider} />
+        {/* Available */}
+        <AvailableInfomation
+          planter={plant}
+          color={plant?.img_object[choosedPlanterIndex]?.color}
+        />
+        <View style={styles.divider} />
+        {/* About this item */}
+        <About />
+        <View style={styles.divider} />
+        {/* Product description */}
+
+        {/* suggestion */}
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.suggestionList}
+          horizontal
+          nestedScrollEnabled={true}
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+        >
+          {suggestionPlanter.map((item, key) => (
+            <PlantSuggestion
+              plant={item}
+              key={key}
+              handleNext={() => scrollToNext(key)}
+            />
+          ))}
+        </ScrollView>
       </ScrollView>
       {cartRedux?.cartList[0].total_price !== 0 && (
         <LinearGradient
@@ -638,7 +715,7 @@ const styles = StyleSheet.create({
     marginLeft: "10%",
   },
   headerPlantFeatureIcon: {
-    transform: [{ translateY: 24 }],
+    transform: [{ translateY: 0 }],
   },
   headerPlantContainer: {
     position: "absolute",
@@ -704,7 +781,7 @@ const styles = StyleSheet.create({
   // plantOverview
   plantOverview: {
     width: WIDTH,
-    paddingLeft: 32,
+    paddingHorizontal: 18,
     flexDirection: "row",
     flexWrap: "wrap",
   },
@@ -712,7 +789,6 @@ const styles = StyleSheet.create({
     width: WIDTH * 0.3,
   },
   plantOverviewTitle: {
-    width: "100%",
     fontSize: 14,
     fontWeight: "bold",
     color: "#002140",
@@ -744,14 +820,14 @@ const styles = StyleSheet.create({
     width: "90%",
     fontSize: 15,
     fontWeight: "regular",
-    color: "#002140",
+    color: "#979797",
   },
   // plantImageList
   plantImageList: {
     width: WIDTH,
     flexDirection: "row",
     height: 90,
-    marginTop: 16,
+    marginTop: 28,
     paddingHorizontal: 18,
   },
   plantListImage: {
@@ -828,36 +904,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  verifyPlantLeftTitle: {
-    fontSize: 20,
-    color: "#002140",
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  verifyPlantLeftDes: {
-    fontSize: 14,
-    color: "#002140",
-    fontWeight: "medium",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  verifyPlantImage: {
-    width: "60%",
-    height: 180 - 24 * 2,
-  },
-  verifyPlantLeftButton: {
-    padding: 8,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: "#0D986A",
-    borderRadius: 4,
-  },
-  verifyPlantLeftButtonText: {
-    fontSize: 13,
-    color: "#0D986A",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
   // bottomCartSheet
   bottomCartSheet: {
     width: "100%",
@@ -885,5 +931,46 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#FFFFFF",
     fontWeight: "semibold",
+  },
+  suggestionList: {
+    width: WIDTH,
+    marginRight: WIDTH * 0.5,
+    marginVertical: 12,
+  },
+
+  reviewAmount: {
+    color: "#979797",
+    textDecorationLine: "underline",
+  },
+
+  flexRow: {
+    width: "100%",
+    flexDirection: "row",
+  },
+  divider: {
+    width: "90%",
+    height: 2,
+    marginHorizontal: "5%",
+    marginTop: 12,
+    backgroundColor: "black",
+  },
+
+  starList: {
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "100%",
+  },
+  starItem: {
+    width: "15%",
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 12,
+  },
+  iconBorder: {
+    position: "absolute",
+  },
+  iconFill: {
+    position: "absolute",
   },
 });
