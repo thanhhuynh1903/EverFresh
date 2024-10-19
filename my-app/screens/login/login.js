@@ -8,7 +8,7 @@ import {
   Image,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { getCurrentUserThunk, loginThunk } from "../../redux/thunk/userThunk";
 import SafeAreaWrapper from "../../components/SafeAreaWrapper";
@@ -24,6 +24,8 @@ import { getNotificationThunk } from "../../redux/thunk/notificationThunk";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import LogoCorner from "../../components/logo-corner";
 import GAuth from "../../components/GoogleAuth/GAuth";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { auth } from "@react-native-firebase/auth";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
@@ -35,11 +37,37 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    // Configure Google Sign-In on component mount
+    GoogleSignin.configure({
+      // scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+      webClientId:
+        "1018818217852-208hfol82677jsn845k6830oe4l0up7e.apps.googleusercontent.com",
+    });
+
+    // Optional cleanup when the component unmounts
+    return () => {};
+  }, []);
+
   useFocusEffect(
     React.useCallback(() => {
       handleCheckToken();
     }, [])
   );
+
+  async function onGoogleButtonPress() {
+    // Check if your device supports Google Play
+    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    // Get the users ID token
+    const { idToken } = await GoogleSignin.signIn();
+    console.log(idToken);
+
+    // Create a Google credential with the token
+    // const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+    // // Sign-in the user with the credential
+    // return auth().signInWithCredential(googleCredential);
+  }
 
   handleCheckToken = async () => {
     setLoading(true);
@@ -156,14 +184,17 @@ export default function LoginPage() {
           </TouchableOpacity>
           <Text style={styles.or}>Or</Text>
           <View style={styles.otherLogin}>
-            <GAuth handleCheckToken={handleCheckToken} />
-            {/* <TouchableOpacity style={styles.googleIconContainer}>
+            {/* <GAuth handleCheckToken={handleCheckToken} /> */}
+            <TouchableOpacity
+              style={styles.googleIconContainer}
+              onPress={onGoogleButtonPress}
+            >
               <Image
                 resizeMode="cover"
                 style={styles.googleIcon}
                 source={require("../../assets/utilsImage/google.png")}
               />
-            </TouchableOpacity> */}
+            </TouchableOpacity>
           </View>
         </View>
       </View>

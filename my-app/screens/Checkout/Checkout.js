@@ -19,12 +19,14 @@ import { useSelector } from "react-redux";
 import { formatPrice } from "../../utils/utils";
 import { getDeliveryInformation } from "../../api/delivery";
 import DeliveryInfomationBottomSheet from "../../components/DeliveryInfomationBottomSheet/DeliveryInfomationBottomSheet";
+import useCustomToast from "../../components/ToastNotification/ToastNotification";
 
 const WIDTH = Dimensions.get("window").width;
 const HEIGHT = Dimensions.get("window").height;
 
 export default function Checkout({ route }) {
   const navigation = useNavigation();
+  const showToast = useCustomToast();
   const cartRedux = useSelector(selectCart);
   const userRedux = useSelector(selectUser);
   const [cart, setCart] = useState(route.params.cart);
@@ -133,9 +135,17 @@ export default function Checkout({ route }) {
         <TouchableOpacity
           style={styles.proceedButton}
           onPress={() => {
+            if (!deliveryInformation) {
+              showToast({
+                title: "Warning",
+                message: `Choose delivery information to continue`,
+                type: "warning",
+              });
+              return;
+            }
             navigation.navigate("Payment", {
               cart: cart,
-              deliveryInformation: deliveryInformationList[0],
+              deliveryInformation: deliveryInformation,
               deliveryMethod: deliveryMethod,
               voucher: coupon,
               currentCart: route.params.currentCart,
